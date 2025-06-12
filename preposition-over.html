@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: OVER</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/NtC8JgAhB" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Click the "Start" button to watch the yellow circle move over the blue obstacle, crossing above it.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>OVER</strong> means moving above something, typically crossing from one side to the other while maintaining a higher position than the obstacle below.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "over" relationships on screen:</p>
+        <ul>
+            <li><strong>Elevated Path:</strong> Create movement that passes above obstacles or boundaries</li>
+            <li><strong>Arc Motion:</strong> Use curved paths that go up and over obstacles</li>
+            <li><strong>Clearance:</strong> Maintain sufficient distance above the obstacle during crossing</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Arc Movement:</strong><br>
+            • <a href="https://p5js.org/reference/p5/sin" target="_blank">sin()</a> and <a href="https://p5js.org/reference/p5/cos" target="_blank">cos()</a> - Create parabolic or arc paths<br>
+            • <code>y = startY - sin(progress * PI) * arcHeight</code> - Simple arc formula<br><br>
+            
+            <strong>Path Calculation:</strong><br>
+            • <a href="https://p5js.org/reference/p5/lerp" target="_blank">lerp(start, stop, amount)</a> - Interpolate horizontal movement<br>
+            • <a href="https://p5js.org/reference/p5/map" target="_blank">map(value, start1, stop1, start2, stop2)</a> - Map progress to arc height<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw moving objects and obstacles<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw obstacles to cross over<br>
+            • <a href="https://p5js.org/reference/p5/bezier" target="_blank">bezier()</a> - Draw smooth curved paths<br><br>
+            
+            <strong>Height Calculation:</strong><br>
+            • Calculate minimum clearance above obstacles<br>
+            • Use obstacle height + clearance for arc peak<br><br>
+            
+            <strong>Visual Indicators:</strong><br>
+            • Shadow or projection to show height relationship<br>
+            • Guide lines to show crossing path<br><br>
+            
+            <strong>Mouse Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Start crossing animation<br>
+            • Button controls for arc movement demonstration
+        </div>
+        
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Over":</strong><br><br>
+            
+            1. <strong>Define crossing path:</strong> Set start, end, and obstacle positions<br>
+            <code>let obstacle = {x: 200, y: 180, width: 60, height: 40};</code><br>
+            <code>let startPoint = {x: 80, y: 200};</code><br>
+            <code>let endPoint = {x: 320, y: 200};</code><br><br>
+            
+            2. <strong>Calculate arc height:</strong> Determine clearance over obstacle<br>
+            <code>let obstacleTop = obstacle.y;</code><br>
+            <code>let clearance = 30;</code><br>
+            <code>let arcHeight = startPoint.y - obstacleTop + clearance;</code><br><br>
+            
+            3. <strong>Animate arc movement:</strong> Calculate position on arc<br>
+            <code>let x = lerp(startPoint.x, endPoint.x, progress);</code><br>
+            <code>let arcProgress = sin(progress * PI);</code><br>
+            <code>let y = startPoint.y - arcProgress * arcHeight;</code><br><br>
+            
+            4. <strong>Track crossing phases:</strong> Monitor position relative to obstacle<br>
+            <code>let isOverObstacle = (x > obstacle.x && x < obstacle.x + obstacle.width);</code><br>
+            <code>let isAboveObstacle = (y < obstacle.y);</code>
+        </div>
+    </div>
+
+    <script>
+        let obstacle = { x: 170, y: 180, width: 60, height: 40 };
+        let movingCircle = { x: 80, y: 200, radius: 15 };
+        let startPoint = { x: 80, y: 200 };
+        let endPoint = { x: 320, y: 200 };
+        let progress = 0;
+        let isMoving = false;
+        let hasCrossedOver = false;
+        let trail = [];
+        let arcHeight = 80;
+        
+        function setup() {
+            createCanvas(400, 300).parent('canvas');
+        }
+        
+        function draw() {
+            background(240);
+            
+            // Update movement
+            if (isMoving && progress < 1) {
+                progress += 0.02; // Speed of crossing
+                
+                // Calculate arc position
+                movingCircle.x = lerp(startPoint.x, endPoint.x, progress);
+                let arcProgress = sin(progress * PI);
+                movingCircle.y = startPoint.y - arcProgress * arcHeight;
+                
+                // Add to trail
+                trail.push({x: movingCircle.x, y: movingCircle.y});
+                if (trail.length > 80) {
+                    trail.shift();
+                }
+            } else if (progress >= 1) {
+                isMoving = false;
+                hasCrossedOver = true;
+            }
+            
+            // Check position relative to obstacle
+            let isOverObstacle = (movingCircle.x > obstacle.x && 
+                                movingCircle.x < obstacle.x + obstacle.width);
+            let isAboveObstacle = (movingCircle.y < obstacle.y);
+            let isCrossingOver = isOverObstacle && isAboveObstacle;
+            
+            // Draw crossing path preview
+            stroke(200, 200, 200, 150);
+            strokeWeight(2);
+            noFill();
+            beginShape();
+            for (let i = 0; i <= 50; i++) {
+                let t = i / 50;
+                let x = lerp(startPoint.x, endPoint.x, t);
+                let y = startPoint.y - sin(t * PI) * arcHeight;
+                vertex(x, y);
+            }
+            endShape();
+            
+            // Draw obstacle
+            fill(100, 150, 255);
+            stroke(70, 120, 220);
+            strokeWeight(3);
+            rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            
+            // Draw clearance zone above obstacle
+            if (isCrossingOver) {
+                fill(100, 255, 100, 50);
+                noStroke();
+                rect(obstacle.x, obstacle.y - 40, obstacle.width, 40);
+            }
+            
+            // Draw height reference lines
+            if (isMoving) {
+                // Vertical line from circle to ground level
+                stroke(255, 100, 100, 150);
+                strokeWeight(1);
+                line(movingCircle.x, movingCircle.y, movingCircle.x, startPoint.y);
+                
+                // Height indicator
+                fill(255, 100, 100);
+                noStroke();
+                textAlign(CENTER);
+                textSize(10);
+                let height = startPoint.y - movingCircle.y;
+                text(Math.round(height) + "px", movingCircle.x + 20, movingCircle.y);
+                
+                // Show clearance over obstacle
+                if (isCrossingOver) {
+                    stroke(100, 255, 100);
+                    strokeWeight(2);
+                    line(movingCircle.x, movingCircle.y, movingCircle.x, obstacle.y);
+                    
+                    fill(100, 255, 100);
+                    noStroke();
+                    let clearance = obstacle.y - movingCircle.y;
+                    text("Clear: " + Math.round(clearance) + "px", movingCircle.x - 30, movingCircle.y);
+                }
+            }
+            
+            // Draw movement trail
+            if (trail.length > 1) {
+                stroke(255, 200, 0, 150);
+                strokeWeight(3);
+                noFill();
+                beginShape();
+                for (let point of trail) {
+                    vertex(point.x, point.y);
+                }
+                endShape();
+            }
+            
+            // Draw shadow on ground
+            fill(0, 0, 0, 50);
+            noStroke();
+            ellipse(movingCircle.x, startPoint.y + 5, movingCircle.radius * 1.5, movingCircle.radius * 0.5);
+            
+            // Draw start and end markers
+            fill(100, 255, 100);
+            noStroke();
+            ellipse(startPoint.x, startPoint.y, 12, 12);
+            fill(255, 100, 100);
+            ellipse(endPoint.x, endPoint.y, 12, 12);
+            
+            // Draw moving circle with state-based coloring
+            if (hasCrossedOver) {
+                fill(100, 255, 100);
+                stroke(50, 200, 50);
+            } else if (isCrossingOver) {
+                fill(255, 255, 100);
+                stroke(255, 200, 0);
+            } else {
+                fill(255, 200, 100);
+                stroke(255, 150, 0);
+            }
+            strokeWeight(2);
+            ellipse(movingCircle.x, movingCircle.y, movingCircle.radius * 2, movingCircle.radius * 2);
+            
+            // Labels
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            text("Start", startPoint.x, startPoint.y + 20);
+            text("End", endPoint.x, endPoint.y + 20);
+            text("Obstacle", obstacle.x + obstacle.width/2, obstacle.y + obstacle.height + 15);
+            
+            // Control buttons
+            fill(200);
+            stroke(100);
+            strokeWeight(1);
+            rect(10, 20, 60, 25);
+            rect(80, 20, 60, 25);
+            
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            text("Start", 40, 37);
+            text("Reset", 110, 37);
+            
+            // Determine relationship
+            let relationship = "";
+            if (hasCrossedOver) {
+                relationship = "Circle has moved OVER the obstacle";
+            } else if (isCrossingOver) {
+                relationship = "Circle is passing OVER the obstacle";
+            } else if (isMoving) {
+                if (progress < 0.5) {
+                    relationship = "Circle is rising to go over obstacle";
+                } else {
+                    relationship = "Circle is descending after going over";
+                }
+            } else {
+                relationship = "Click Start to move over the obstacle";
+            }
+            
+            // Draw measurement info
+            textAlign(LEFT);
+            textSize(10);
+            text("Arc height: " + arcHeight + " pixels", 10, 60);
+            text("Over obstacle: " + isOverObstacle, 10, 75);
+            text("Above obstacle: " + isAboveObstacle, 10, 90);
+            text("Crossing over: " + isCrossingOver, 10, 105);
+            
+            // Draw relationship text
+            textAlign(CENTER);
+            textSize(16);
+            text(relationship, width/2, height - 40);
+            text("Watch the circle arc over the obstacle", width/2, height - 15);
+        }
+        
+        function mousePressed() {
+            // Check if Start button clicked
+            if (mouseX > 10 && mouseX < 70 && mouseY > 20 && mouseY < 45) {
+                if (!isMoving && !hasCrossedOver) {
+                    isMoving = true;
+                    progress = 0;
+                    trail = [];
+                }
+            }
+            
+            // Check if Reset button clicked
+            if (mouseX > 80 && mouseX < 140 && mouseY > 20 && mouseY < 45) {
+                progress = 0;
+                isMoving = false;
+                hasCrossedOver = false;
+                movingCircle.x = startPoint.x;
+                movingCircle.y = startPoint.y;
+                trail = [];
+            }
+        }
+    </script>
+</body>
+</html>

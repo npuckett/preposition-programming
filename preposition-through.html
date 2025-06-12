@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: THROUGH</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/cSHRaES3q" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Drag the yellow circle in the canvas below. Watch as it moves "through" the blue barrier - the path it takes determines the relationship.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>THROUGH</strong> means moving from one side of something to the other, passing inside or across its boundaries. This involves motion and the crossing of a barrier or boundary.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "through" relationships on screen:</p>
+        <ul>
+            <li><strong>Path Tracking:</strong> Record the movement path of an element</li>
+            <li><strong>Boundary Crossing:</strong> Detect when an element crosses from one side of a barrier to another</li>
+            <li><strong>Transit Detection:</strong> Check if movement passes through a defined area</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Movement Tracking:</strong><br>
+            • Store previous positions to track movement paths<br>
+            • Use arrays to record position history<br><br>
+            
+            <strong>Boundary Detection:</strong><br>
+            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist(x1, y1, x2, y2)</a> - Calculate distance to barriers<br>
+            • Check if element crosses specific coordinates<br><br>
+            
+            <strong>Drawing Path:</strong><br>
+            • <a href="https://p5js.org/reference/p5/line" target="_blank">line(x1, y1, x2, y2)</a> - Draw movement trails<br>
+            • <a href="https://p5js.org/reference/p5/beginShape" target="_blank">beginShape()</a> and <a href="https://p5js.org/reference/p5/endShape" target="_blank">endShape()</a> - Draw complex paths<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw moving elements<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw barriers<br><br>
+            
+            <strong>State Management:</strong><br>
+            • Track whether element has entered/exited barriers<br>
+            • Use boolean flags for transit states<br><br>
+            
+            <strong>Mouse Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Detect when mouse is clicked<br>
+            • <a href="https://p5js.org/reference/p5/mouseDragged" target="_blank">mouseDragged()</a> - Detect when mouse is dragged<br>
+            • <a href="https://p5js.org/reference/p5/mouseReleased" target="_blank">mouseReleased()</a> - Detect when mouse is released
+        </div>
+        
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Through":</strong><br><br>
+            
+            1. <strong>Define barrier:</strong> Create obstacle or boundary<br>
+            <code>let barrier = {x: 200, y: 100, width: 50, height: 100};</code><br><br>
+            
+            2. <strong>Track movement:</strong> Store position history<br>
+            <code>let movingElement = {x: 100, y: 150, path: [], hasPassedThrough: false};</code><br><br>
+            
+            3. <strong>Check transit:</strong> Detect crossing of barrier<br>
+            <code>let isInside = (element.x > barrier.x && element.x < barrier.x + barrier.width);</code><br>
+            <code>if (wasOutside && isInside) element.hasEnteredBarrier = true;</code><br><br>
+            
+            4. <strong>Record path:</strong> Add positions to trail<br>
+            <code>movingElement.path.push({x: mouseX, y: mouseY});</code><br>
+            <code>if (movingElement.path.length > 50) movingElement.path.shift();</code>
+        </div>
+    </div>
+
+    <script>
+        let barrier = { x: 180, y: 50, width: 40, height: 200 };
+        let movingCircle = { 
+            x: 100, 
+            y: 150, 
+            radius: 15, 
+            dragging: false,
+            path: [],
+            hasEnteredBarrier: false,
+            hasExitedBarrier: false,
+            hasPassed: false
+        };
+        
+        function setup() {
+            createCanvas(400, 300).parent('canvas');
+        }
+        
+        function draw() {
+            background(240);
+            
+            // Draw barrier
+            fill(100, 150, 255, 100);
+            stroke(100, 150, 255);
+            strokeWeight(3);
+            rect(barrier.x, barrier.y, barrier.width, barrier.height);
+            
+            // Check if circle is inside barrier
+            let isInsideBarrier = (movingCircle.x > barrier.x && 
+                                  movingCircle.x < barrier.x + barrier.width &&
+                                  movingCircle.y > barrier.y && 
+                                  movingCircle.y < barrier.y + barrier.height);
+            
+            // Track entrance and exit
+            if (isInsideBarrier && !movingCircle.hasEnteredBarrier) {
+                movingCircle.hasEnteredBarrier = true;
+            }
+            
+            if (!isInsideBarrier && movingCircle.hasEnteredBarrier && !movingCircle.hasExitedBarrier) {
+                movingCircle.hasExitedBarrier = true;
+                movingCircle.hasPassed = true;
+            }
+            
+            // Draw path trail
+            stroke(255, 200, 0, 150);
+            strokeWeight(2);
+            noFill();
+            if (movingCircle.path.length > 1) {
+                beginShape();
+                for (let i = 0; i < movingCircle.path.length; i++) {
+                    let point = movingCircle.path[i];
+                    vertex(point.x, point.y);
+                }
+                endShape();
+            }
+            
+            // Draw moving circle with state-based coloring
+            if (movingCircle.hasPassed) {
+                fill(100, 255, 100);
+                stroke(50, 200, 50);
+            } else if (isInsideBarrier) {
+                fill(255, 255, 100);
+                stroke(255, 200, 0);
+            } else {
+                fill(255, 200, 100);
+                stroke(255, 150, 50);
+            }
+            strokeWeight(2);
+            ellipse(movingCircle.x, movingCircle.y, movingCircle.radius * 2, movingCircle.radius * 2);
+            
+            // Draw entrance and exit markers
+            if (movingCircle.path.length > 0) {
+                // Start position
+                fill(100, 255, 100);
+                noStroke();
+                ellipse(movingCircle.path[0].x, movingCircle.path[0].y, 8, 8);
+                
+                // Current position marker
+                fill(255, 100, 100);
+                ellipse(movingCircle.x, movingCircle.y, 6, 6);
+            }
+            
+            // Labels
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            text("Barrier", barrier.x + barrier.width/2, barrier.y - 10);
+            text("Moving Circle", movingCircle.x, movingCircle.y - movingCircle.radius - 8);
+            
+            // Determine relationship
+            let relationship = "";
+            if (movingCircle.hasPassed) {
+                relationship = "Circle has moved THROUGH the barrier";
+            } else if (isInsideBarrier) {
+                relationship = "Circle is passing through the barrier";
+            } else if (movingCircle.hasEnteredBarrier) {
+                relationship = "Circle entered but hasn't exited";
+            } else {
+                relationship = "Circle hasn't passed through yet";
+            }
+            
+            // Draw state info
+            textAlign(LEFT);
+            textSize(10);
+            text("Inside barrier: " + isInsideBarrier, 10, 20);
+            text("Has entered: " + movingCircle.hasEnteredBarrier, 10, 35);
+            text("Has exited: " + movingCircle.hasExitedBarrier, 10, 50);
+            text("Has passed through: " + movingCircle.hasPassed, 10, 65);
+            
+            // Reset button area
+            fill(200);
+            stroke(100);
+            strokeWeight(1);
+            rect(10, 80, 80, 25);
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            text("Reset", 50, 97);
+            
+            // Draw relationship text
+            textAlign(CENTER);
+            textSize(16);
+            text(relationship, width/2, height - 40);
+            text("Drag the circle through the barrier", width/2, height - 15);
+        }
+        
+        function mousePressed() {
+            // Check if reset button clicked
+            if (mouseX > 10 && mouseX < 90 && mouseY > 80 && mouseY < 105) {
+                // Reset the movement tracking
+                movingCircle.hasEnteredBarrier = false;
+                movingCircle.hasExitedBarrier = false;
+                movingCircle.hasPassed = false;
+                movingCircle.path = [];
+                movingCircle.x = 100;
+                movingCircle.y = 150;
+                return;
+            }
+            
+            // Check if mouse is over moving circle
+            if (dist(mouseX, mouseY, movingCircle.x, movingCircle.y) < movingCircle.radius) {
+                movingCircle.dragging = true;
+            }
+        }
+        
+        function mouseDragged() {
+            // Update position if dragging
+            if (movingCircle.dragging) {
+                movingCircle.x = mouseX;
+                movingCircle.y = mouseY;
+                
+                // Add to path
+                movingCircle.path.push({x: mouseX, y: mouseY});
+                
+                // Limit path length
+                if (movingCircle.path.length > 100) {
+                    movingCircle.path.shift();
+                }
+            }
+        }
+        
+        function mouseReleased() {
+            // Stop dragging
+            movingCircle.dragging = false;
+        }
+    </script>
+</body>
+</html>

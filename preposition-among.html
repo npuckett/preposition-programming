@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: AMONG</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/gTIDK9eFQ" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Drag the yellow circle in the canvas below. Notice how it can be "among" the group of circles when it's positioned within their cluster.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>AMONG</strong> means positioned within a group of three or more things. Unlike "between" which involves two reference points, "among" requires being surrounded by or mixed with multiple elements.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "among" relationships on screen:</p>
+        <ul>
+            <li><strong>Distance-based:</strong> Check if an element is within a certain distance of multiple other elements</li>
+            <li><strong>Boundary-based:</strong> Calculate if an element falls within the bounds of a group</li>
+            <li><strong>Center-proximity:</strong> Check if element is near the center of a group</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Coordinate System:</strong><br>
+            • <a href="https://p5js.org/reference/p5/createCanvas" target="_blank">createCanvas(width, height)</a> - Creates coordinate system where (0,0) is top-left<br>
+            • Group positioning requires tracking multiple coordinates<br><br>
+            
+            <strong>Distance Calculations:</strong><br>
+            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist(x1, y1, x2, y2)</a> - Calculate distance between points<br>
+            • Array methods for checking multiple distances<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw circles at specific positions<br>
+            • <a href="https://p5js.org/reference/p5/stroke" target="_blank">stroke()</a> and <a href="https://p5js.org/reference/p5/fill" target="_blank">fill()</a> - Style elements differently<br><br>
+            
+            <strong>Group Analysis:</strong><br>
+            • Calculate center point of group<br>
+            • Determine group boundaries<br><br>
+            
+            <strong>Mouse Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Detect when mouse is clicked<br>
+            • <a href="https://p5js.org/reference/p5/mouseDragged" target="_blank">mouseDragged()</a> - Detect when mouse is dragged<br>
+            • <a href="https://p5js.org/reference/p5/mouseReleased" target="_blank">mouseReleased()</a> - Detect when mouse is released
+        </div>
+        
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Among":</strong><br><br>
+            
+            1. <strong>Create group:</strong> Define multiple reference elements<br>
+            <code>let group = [{x: 100, y: 100}, {x: 200, y: 120}, {x: 150, y: 180}];</code><br><br>
+            
+            2. <strong>Calculate group center:</strong> Find average position<br>
+            <code>let centerX = group.reduce((sum, p) => sum + p.x, 0) / group.length;</code><br><br>
+            
+            3. <strong>Check if among:</strong> Test proximity to group<br>
+            <code>let distToCenter = dist(element.x, element.y, centerX, centerY);</code><br>
+            <code>let isAmong = distToCenter < groupRadius;</code><br><br>
+            
+            4. <strong>For mouse interaction:</strong> Use mouse events for dragging<br>
+            <code>if (dist(mouseX, mouseY, circle.x, circle.y) < radius) {</code><br>
+            <code>&nbsp;&nbsp;circle.dragging = true; }</code>
+        </div>
+    </div>
+
+    <script>
+        let groupCircles = [
+            { x: 120, y: 100, radius: 15 },
+            { x: 280, y: 120, radius: 15 },
+            { x: 180, y: 180, radius: 15 },
+            { x: 220, y: 80, radius: 15 },
+            { x: 160, y: 140, radius: 15 }
+        ];
+        let yellowCircle = { x: 300, y: 50, radius: 20, dragging: false };
+        
+        function setup() {
+            createCanvas(400, 300).parent('canvas');
+        }
+        
+        function draw() {
+            background(240);
+            
+            // Calculate group center and bounds
+            let centerX = groupCircles.reduce((sum, c) => sum + c.x, 0) / groupCircles.length;
+            let centerY = groupCircles.reduce((sum, c) => sum + c.y, 0) / groupCircles.length;
+            
+            // Calculate group radius (distance to farthest group member)
+            let maxDist = 0;
+            for (let circle of groupCircles) {
+                let d = dist(centerX, centerY, circle.x, circle.y);
+                if (d > maxDist) maxDist = d;
+            }
+            let groupRadius = maxDist + 40; // Add buffer for "among" detection
+            
+            // Draw group boundary (invisible circle)
+            noFill();
+            stroke(150, 150, 150, 100);
+            strokeWeight(2);
+            ellipse(centerX, centerY, groupRadius * 2, groupRadius * 2);
+            
+            // Draw group center
+            fill(100);
+            noStroke();
+            ellipse(centerX, centerY, 6, 6);
+            
+            // Check if yellow circle is among the group
+            let distToCenter = dist(yellowCircle.x, yellowCircle.y, centerX, centerY);
+            let isAmong = distToCenter < groupRadius;
+            
+            // Draw group circles
+            for (let circle of groupCircles) {
+                fill(100, 150, 255);
+                noStroke();
+                ellipse(circle.x, circle.y, circle.radius * 2, circle.radius * 2);
+            }
+            
+            // Draw yellow circle with different appearance based on relationship
+            if (isAmong) {
+                fill(255, 255, 0);
+                stroke(255, 200, 0);
+                strokeWeight(3);
+            } else {
+                fill(255, 255, 100);
+                noStroke();
+            }
+            ellipse(yellowCircle.x, yellowCircle.y, yellowCircle.radius * 2, yellowCircle.radius * 2);
+            
+            // Labels
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            text("Yellow", yellowCircle.x, yellowCircle.y - yellowCircle.radius - 8);
+            text("Group\nCenter", centerX, centerY + 20);
+            
+            // Determine relationship
+            let relationship = "";
+            if (isAmong) {
+                relationship = "Yellow is AMONG the blue circles";
+            } else {
+                relationship = "Yellow is NOT among the blue circles";
+            }
+            
+            // Draw distance info
+            textAlign(LEFT);
+            textSize(10);
+            text("Distance to center: " + Math.round(distToCenter), 10, 20);
+            text("Group radius: " + Math.round(groupRadius), 10, 35);
+            
+            // Draw relationship text
+            textAlign(CENTER);
+            textSize(16);
+            text(relationship, width/2, height - 40);
+            text("Drag the yellow circle to change the relationship", width/2, height - 15);
+        }
+        
+        function mousePressed() {
+            // Check if mouse is over yellow circle
+            if (dist(mouseX, mouseY, yellowCircle.x, yellowCircle.y) < yellowCircle.radius) {
+                yellowCircle.dragging = true;
+            }
+        }
+        
+        function mouseDragged() {
+            // Update position if dragging
+            if (yellowCircle.dragging) {
+                yellowCircle.x = mouseX;
+                yellowCircle.y = mouseY;
+            }
+        }
+        
+        function mouseReleased() {
+            // Stop dragging
+            yellowCircle.dragging = false;
+        }
+    </script>
+</body>
+</html>

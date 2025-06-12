@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: DURING</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/_0kHqjHjb" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Click the buttons below to watch activities that occur during a specific time period. Notice how they activate and deactivate based on timing.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="sketch-holder"></div>
+            <div id="controls">
+                <button onclick="startAnimation()">Start Animation</button>
+                <button onclick="resetAnimation()">Reset</button>
+            </div>
+            <div id="status">Animation: Ready to start</div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p>The preposition <strong>"during"</strong> indicates that something happens within the time span of another event or period. It describes concurrent or overlapping timeframes where one action occurs while another is taking place. In programming, this involves checking if the current time falls within a specific interval.</p>        <h3>Translation Strategy</h3>
+        <p>To create "during" relationships in time:</p>
+        <ul>
+            <li><strong>Time Periods:</strong> Define start and end times for intervals</li>
+            <li><strong>Range Checking:</strong> Use conditional logic to test if current time falls within period</li>
+            <li><strong>State Management:</strong> Activate/deactivate elements based on time intervals</li>
+        </ul>
+
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Time Management:</strong><br>
+            • <a href="https://p5js.org/reference/p5/millis" target="_blank">millis()</a> - tracks elapsed time for temporal calculations<br>
+            • Range checking: <code>time >= start && time <= end</code><br>
+            • <a href="https://p5js.org/reference/p5/frameCount" target="_blank">frameCount</a> - alternative timing method<br><br>
+            
+            <strong>Visual Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/map" target="_blank">map()</a> - converts time values to visual positions<br>
+            • <a href="https://p5js.org/reference/p5/sin" target="_blank">sin()</a> - creates wave animations for events<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect()</a> - draws time periods and progress bars<br>
+            • <a href="https://p5js.org/reference/p5/text" target="_blank">text()</a> - displays timing and status information<br><br>
+            
+            <strong>Animation:</strong><br>
+            • State-based animations during specific periods<br>
+            • Conditional particle systems<br>
+            • Timeline visualization with highlighted periods
+        </div>
+
+        <h3>Code Structure</h3>        <div class="code-section">
+            <strong>Basic Pattern for "During":</strong><br><br>
+            
+            1. <strong>Define time period:</strong> Set start and end times<br>
+            <code>let timeline = {</code><br>
+            <code>&nbsp;&nbsp;duringPeriod: {start: 2000, end: 6000}, // 2-6 seconds</code><br>
+            <code>&nbsp;&nbsp;activities: [...]</code><br>
+            <code>};</code><br><br>
+            
+            2. <strong>Calculate current time:</strong> Track elapsed time<br>
+            <code>let elapsed = millis() - timeline.startTime;</code><br><br>
+            
+            3. <strong>Check if currently during period:</strong> Range checking<br>
+            <code>let duringActive = elapsed >= timeline.duringPeriod.start &&</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elapsed <= timeline.duringPeriod.end;</code><br><br>
+            
+            4. <strong>Activate elements during period:</strong> State management<br>
+            <code>for (let activity of timeline.activities) {</code><br>
+            <code>&nbsp;&nbsp;activity.active = duringActive;</code><br>
+            <code>}</code>
+        </div>
+    </div>
+
+    <script>
+        let timeline = {
+            startTime: null,
+            running: false,
+            duringPeriod: {start: 2000, end: 6000}, // 2-6 seconds
+            totalTime: 8000,
+            activities: [
+                {name: "Rain", active: false, y: 120},
+                {name: "Music", active: false, y: 180},
+                {name: "Celebration", active: false, y: 240}
+            ]
+        };
+
+        let raindrops = [];
+        let musicNotes = [];
+        let fireworks = [];
+
+        function setup() {
+            let canvas = createCanvas(600, 400);
+            canvas.parent('sketch-holder');
+            textAlign(CENTER, CENTER);
+            textSize(14);
+        }
+
+        function draw() {
+            background(240, 248, 255);
+            
+            if (timeline.running) {
+                checkDuringPeriod();
+                drawTimeline();
+                drawActivities();
+                updateStatus();
+            } else {
+                drawInstructions();
+            }
+        }
+
+        function checkDuringPeriod() {
+            let elapsed = millis() - timeline.startTime;
+            let duringActive = elapsed >= timeline.duringPeriod.start && 
+                              elapsed <= timeline.duringPeriod.end;
+            
+            for (let activity of timeline.activities) {
+                activity.active = duringActive;
+            }
+        }
+
+        function drawTimeline() {
+            let elapsed = millis() - timeline.startTime;
+            
+            // Main timeline
+            stroke(100);
+            strokeWeight(3);
+            line(50, height - 80, width - 50, height - 80);
+            
+            // During period highlight
+            let startX = map(timeline.duringPeriod.start, 0, timeline.totalTime, 50, width - 50);
+            let endX = map(timeline.duringPeriod.end, 0, timeline.totalTime, 50, width - 50);
+            
+            fill(100, 150, 255, 100);
+            noStroke();
+            rect(startX, height - 100, endX - startX, 40);
+            
+            // During period markers
+            stroke(0, 100, 200);
+            strokeWeight(3);
+            line(startX, height - 100, startX, height - 60);
+            line(endX, height - 100, endX, height - 60);
+            
+            fill(0);
+            noStroke();
+            text("During Period", (startX + endX) / 2, height - 110);
+            text("Start\n2s", startX, height - 40);
+            text("End\n6s", endX, height - 40);
+            
+            // Current time indicator
+            let currentX = map(elapsed, 0, timeline.totalTime, 50, width - 50);
+            if (currentX <= width - 50) {
+                stroke(255, 0, 0);
+                strokeWeight(2);
+                line(currentX, height - 120, currentX, height - 40);
+                fill(255, 0, 0);
+                noStroke();
+                text("Now: " + (elapsed/1000).toFixed(1) + "s", currentX, height - 130);
+            }
+            
+            // Time markers
+            for (let i = 0; i <= 8; i++) {
+                let x = map(i * 1000, 0, timeline.totalTime, 50, width - 50);
+                stroke(150);
+                strokeWeight(1);
+                line(x, height - 85, x, height - 75);
+                fill(100);
+                noStroke();
+                text(i + "s", x, height - 25);
+            }
+        }
+
+        function drawActivities() {
+            // Check if currently during the period
+            let elapsed = millis() - timeline.startTime;
+            let isDuring = elapsed >= timeline.duringPeriod.start && 
+                          elapsed <= timeline.duringPeriod.end;
+            
+            // Rain activity
+            if (timeline.activities[0].active) {
+                // Create raindrops
+                if (frameCount % 5 === 0) {
+                    raindrops.push({
+                        x: random(width),
+                        y: 0,
+                        speed: random(3, 6)
+                    });
+                }
+                
+                // Draw and update raindrops
+                fill(100, 150, 255);
+                noStroke();
+                for (let i = raindrops.length - 1; i >= 0; i--) {
+                    let drop = raindrops[i];
+                    ellipse(drop.x, drop.y, 3, 8);
+                    drop.y += drop.speed;
+                    
+                    if (drop.y > height - 120) {
+                        raindrops.splice(i, 1);
+                    }
+                }
+            } else {
+                raindrops = []; // Clear raindrops when not during
+            }
+            
+            // Music activity
+            if (timeline.activities[1].active) {
+                // Create music notes
+                if (frameCount % 30 === 0) {
+                    musicNotes.push({
+                        x: random(100, width - 100),
+                        y: timeline.activities[1].y,
+                        age: 0
+                    });
+                }
+                
+                // Draw and update music notes
+                fill(255, 100, 150);
+                noStroke();
+                textSize(20);
+                for (let i = musicNotes.length - 1; i >= 0; i--) {
+                    let note = musicNotes[i];
+                    text("♫", note.x, note.y - note.age);
+                    note.age += 2;
+                    
+                    if (note.age > 60) {
+                        musicNotes.splice(i, 1);
+                    }
+                }
+                textSize(14);
+            } else {
+                musicNotes = []; // Clear notes when not during
+            }
+            
+            // Celebration activity
+            if (timeline.activities[2].active) {
+                // Create fireworks
+                if (frameCount % 20 === 0) {
+                    fireworks.push({
+                        x: random(width),
+                        y: random(50, 200),
+                        particles: [],
+                        exploded: false,
+                        age: 0
+                    });
+                }
+                
+                // Draw and update fireworks
+                for (let i = fireworks.length - 1; i >= 0; i--) {
+                    let firework = fireworks[i];
+                    
+                    if (!firework.exploded && firework.age > 30) {
+                        firework.exploded = true;
+                        for (let j = 0; j < 8; j++) {
+                            firework.particles.push({
+                                x: firework.x,
+                                y: firework.y,
+                                vx: random(-3, 3),
+                                vy: random(-3, 3),
+                                life: 60
+                            });
+                        }
+                    }
+                    
+                    if (firework.exploded) {
+                        for (let particle of firework.particles) {
+                            fill(random(255), random(255), random(255));
+                            noStroke();
+                            circle(particle.x, particle.y, 4);
+                            particle.x += particle.vx;
+                            particle.y += particle.vy;
+                            particle.life--;
+                        }
+                        
+                        firework.particles = firework.particles.filter(p => p.life > 0);
+                        if (firework.particles.length === 0) {
+                            fireworks.splice(i, 1);
+                        }
+                    }
+                    
+                    firework.age++;
+                }
+            } else {
+                fireworks = []; // Clear fireworks when not during
+            }
+            
+            // Activity labels
+            fill(0);
+            textAlign(LEFT, CENTER);
+            for (let i = 0; i < timeline.activities.length; i++) {
+                let activity = timeline.activities[i];
+                if (activity.active) {
+                    fill(0, 150, 0);
+                } else {
+                    fill(150);
+                }
+                text(activity.name + (activity.active ? " (ACTIVE)" : " (inactive)"), 
+                     20, activity.y);
+            }
+            textAlign(CENTER, CENTER);
+        }
+
+        function drawInstructions() {
+            fill(100);
+            text("Click 'Start Animation' to begin", width/2, height/2 - 60);
+            text("The blue zone represents the 'during' period (2-6 seconds)", width/2, height/2 - 30);
+            text("Watch how activities are only active DURING this time", width/2, height/2);
+            
+            // Preview timeline
+            stroke(200);
+            strokeWeight(2);
+            line(100, height/2 + 50, width-100, height/2 + 50);
+            
+            // Preview during period
+            fill(100, 150, 255, 100);
+            noStroke();
+            rect(200, height/2 + 35, 200, 30);
+            
+            fill(0);
+            text("During Period", 300, height/2 + 75);
+        }
+
+        function updateStatus() {
+            let elapsed = millis() - timeline.startTime;
+            let status = "";
+            
+            if (elapsed < timeline.duringPeriod.start) {
+                status = "Before the 'during' period... (" + 
+                        ((timeline.duringPeriod.start - elapsed)/1000).toFixed(1) + "s until start)";
+            } else if (elapsed <= timeline.duringPeriod.end) {
+                status = "DURING the active period! (" + 
+                        ((timeline.duringPeriod.end - elapsed)/1000).toFixed(1) + "s remaining)";
+            } else {
+                status = "After the 'during' period - activities stopped";
+            }
+            
+            document.getElementById('status').innerHTML = status;
+        }
+
+        function startAnimation() {
+            timeline.startTime = millis();
+            timeline.running = true;
+            raindrops = [];
+            musicNotes = [];
+            fireworks = [];
+        }
+
+        function resetAnimation() {
+            timeline.running = false;
+            timeline.startTime = null;
+            raindrops = [];
+            musicNotes = [];
+            fireworks = [];
+            for (let activity of timeline.activities) {
+                activity.active = false;
+            }
+            document.getElementById('status').innerHTML = "Animation: Ready to start";
+        }
+    </script>
+</body>
+</html>

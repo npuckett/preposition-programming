@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: UNDER</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/2a5R_KyKS" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Click the "Start" button to watch the yellow circle move under the blue obstacle, passing beneath it.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>UNDER</strong> means moving below something, typically crossing from one side to the other while maintaining a lower position than the obstacle above.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "under" relationships on screen:</p>
+        <ul>
+            <li><strong>Lower Path:</strong> Create movement that passes below obstacles or boundaries</li>
+            <li><strong>Ducking Motion:</strong> Use paths that go down and under obstacles</li>
+            <li><strong>Clearance Below:</strong> Maintain position below the obstacle during crossing</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Below Movement:</strong><br>
+            • <a href="https://p5js.org/reference/p5/sin" target="_blank">sin()</a> - Create downward arc or valley paths<br>
+            • <code>y = startY + sin(progress * PI) * duckHeight</code> - Ducking arc formula<br><br>
+            
+            <strong>Path Calculation:</strong><br>
+            • <a href="https://p5js.org/reference/p5/lerp" target="_blank">lerp(start, stop, amount)</a> - Interpolate horizontal movement<br>
+            • <a href="https://p5js.org/reference/p5/map" target="_blank">map(value, start1, stop1, start2, stop2)</a> - Map progress to depth<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw moving objects and obstacles<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw obstacles to pass under<br>
+            • <a href="https://p5js.org/reference/p5/bezier" target="_blank">bezier()</a> - Draw smooth curved paths<br><br>
+            
+            <strong>Depth Calculation:</strong><br>
+            • Calculate how far below obstacle to pass<br>
+            • Use obstacle bottom + clearance for lowest point<br><br>
+            
+            <strong>Visual Indicators:</strong><br>
+            • Shadow or highlighting to show relationship<br>
+            • Guide lines to show ducking path<br><br>
+            
+            <strong>Mouse Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Start ducking animation<br>
+            • Button controls for under movement demonstration
+        </div>
+        
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Under":</strong><br><br>
+            
+            1. <strong>Define ducking path:</strong> Set start, end, and obstacle positions<br>
+            <code>let obstacle = {x: 200, y: 80, width: 60, height: 40};</code><br>
+            <code>let startPoint = {x: 80, y: 120};</code><br>
+            <code>let endPoint = {x: 320, y: 120};</code><br><br>
+            
+            2. <strong>Calculate ducking depth:</strong> Determine how far below to go<br>
+            <code>let obstacleBottom = obstacle.y + obstacle.height;</code><br>
+            <code>let clearance = 20;</code><br>
+            <code>let duckDepth = (obstacleBottom + clearance) - startPoint.y;</code><br><br>
+            
+            3. <strong>Animate ducking movement:</strong> Calculate position in valley<br>
+            <code>let x = lerp(startPoint.x, endPoint.x, progress);</code><br>
+            <code>let duckProgress = sin(progress * PI);</code><br>
+            <code>let y = startPoint.y + duckProgress * duckDepth;</code><br><br>
+            
+            4. <strong>Track ducking phases:</strong> Monitor position relative to obstacle<br>
+            <code>let isUnderObstacle = (x > obstacle.x && x < obstacle.x + obstacle.width);</code><br>
+            <code>let isBelowObstacle = (y > obstacle.y + obstacle.height);</code>
+        </div>
+    </div>
+
+    <script>
+        let obstacle = { x: 170, y: 80, width: 60, height: 40 };
+        let movingCircle = { x: 80, y: 120, radius: 15 };
+        let startPoint = { x: 80, y: 120 };
+        let endPoint = { x: 320, y: 120 };
+        let progress = 0;
+        let isMoving = false;
+        let hasPassedUnder = false;
+        let trail = [];
+        let duckDepth = 60;
+        
+        function setup() {
+            createCanvas(400, 300).parent('canvas');
+        }
+        
+        function draw() {
+            background(240);
+            
+            // Update movement
+            if (isMoving && progress < 1) {
+                progress += 0.02; // Speed of crossing
+                
+                // Calculate ducking position (inverted arc)
+                movingCircle.x = lerp(startPoint.x, endPoint.x, progress);
+                let duckProgress = sin(progress * PI);
+                movingCircle.y = startPoint.y + duckProgress * duckDepth;
+                
+                // Add to trail
+                trail.push({x: movingCircle.x, y: movingCircle.y});
+                if (trail.length > 80) {
+                    trail.shift();
+                }
+            } else if (progress >= 1) {
+                isMoving = false;
+                hasPassedUnder = true;
+            }
+            
+            // Check position relative to obstacle
+            let isUnderObstacle = (movingCircle.x > obstacle.x && 
+                                 movingCircle.x < obstacle.x + obstacle.width);
+            let isBelowObstacle = (movingCircle.y > obstacle.y + obstacle.height);
+            let isPassingUnder = isUnderObstacle && isBelowObstacle;
+            
+            // Draw ducking path preview
+            stroke(200, 200, 200, 150);
+            strokeWeight(2);
+            noFill();
+            beginShape();
+            for (let i = 0; i <= 50; i++) {
+                let t = i / 50;
+                let x = lerp(startPoint.x, endPoint.x, t);
+                let y = startPoint.y + sin(t * PI) * duckDepth;
+                vertex(x, y);
+            }
+            endShape();
+            
+            // Draw obstacle
+            fill(100, 150, 255);
+            stroke(70, 120, 220);
+            strokeWeight(3);
+            rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            
+            // Draw clearance zone below obstacle
+            if (isPassingUnder) {
+                fill(100, 255, 100, 50);
+                noStroke();
+                rect(obstacle.x, obstacle.y + obstacle.height, obstacle.width, 30);
+            }
+            
+            // Draw depth reference lines
+            if (isMoving) {
+                // Vertical line from circle to start level
+                stroke(255, 100, 100, 150);
+                strokeWeight(1);
+                line(movingCircle.x, movingCircle.y, movingCircle.x, startPoint.y);
+                
+                // Depth indicator
+                fill(255, 100, 100);
+                noStroke();
+                textAlign(CENTER);
+                textSize(10);
+                let depth = movingCircle.y - startPoint.y;
+                text(Math.round(depth) + "px", movingCircle.x + 20, movingCircle.y);
+                
+                // Show clearance under obstacle
+                if (isPassingUnder) {
+                    stroke(100, 255, 100);
+                    strokeWeight(2);
+                    line(movingCircle.x, movingCircle.y, movingCircle.x, obstacle.y + obstacle.height);
+                    
+                    fill(100, 255, 100);
+                    noStroke();
+                    let clearance = movingCircle.y - (obstacle.y + obstacle.height);
+                    text("Clear: " + Math.round(clearance) + "px", movingCircle.x - 30, movingCircle.y - 10);
+                }
+            }
+            
+            // Draw ground reference line
+            stroke(150, 150, 150, 100);
+            strokeWeight(1);
+            line(0, startPoint.y, width, startPoint.y);
+            
+            // Draw movement trail
+            if (trail.length > 1) {
+                stroke(255, 200, 0, 150);
+                strokeWeight(3);
+                noFill();
+                beginShape();
+                for (let point of trail) {
+                    vertex(point.x, point.y);
+                }
+                endShape();
+            }
+            
+            // Draw start and end markers
+            fill(100, 255, 100);
+            noStroke();
+            ellipse(startPoint.x, startPoint.y, 12, 12);
+            fill(255, 100, 100);
+            ellipse(endPoint.x, endPoint.y, 12, 12);
+            
+            // Draw obstacle shadow/base
+            fill(0, 0, 0, 30);
+            noStroke();
+            rect(obstacle.x, obstacle.y + obstacle.height, obstacle.width, 8);
+            
+            // Draw moving circle with state-based coloring
+            if (hasPassedUnder) {
+                fill(100, 255, 100);
+                stroke(50, 200, 50);
+            } else if (isPassingUnder) {
+                fill(255, 255, 100);
+                stroke(255, 200, 0);
+            } else {
+                fill(255, 200, 100);
+                stroke(255, 150, 0);
+            }
+            strokeWeight(2);
+            ellipse(movingCircle.x, movingCircle.y, movingCircle.radius * 2, movingCircle.radius * 2);
+            
+            // Labels
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            text("Start", startPoint.x, startPoint.y - 15);
+            text("End", endPoint.x, endPoint.y - 15);
+            text("Obstacle", obstacle.x + obstacle.width/2, obstacle.y - 10);
+            
+            // Control buttons
+            fill(200);
+            stroke(100);
+            strokeWeight(1);
+            rect(10, 20, 60, 25);
+            rect(80, 20, 60, 25);
+            
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            text("Start", 40, 37);
+            text("Reset", 110, 37);
+            
+            // Determine relationship
+            let relationship = "";
+            if (hasPassedUnder) {
+                relationship = "Circle has moved UNDER the obstacle";
+            } else if (isPassingUnder) {
+                relationship = "Circle is passing UNDER the obstacle";
+            } else if (isMoving) {
+                if (progress < 0.5) {
+                    relationship = "Circle is ducking to go under obstacle";
+                } else {
+                    relationship = "Circle is rising after going under";
+                }
+            } else {
+                relationship = "Click Start to move under the obstacle";
+            }
+            
+            // Draw measurement info
+            textAlign(LEFT);
+            textSize(10);
+            text("Duck depth: " + duckDepth + " pixels", 10, 60);
+            text("Under obstacle: " + isUnderObstacle, 10, 75);
+            text("Below obstacle: " + isBelowObstacle, 10, 90);
+            text("Passing under: " + isPassingUnder, 10, 105);
+            
+            // Draw relationship text
+            textAlign(CENTER);
+            textSize(16);
+            text(relationship, width/2, height - 40);
+            text("Watch the circle duck under the obstacle", width/2, height - 15);
+        }
+        
+        function mousePressed() {
+            // Check if Start button clicked
+            if (mouseX > 10 && mouseX < 70 && mouseY > 20 && mouseY < 45) {
+                if (!isMoving && !hasPassedUnder) {
+                    isMoving = true;
+                    progress = 0;
+                    trail = [];
+                }
+            }
+            
+            // Check if Reset button clicked
+            if (mouseX > 80 && mouseX < 140 && mouseY > 20 && mouseY < 45) {
+                progress = 0;
+                isMoving = false;
+                hasPassedUnder = false;
+                movingCircle.x = startPoint.x;
+                movingCircle.y = startPoint.y;
+                trail = [];
+            }
+        }
+    </script>
+</body>
+</html>

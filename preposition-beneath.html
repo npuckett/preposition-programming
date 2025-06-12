@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: BENEATH</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/Gbdl8UOve" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Drag the circles in the canvas below. Notice how "beneath" is similar to "below" but often implies being covered or hidden underneath.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>BENEATH</strong> means positioned under something, often with the implication of being covered or hidden. While similar to "below," beneath suggests a closer, more intimate spatial relationship.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "beneath" relationships on screen:</p>
+        <ul>
+            <li><strong>Vertical Below:</strong> Position one element with a larger Y coordinate than another</li>
+            <li><strong>Close Proximity:</strong> Elements should be closer than a simple "below" relationship</li>
+            <li><strong>Overlap Consideration:</strong> May involve partial coverage or shadowing</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Coordinate System:</strong><br>
+            • <a href="https://p5js.org/reference/p5/createCanvas" target="_blank">createCanvas(width, height)</a> - Creates coordinate system where (0,0) is top-left<br>
+            • Y coordinates: 0 = top, height = bottom<br><br>
+            
+            <strong>Position Comparison:</strong><br>
+            • <code>elementA.y > elementB.y</code> - Check if A is beneath B<br>
+            • <code>abs(elementA.x - elementB.x)</code> - Check horizontal alignment<br>
+            • <a href="https://p5js.org/reference/p5/abs" target="_blank">abs()</a> - Get absolute value for alignment checks<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw circles at specific positions<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw shadows or bases<br><br>
+            
+            <strong>Visual Effects:</strong><br>
+            • <a href="https://p5js.org/reference/p5/fill" target="_blank">fill(r, g, b, alpha)</a> - Use transparency for shadowing<br>
+            • Gradient effects to show depth<br><br>
+            
+            <strong>Mouse Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Detect when mouse is clicked<br>
+            • <a href="https://p5js.org/reference/p5/mouseDragged" target="_blank">mouseDragged()</a> - Detect when mouse is dragged<br>
+            • <a href="https://p5js.org/reference/p5/mouseReleased" target="_blank">mouseReleased()</a> - Detect when mouse is released
+        </div>
+        
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Beneath":</strong><br><br>
+            
+            1. <strong>Store positions:</strong> Keep track of element coordinates<br>
+            <code>let topElement = {x: 150, y: 100};</code><br>
+            <code>let bottomElement = {x: 155, y: 160};</code><br><br>
+            
+            2. <strong>Check vertical relationship:</strong> Ensure bottom element is below<br>
+            <code>let isBeneath = bottomElement.y > topElement.y;</code><br><br>
+            
+            3. <strong>Check proximity:</strong> Elements should be close for "beneath"<br>
+            <code>let horizontalAlignment = abs(topElement.x - bottomElement.x);</code><br>
+            <code>let verticalDistance = bottomElement.y - topElement.y;</code><br>
+            <code>let isBeneath = isBeneath && horizontalAlignment < 50 && verticalDistance < 100;</code><br><br>
+            
+            4. <strong>For mouse interaction:</strong> Use mouse events for dragging<br>
+            <code>if (dist(mouseX, mouseY, circle.x, circle.y) < radius) {</code><br>
+            <code>&nbsp;&nbsp;circle.dragging = true; }</code>
+        </div>
+    </div>
+
+    <script>
+        let blueCircle = { x: 200, y: 100, radius: 20, dragging: false };
+        let redCircle = { x: 200, y: 180, radius: 20, dragging: false };
+        
+        function setup() {
+            createCanvas(400, 300).parent('canvas');
+        }
+        
+        function draw() {
+            background(240);
+            
+            // Calculate relationships
+            let verticalDistance = redCircle.y - blueCircle.y;
+            let horizontalAlignment = abs(blueCircle.x - redCircle.x);
+            
+            // Thresholds for "beneath"
+            let maxHorizontalOffset = 50;
+            let maxVerticalDistance = 120;
+            let minVerticalDistance = 30;
+            
+            // Check if red is beneath blue
+            let isBelowVertically = redCircle.y > blueCircle.y;
+            let isAligned = horizontalAlignment < maxHorizontalOffset;
+            let isProperDistance = verticalDistance > minVerticalDistance && verticalDistance < maxVerticalDistance;
+            let isBeneath = isBelowVertically && isAligned && isProperDistance;
+            
+            // Draw shadow/ground effect when beneath
+            if (isBeneath) {
+                // Draw shadow beneath the bottom circle
+                fill(0, 0, 0, 30);
+                noStroke();
+                ellipse(redCircle.x + 5, redCircle.y + 10, redCircle.radius * 1.5, redCircle.radius * 0.8);
+                
+                // Draw connection line
+                stroke(100, 200, 100);
+                strokeWeight(2);
+                line(blueCircle.x, blueCircle.y + blueCircle.radius, 
+                     redCircle.x, redCircle.y - redCircle.radius);
+            }
+            
+            // Draw alignment guide
+            if (isAligned) {
+                stroke(150, 150, 255, 100);
+                strokeWeight(1);
+                let avgX = (blueCircle.x + redCircle.x) / 2;
+                line(avgX, 0, avgX, height);
+            }
+            
+            // Draw proximity zone
+            stroke(200, 200, 200, 100);
+            strokeWeight(1);
+            noFill();
+            rect(blueCircle.x - maxHorizontalOffset, blueCircle.y + minVerticalDistance,
+                 maxHorizontalOffset * 2, maxVerticalDistance - minVerticalDistance);
+            
+            // Determine relationship
+            let relationship = "";
+            if (isBeneath) {
+                relationship = "Red is BENEATH blue";
+            } else if (!isBelowVertically) {
+                relationship = "Red is not below blue";
+            } else if (!isAligned) {
+                relationship = "Circles are not aligned";
+            } else if (!isProperDistance) {
+                if (verticalDistance < minVerticalDistance) {
+                    relationship = "Circles are too close";
+                } else {
+                    relationship = "Circles are too far apart";
+                }
+            }
+            
+            // Draw circles
+            drawCircle(blueCircle, color(100, 150, 255), "Blue");
+            drawCircle(redCircle, color(255, 100, 100), "Red");
+            
+            // Draw measurement info
+            fill(0);
+            noStroke();
+            textAlign(LEFT);
+            textSize(10);
+            text("Vertical distance: " + Math.round(verticalDistance), 10, 20);
+            text("Horizontal offset: " + Math.round(horizontalAlignment), 10, 35);
+            text("Below: " + isBelowVertically + " | Aligned: " + isAligned + " | Distance OK: " + isProperDistance, 10, 50);
+            
+            // Draw relationship text
+            textAlign(CENTER);
+            textSize(16);
+            text(relationship, width/2, height - 40);
+            text("Drag the circles to change the relationship", width/2, height - 15);
+        }
+        
+        function drawCircle(circle, circleColor, label) {
+            // Circle
+            fill(circleColor);
+            noStroke();
+            ellipse(circle.x, circle.y, circle.radius * 2, circle.radius * 2);
+            
+            // Label
+            fill(0);
+            textAlign(CENTER);
+            textSize(12);
+            text(label, circle.x, circle.y - circle.radius - 8);
+        }
+        
+        function mousePressed() {
+            // Check if mouse is over blue circle
+            if (dist(mouseX, mouseY, blueCircle.x, blueCircle.y) < blueCircle.radius) {
+                blueCircle.dragging = true;
+            }
+            // Check if mouse is over red circle
+            else if (dist(mouseX, mouseY, redCircle.x, redCircle.y) < redCircle.radius) {
+                redCircle.dragging = true;
+            }
+        }
+        
+        function mouseDragged() {
+            // Update position if dragging
+            if (blueCircle.dragging) {
+                blueCircle.x = mouseX;
+                blueCircle.y = mouseY;
+            }
+            if (redCircle.dragging) {
+                redCircle.x = mouseX;
+                redCircle.y = mouseY;
+            }
+        }
+        
+        function mouseReleased() {
+            // Stop dragging
+            blueCircle.dragging = false;
+            redCircle.dragging = false;
+        }
+    </script>
+</body>
+</html>

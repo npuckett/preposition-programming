@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: PAST</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/DjakxBC0M" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Click the "Start" button to watch the yellow circle move past the blue obstacle, continuing beyond it.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>PAST</strong> means moving alongside and beyond something, continuing in the same direction after passing by an object or landmark.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "past" relationships on screen:</p>
+        <ul>
+            <li><strong>Reference Point:</strong> Define a clear landmark or obstacle to pass by</li>
+            <li><strong>Continuation:</strong> Show movement that doesn't stop at the reference but continues beyond</li>
+            <li><strong>Proximity Detection:</strong> Track when the object is alongside and when it has moved beyond</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Position Tracking:</strong><br>
+            • Compare coordinates to determine relative position<br>
+            • <code>object.x > landmark.x</code> - Check if object has moved past landmark horizontally<br>
+            • Track position history to confirm passing motion<br><br>
+            
+            <strong>Movement Animation:</strong><br>
+            • <a href="https://p5js.org/reference/p5/lerp" target="_blank">lerp(start, stop, amount)</a> - Smooth movement past landmarks<br>
+            • Constant velocity for realistic passing motion<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw moving objects and landmarks<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw reference obstacles<br>
+            • <a href="https://p5js.org/reference/p5/line" target="_blank">line(x1, y1, x2, y2)</a> - Draw movement paths<br><br>
+            
+            <strong>State Management:</strong><br>
+            • Track approach, alongside, and past phases<br>
+            • Boolean flags for different passing stages<br><br>
+            
+            <strong>Visual Indicators:</strong><br>
+            • Motion trails to show continuous movement<br>
+            • Reference lines to clarify spatial relationships<br><br>
+            
+            <strong>Mouse Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Start passing animation<br>
+            • Button controls for demonstration
+        </div>
+        
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Past":</strong><br><br>
+            
+            1. <strong>Define landmark and path:</strong> Set up reference point and movement route<br>
+            <code>let landmark = {x: 200, y: 150, width: 40, height: 80};</code><br>
+            <code>let startPoint = {x: 50, y: 150};</code><br>
+            <code>let endPoint = {x: 350, y: 150};</code><br><br>
+            
+            2. <strong>Track passing phases:</strong> Monitor position relative to landmark<br>
+            <code>let isApproaching = object.x < landmark.x;</code><br>
+            <code>let isAlongside = (object.x >= landmark.x && object.x <= landmark.x + landmark.width);</code><br>
+            <code>let hasPassed = object.x > landmark.x + landmark.width;</code><br><br>
+            
+            3. <strong>Animate movement:</strong> Continuous motion past landmark<br>
+            <code>if (isMoving && progress < 1) {</code><br>
+            <code>&nbsp;&nbsp;progress += speed;</code><br>
+            <code>&nbsp;&nbsp;object.x = lerp(startPoint.x, endPoint.x, progress);</code><br>
+            <code>}</code><br><br>
+            
+            4. <strong>Detect completion:</strong> Confirm object has moved past<br>
+            <code>if (hasPassed && !wasAlongside) { hasMovedPast = true; }</code>
+        </div>
+    </div>
+
+    <script>
+        let landmark = { x: 180, y: 100, width: 40, height: 100 };
+        let movingCircle = { x: 50, y: 150, radius: 15 };
+        let startPoint = { x: 50, y: 150 };
+        let endPoint = { x: 370, y: 150 };
+        let progress = 0;
+        let isMoving = false;
+        let hasMovedPast = false;
+        let wasAlongside = false;
+        let trail = [];
+        
+        function setup() {
+            createCanvas(400, 300).parent('canvas');
+        }
+        
+        function draw() {
+            background(240);
+            
+            // Update movement
+            if (isMoving && progress < 1) {
+                progress += 0.015; // Speed of movement
+                movingCircle.x = lerp(startPoint.x, endPoint.x, progress);
+                movingCircle.y = startPoint.y; // Keep same Y level
+                
+                // Add to trail
+                trail.push({x: movingCircle.x, y: movingCircle.y});
+                if (trail.length > 100) {
+                    trail.shift();
+                }
+            } else if (progress >= 1) {
+                isMoving = false;
+            }
+            
+            // Determine position relative to landmark
+            let isApproaching = movingCircle.x < landmark.x;
+            let isAlongside = (movingCircle.x >= landmark.x && 
+                             movingCircle.x <= landmark.x + landmark.width);
+            let hasPassed = movingCircle.x > landmark.x + landmark.width;
+            
+            // Track the passing event
+            if (isAlongside) {
+                wasAlongside = true;
+            }
+            if (hasPassed && wasAlongside) {
+                hasMovedPast = true;
+            }
+            
+            // Draw movement path line
+            stroke(200, 200, 200, 150);
+            strokeWeight(2);
+            line(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+            
+            // Draw landmark
+            fill(100, 150, 255);
+            stroke(70, 120, 220);
+            strokeWeight(3);
+            rect(landmark.x, landmark.y, landmark.width, landmark.height);
+            
+            // Draw reference lines to show spatial relationship
+            if (isMoving || hasMovedPast) {
+                // Vertical line through landmark
+                stroke(100, 150, 255, 100);
+                strokeWeight(1);
+                line(landmark.x, 0, landmark.x, height);
+                line(landmark.x + landmark.width, 0, landmark.x + landmark.width, height);
+                
+                // Horizontal alignment line
+                stroke(200, 100, 100, 100);
+                line(0, movingCircle.y, width, movingCircle.y);
+            }
+            
+            // Draw movement trail
+            if (trail.length > 1) {
+                stroke(255, 200, 0, 150);
+                strokeWeight(3);
+                noFill();
+                beginShape();
+                for (let point of trail) {
+                    vertex(point.x, point.y);
+                }
+                endShape();
+            }
+            
+            // Draw start and end markers
+            fill(100, 255, 100);
+            noStroke();
+            ellipse(startPoint.x, startPoint.y, 12, 12);
+            fill(255, 100, 100);
+            ellipse(endPoint.x, endPoint.y, 12, 12);
+            
+            // Draw position indicator relative to landmark
+            if (isMoving) {
+                stroke(255, 100, 100);
+                strokeWeight(1);
+                line(movingCircle.x, movingCircle.y, movingCircle.x, landmark.y + landmark.height/2);
+                
+                // Distance indicator
+                fill(255, 100, 100);
+                noStroke();
+                textAlign(CENTER);
+                textSize(10);
+                let distanceFromLandmark = movingCircle.x - (landmark.x + landmark.width/2);
+                text(Math.round(distanceFromLandmark), movingCircle.x, landmark.y + landmark.height + 15);
+            }
+            
+            // Draw moving circle with state-based coloring
+            if (hasMovedPast) {
+                fill(100, 255, 100);
+                stroke(50, 200, 50);
+            } else if (isAlongside) {
+                fill(255, 255, 100);
+                stroke(255, 200, 0);
+            } else if (isApproaching) {
+                fill(255, 200, 100);
+                stroke(255, 150, 0);
+            } else {
+                fill(200, 200, 200);
+                stroke(150, 150, 150);
+            }
+            strokeWeight(2);
+            ellipse(movingCircle.x, movingCircle.y, movingCircle.radius * 2, movingCircle.radius * 2);
+            
+            // Draw direction arrow
+            if (isMoving) {
+                stroke(100, 200, 100);
+                strokeWeight(2);
+                let arrowX = movingCircle.x + 20;
+                let arrowY = movingCircle.y;
+                line(movingCircle.x + movingCircle.radius, movingCircle.y, arrowX, arrowY);
+                
+                // Arrow head
+                let arrowSize = 8;
+                line(arrowX, arrowY, arrowX - arrowSize, arrowY - arrowSize/2);
+                line(arrowX, arrowY, arrowX - arrowSize, arrowY + arrowSize/2);
+            }
+            
+            // Labels
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            text("Start", startPoint.x, startPoint.y - 15);
+            text("End", endPoint.x, endPoint.y - 15);
+            text("Landmark", landmark.x + landmark.width/2, landmark.y - 10);
+            
+            // Control buttons
+            fill(200);
+            stroke(100);
+            strokeWeight(1);
+            rect(10, 20, 60, 25);
+            rect(80, 20, 60, 25);
+            
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            text("Start", 40, 37);
+            text("Reset", 110, 37);
+            
+            // Determine relationship
+            let relationship = "";
+            if (hasMovedPast) {
+                relationship = "Circle has moved PAST the landmark";
+            } else if (isAlongside) {
+                relationship = "Circle is passing by the landmark";
+            } else if (isApproaching && isMoving) {
+                relationship = "Circle is approaching the landmark";
+            } else if (isMoving) {
+                relationship = "Circle is moving away from the landmark";
+            } else {
+                relationship = "Click Start to move past the landmark";
+            }
+            
+            // Draw measurement info
+            textAlign(LEFT);
+            textSize(10);
+            text("Approaching: " + isApproaching, 10, 60);
+            text("Alongside: " + isAlongside, 10, 75);
+            text("Has passed: " + hasPassed, 10, 90);
+            text("Moved past: " + hasMovedPast, 10, 105);
+            
+            // Draw relationship text
+            textAlign(CENTER);
+            textSize(16);
+            text(relationship, width/2, height - 40);
+            text("Watch the circle move beyond the landmark", width/2, height - 15);
+        }
+        
+        function mousePressed() {
+            // Check if Start button clicked
+            if (mouseX > 10 && mouseX < 70 && mouseY > 20 && mouseY < 45) {
+                if (!isMoving && !hasMovedPast) {
+                    isMoving = true;
+                    progress = 0;
+                    trail = [];
+                }
+            }
+            
+            // Check if Reset button clicked
+            if (mouseX > 80 && mouseX < 140 && mouseY > 20 && mouseY < 45) {
+                progress = 0;
+                isMoving = false;
+                hasMovedPast = false;
+                wasAlongside = false;
+                movingCircle.x = startPoint.x;
+                movingCircle.y = startPoint.y;
+                trail = [];
+            }
+        }
+    </script>
+</body>
+</html>

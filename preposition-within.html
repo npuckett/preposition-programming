@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: WITHIN</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/dH7RokMtk" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Drag the small circle in the canvas below. Notice how it can be "within" the larger blue boundary when it's completely inside.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>WITHIN</strong> means positioned inside the boundaries or limits of something else. This requires checking if an element is completely contained by another element's bounds.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "within" relationships on screen:</p>
+        <ul>
+            <li><strong>Boundary Checking:</strong> Determine if an element is completely inside another's bounds</li>
+            <li><strong>Distance from Center:</strong> Check if distance from center is less than container radius</li>
+            <li><strong>Complete Containment:</strong> All parts of the inner element must be inside the outer element</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Coordinate System:</strong><br>
+            • <a href="https://p5js.org/reference/p5/createCanvas" target="_blank">createCanvas(width, height)</a> - Creates coordinate system where (0,0) is top-left<br>
+            • Boundary checking involves both X and Y coordinates<br><br>
+            
+            <strong>Distance Calculations:</strong><br>
+            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist(x1, y1, x2, y2)</a> - Calculate distance from center<br>
+            • For circular boundaries: <code>distance < (outerRadius - innerRadius)</code><br><br>
+            
+            <strong>Boundary Checking:</strong><br>
+            • For rectangular boundaries: check X and Y ranges separately<br>
+            • For circular boundaries: use distance from center<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw circular boundaries<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw rectangular boundaries<br>
+            • <a href="https://p5js.org/reference/p5/noFill" target="_blank">noFill()</a> - Draw outline-only boundaries<br><br>
+            
+            <strong>Mouse Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Detect when mouse is clicked<br>
+            • <a href="https://p5js.org/reference/p5/mouseDragged" target="_blank">mouseDragged()</a> - Detect when mouse is dragged<br>
+            • <a href="https://p5js.org/reference/p5/mouseReleased" target="_blank">mouseReleased()</a> - Detect when mouse is released
+        </div>
+        
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Within":</strong><br><br>
+            
+            1. <strong>Define container:</strong> Create boundary element<br>
+            <code>let container = {x: 200, y: 150, radius: 80};</code><br><br>
+            
+            2. <strong>Define inner element:</strong> Create element to test<br>
+            <code>let innerElement = {x: 200, y: 150, radius: 15};</code><br><br>
+            
+            3. <strong>Check containment:</strong> Test if completely inside<br>
+            <code>let distanceFromCenter = dist(innerElement.x, innerElement.y, container.x, container.y);</code><br>
+            <code>let isWithin = distanceFromCenter + innerElement.radius < container.radius;</code><br><br>
+            
+            4. <strong>For rectangular containers:</strong> Check all edges<br>
+            <code>let isWithin = (element.x - radius > container.left) &&</code><br>
+            <code>&nbsp;&nbsp;(element.x + radius < container.right) &&</code><br>
+            <code>&nbsp;&nbsp;(element.y - radius > container.top) &&</code><br>
+            <code>&nbsp;&nbsp;(element.y + radius < container.bottom);</code>
+        </div>
+    </div>
+
+    <script>
+        let container = { x: 200, y: 150, radius: 80 };
+        let smallCircle = { x: 150, y: 120, radius: 15, dragging: false };
+        
+        function setup() {
+            createCanvas(400, 300).parent('canvas');
+        }
+        
+        function draw() {
+            background(240);
+            
+            // Calculate if small circle is within the container
+            let distanceFromCenter = dist(smallCircle.x, smallCircle.y, container.x, container.y);
+            let isWithin = distanceFromCenter + smallCircle.radius <= container.radius;
+            
+            // Draw container circle
+            if (isWithin) {
+                fill(100, 150, 255, 50);
+                stroke(100, 150, 255);
+            } else {
+                noFill();
+                stroke(150);
+            }
+            strokeWeight(3);
+            ellipse(container.x, container.y, container.radius * 2, container.radius * 2);
+            
+            // Draw distance line from container center to small circle
+            stroke(200, 100, 100, 150);
+            strokeWeight(1);
+            line(container.x, container.y, smallCircle.x, smallCircle.y);
+            
+            // Draw the boundary threshold circle (where small circle edge would touch)
+            noFill();
+            stroke(100, 200, 100, 100);
+            strokeWeight(1);
+            let thresholdRadius = container.radius - smallCircle.radius;
+            ellipse(container.x, container.y, thresholdRadius * 2, thresholdRadius * 2);
+            
+            // Draw small circle
+            if (isWithin) {
+                fill(255, 200, 100);
+                stroke(255, 150, 0);
+                strokeWeight(2);
+            } else {
+                fill(255, 100, 100);
+                stroke(200, 50, 50);
+                strokeWeight(2);
+            }
+            ellipse(smallCircle.x, smallCircle.y, smallCircle.radius * 2, smallCircle.radius * 2);
+            
+            // Draw container center
+            fill(0);
+            noStroke();
+            ellipse(container.x, container.y, 6, 6);
+            
+            // Labels
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            text("Container", container.x, container.y + container.radius + 20);
+            text("Small Circle", smallCircle.x, smallCircle.y - smallCircle.radius - 8);
+            
+            // Determine relationship
+            let relationship = "";
+            if (isWithin) {
+                relationship = "Small circle is WITHIN container";
+            } else {
+                relationship = "Small circle is NOT within container";
+            }
+            
+            // Draw measurement info
+            textAlign(LEFT);
+            textSize(10);
+            text("Distance from center: " + Math.round(distanceFromCenter), 10, 20);
+            text("Container radius: " + container.radius, 10, 35);
+            text("Small circle radius: " + smallCircle.radius, 10, 50);
+            text("Max allowed distance: " + (container.radius - smallCircle.radius), 10, 65);
+            
+            // Draw relationship text
+            textAlign(CENTER);
+            textSize(16);
+            text(relationship, width/2, height - 40);
+            text("Drag the small circle to change the relationship", width/2, height - 15);
+        }
+        
+        function mousePressed() {
+            // Check if mouse is over small circle
+            if (dist(mouseX, mouseY, smallCircle.x, smallCircle.y) < smallCircle.radius) {
+                smallCircle.dragging = true;
+            }
+        }
+        
+        function mouseDragged() {
+            // Update position if dragging
+            if (smallCircle.dragging) {
+                smallCircle.x = mouseX;
+                smallCircle.y = mouseY;
+            }
+        }
+        
+        function mouseReleased() {
+            // Stop dragging
+            smallCircle.dragging = false;
+        }
+    </script>
+</body>
+</html>

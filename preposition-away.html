@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="description">
+        <h1>Preposition: AWAY</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/hgtGXDBXq" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Click anywhere in the canvas below. Watch as the yellow circle moves away from your click position, demonstrating directional movement in the opposite direction.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>AWAY</strong> means moving in the opposite direction from something, creating distance from a source point. This involves calculating direction vectors and moving an object farther from a reference point over time.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "away" relationships on screen:</p>
+        <ul>
+            <li><strong>Inverse Vector Calculation:</strong> Calculate the direction from source to object, then move in the opposite direction</li>
+            <li><strong>Gradual Movement:</strong> Move in small steps away from the source rather than jumping immediately</li>
+            <li><strong>Distance Tracking:</strong> Monitor how far the object gets from its source</li>
+            <li><strong>Boundary Handling:</strong> Consider what happens when objects reach screen edges</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Vector Mathematics:</strong><br>
+            • Calculate direction: <code>dx = currentX - sourceX</code>, <code>dy = currentY - sourceY</code><br>
+            • <a href="https://p5js.org/reference/p5/atan2" target="_blank">atan2(dy, dx)</a> - Calculate angle away from source<br>
+            • <a href="https://p5js.org/reference/p5/cos" target="_blank">cos(angle)</a> and <a href="https://p5js.org/reference/p5/sin" target="_blank">sin(angle)</a> - Convert angle to movement<br><br>
+            
+            <strong>Distance and Movement:</strong><br>
+            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist(x1, y1, x2, y2)</a> - Calculate distance from source<br>
+            • <a href="https://p5js.org/reference/p5/constrain" target="_blank">constrain(value, min, max)</a> - Keep objects within canvas bounds<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw moving objects<br>
+            • <a href="https://p5js.org/reference/p5/line" target="_blank">line(x1, y1, x2, y2)</a> - Draw direction indicators<br>
+            • <a href="https://p5js.org/reference/p5/arrow" target="_blank">Custom arrow drawing</a> - Show direction visually<br><br>
+            
+            <strong>Animation:</strong><br>
+            • Update position each frame in <code>draw()</code> function<br>
+            • Use speed variables to control movement rate<br>
+            • Implement deceleration as distance increases<br><br>
+            
+            <strong>Mouse Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Set new source point when mouse is clicked<br>
+            • <a href="https://p5js.org/reference/p5/mouseX" target="_blank">mouseX</a> and <a href="https://p5js.org/reference/p5/mouseY" target="_blank">mouseY</a> - Get source coordinates
+        </div>
+        
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Away":</strong><br><br>
+            
+            1. <strong>Define moving object and source:</strong> Set up initial positions<br>
+            <code>let movingObject = {x: 200, y: 150, speed: 2};</code><br>
+            <code>let source = {x: 100, y: 100};</code><br><br>
+            
+            2. <strong>Calculate direction away:</strong> Find vector opposite to source<br>
+            <code>let dx = movingObject.x - source.x;</code><br>
+            <code>let dy = movingObject.y - source.y;</code><br>
+            <code>let distance = dist(movingObject.x, movingObject.y, source.x, source.y);</code><br><br>
+            
+            3. <strong>Move away from source:</strong> Update position each frame<br>
+            <code>if (distance > 0) {</code><br>
+            <code>&nbsp;&nbsp;let moveX = (dx / distance) * movingObject.speed;</code><br>
+            <code>&nbsp;&nbsp;let moveY = (dy / distance) * movingObject.speed;</code><br>
+            <code>&nbsp;&nbsp;movingObject.x += moveX;</code><br>
+            <code>&nbsp;&nbsp;movingObject.y += moveY;</code><br>
+            <code>}</code><br><br>
+            
+            4. <strong>Handle boundaries:</strong> Keep object within screen or implement wrapping<br>
+            <code>movingObject.x = constrain(movingObject.x, 0, width);</code>
+        </div>
+    </div>
+
+    <script>
+        let movingCircle = { x: 200, y: 150, speed: 2, isMoving: false };
+        let source = { x: 200, y: 150, visible: false };
+        let trail = [];
+        let maxDistance = 150; // Maximum distance to move away
+        
+        function setup() {
+            createCanvas(400, 300).parent('canvas');
+        }
+        
+        function draw() {
+            background(240);
+            
+            // Calculate distance and direction from source
+            let distance = dist(movingCircle.x, movingCircle.y, source.x, source.y);
+            let dx = movingCircle.x - source.x;
+            let dy = movingCircle.y - source.y;
+            
+            // Move away from source if within max distance and moving
+            if (distance < maxDistance && movingCircle.isMoving && distance > 0) {
+                let moveX = (dx / distance) * movingCircle.speed;
+                let moveY = (dy / distance) * movingCircle.speed;
+                
+                // Update position
+                movingCircle.x += moveX;
+                movingCircle.y += moveY;
+                
+                // Keep within canvas bounds
+                movingCircle.x = constrain(movingCircle.x, 15, width - 15);
+                movingCircle.y = constrain(movingCircle.y, 15, height - 15);
+                
+                // Add to trail
+                trail.push({x: movingCircle.x, y: movingCircle.y});
+                if (trail.length > 30) {
+                    trail.shift();
+                }
+            } else if (distance >= maxDistance) {
+                movingCircle.isMoving = false;
+            }
+            
+            // Draw trail
+            stroke(255, 200, 0, 100);
+            strokeWeight(2);
+            noFill();
+            if (trail.length > 1) {
+                beginShape();
+                for (let i = 0; i < trail.length; i++) {
+                    vertex(trail[i].x, trail[i].y);
+                }
+                endShape();
+            }
+            
+            // Draw direction line from source to circle
+            if (source.visible && distance > 0) {
+                stroke(200, 100, 100, 150);
+                strokeWeight(1);
+                line(source.x, source.y, movingCircle.x, movingCircle.y);
+                
+                // Draw direction arrow (pointing away from source)
+                drawArrow(source.x, source.y, movingCircle.x, movingCircle.y);
+            }
+            
+            // Draw maximum distance indicator
+            if (source.visible) {
+                stroke(150, 150, 150, 100);
+                strokeWeight(1);
+                noFill();
+                ellipse(source.x, source.y, maxDistance * 2, maxDistance * 2);
+            }
+            
+            // Draw source point
+            if (source.visible) {
+                fill(255, 100, 100, 200);
+                stroke(200, 50, 50);
+                strokeWeight(2);
+                ellipse(source.x, source.y, 20, 20);
+                
+                // Source crosshairs
+                stroke(200, 50, 50);
+                strokeWeight(1);
+                line(source.x - 10, source.y, source.x + 10, source.y);
+                line(source.x, source.y - 10, source.x, source.y + 10);
+            }
+            
+            // Draw moving circle
+            fill(255, 200, 100);
+            stroke(255, 150, 0);
+            strokeWeight(2);
+            ellipse(movingCircle.x, movingCircle.y, 25, 25);
+            
+            // Labels
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            text("Moving Circle", movingCircle.x, movingCircle.y - 20);
+            if (source.visible) {
+                text("Source Point", source.x, source.y + 20);
+            }
+            
+            // Determine relationship
+            let relationship = "";
+            if (movingCircle.isMoving) {
+                relationship = "Circle is moving AWAY from the source";
+            } else if (distance >= maxDistance) {
+                relationship = "Circle has moved far AWAY (reached max distance)";
+            } else if (source.visible) {
+                relationship = "Circle is positioned AWAY from the source";
+            } else {
+                relationship = "Click to set a source point";
+            }
+            
+            // Draw measurement info
+            textAlign(LEFT);
+            textSize(10);
+            text("Distance from source: " + Math.round(distance), 10, 20);
+            text("Max distance: " + maxDistance, 10, 35);
+            text("Speed: " + movingCircle.speed + " pixels/frame", 10, 50);
+            text("Moving: " + movingCircle.isMoving, 10, 65);
+            
+            // Reset button
+            fill(200);
+            stroke(100);
+            strokeWeight(1);
+            rect(10, 75, 60, 25);
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            text("Reset", 40, 92);
+            
+            // Draw relationship text
+            textAlign(CENTER);
+            textSize(16);
+            text(relationship, width/2, height - 40);
+            text("Click anywhere to set a source point", width/2, height - 15);
+        }
+        
+        function drawArrow(fromX, fromY, toX, toY) {
+            let angle = atan2(toY - fromY, toX - fromX);
+            let distance = dist(fromX, fromY, toX, toY);
+            
+            if (distance > 30) {
+                // Draw arrow head at the moving circle (showing direction away)
+                let arrowX = toX;
+                let arrowY = toY;
+                
+                stroke(200, 100, 100);
+                strokeWeight(2);
+                // Arrow head pointing away from source
+                let arrowSize = 8;
+                line(arrowX, arrowY, 
+                     arrowX - cos(angle - 0.5) * arrowSize, 
+                     arrowY - sin(angle - 0.5) * arrowSize);
+                line(arrowX, arrowY, 
+                     arrowX - cos(angle + 0.5) * arrowSize, 
+                     arrowY - sin(angle + 0.5) * arrowSize);
+            }
+        }
+        
+        function mousePressed() {
+            // Check if reset button clicked
+            if (mouseX > 10 && mouseX < 70 && mouseY > 75 && mouseY < 100) {
+                movingCircle.x = 200;
+                movingCircle.y = 150;
+                movingCircle.isMoving = false;
+                source.visible = false;
+                trail = [];
+                return;
+            }
+            
+            // Set new source point (where mouse was clicked)
+            source.x = mouseX;
+            source.y = mouseY;
+            source.visible = true;
+            movingCircle.isMoving = true;
+            trail = [];
+        }
+    </script>
+</body>
+</html>
