@@ -71,13 +71,35 @@ function draw() {
     textAlign(CENTER, CENTER);
     textSize(10);
     text("Ground Level", width/2, 235);
-    
-    // Draw obstacle (what we're going over)
+      // Draw obstacle (what we're going over)
     fill(120, 80, 60);
     stroke(90, 60, 40);
     strokeWeight(2);
     rect(obstacle.x - obstacle.width/2, obstacle.y - obstacle.height/2, 
          obstacle.width, obstacle.height);
+    
+    // Draw dotted lines showing the "over" trigger zone
+    stroke(100, 100, 100, 150);
+    strokeWeight(1);
+    drawingContext.setLineDash([5, 5]); // Create dotted line pattern
+    
+    // Left boundary line
+    line(obstacle.x - obstacle.width/2, obstacle.y - obstacle.height/2, 
+         obstacle.x - obstacle.width/2, 50);
+    
+    // Right boundary line  
+    line(obstacle.x + obstacle.width/2, obstacle.y - obstacle.height/2, 
+         obstacle.x + obstacle.width/2, 50);
+    
+    // Reset line dash for other drawings
+    drawingContext.setLineDash([]);
+    
+    // Zone label
+    fill(100, 100, 100, 150);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(8);
+    text("Over Zone", obstacle.x, 60);
     
     // Obstacle label
     fill(255);
