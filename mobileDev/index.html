@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P5.js Preposition Examples</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="index-body">
+    <div class="index-container">
+        <div class="sidebar">
+            <div class="header">
+                <h1>P5.js Prepositions</h1>
+                <p>Methods for converting language to code</p>
+            </div>
+
+            <div class="menu-group">
+                <div class="group-title">Spatial Relationships</div>
+                <button class="menu-item" onclick="loadExample('preposition-above.html', 'Above', this)">Above</button>
+                <button class="menu-item" onclick="loadExample('preposition-below.html', 'Below', this)">Below</button>
+                <button class="menu-item" onclick="loadExample('preposition-between.html', 'Between', this)">Between</button>
+                <button class="menu-item" onclick="loadExample('preposition-among.html', 'Among', this)">Among</button>
+                <button class="menu-item" onclick="loadExample('preposition-beside.html', 'Beside', this)">Beside</button>
+                <button class="menu-item" onclick="loadExample('preposition-behind.html', 'Behind', this)">Behind</button>
+                <button class="menu-item" onclick="loadExample('preposition-beneath.html', 'Beneath', this)">Beneath</button>
+                <button class="menu-item" onclick="loadExample('preposition-within.html', 'Within', this)">Within</button>
+                <button class="menu-item" onclick="loadExample('preposition-through.html', 'Through', this)">Through</button>
+            </div>            <div class="menu-group">
+                <div class="group-title">Movement & Direction</div>
+                <button class="menu-item" onclick="loadExample('preposition-toward.html', 'Toward', this)">Toward</button>
+                <button class="menu-item" onclick="loadExample('preposition-away.html', 'Away', this)">Away</button>
+                <button class="menu-item" onclick="loadExample('preposition-across.html', 'Across', this)">Across</button>
+                <button class="menu-item" onclick="loadExample('preposition-along.html', 'Along', this)">Along</button>
+                <button class="menu-item" onclick="loadExample('preposition-around.html', 'Around', this)">Around</button>
+                <button class="menu-item" onclick="loadExample('preposition-into.html', 'Into', this)">Into</button>
+                <button class="menu-item" onclick="loadExample('preposition-onto.html', 'Onto', this)">Onto</button>
+                <button class="menu-item" onclick="loadExample('preposition-past.html', 'Past', this)">Past</button>
+                <button class="menu-item" onclick="loadExample('preposition-over.html', 'Over', this)">Over</button>
+                <button class="menu-item" onclick="loadExample('preposition-under.html', 'Under', this)">Under</button>
+            </div>
+
+            <div class="menu-group">
+                <div class="group-title">Time-based</div>
+                <button class="menu-item" onclick="loadExample('preposition-before.html', 'Before', this)">Before</button>
+                <button class="menu-item" onclick="loadExample('preposition-after.html', 'After', this)">After</button>
+                <button class="menu-item" onclick="loadExample('preposition-during.html', 'During', this)">During</button>
+                <button class="menu-item" onclick="loadExample('preposition-since.html', 'Since', this)">Since</button>
+                <button class="menu-item" onclick="loadExample('preposition-until.html', 'Until', this)">Until</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="content-header">
+                <h2 id="current-title">Welcome</h2>
+            </div>
+            <div class="frame-container">
+                <div class="welcome-message" id="welcome-message">
+                    <div class="welcome-content">
+                        <h3>Welcome to P5.js Prepositions</h3>
+                        <p>This collection contains interactive examples showing how spatial, directional, and temporal prepositions can be translated into P5.js sketches.</p>
+                        <p>Select a preposition from the menu to explore its interactive example.</p>                        <p><strong>24 examples total:</strong></p>
+                        <p>• 9 Spatial Relationships<br>• 10 Movement & Direction<br>• 5 Time-based</p>
+                    </div>
+                </div>
+                <iframe id="content-frame" style="display: none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadExample(filename, title, buttonElement) {
+            // Remove active class from all menu items
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => item.classList.remove('active'));
+            
+            // Add active class to clicked item
+            buttonElement.classList.add('active');
+            
+            // Update title
+            document.getElementById('current-title').textContent = 'Preposition: ' + title;
+            
+            // Hide welcome message and show iframe
+            document.getElementById('welcome-message').style.display = 'none';
+            const iframe = document.getElementById('content-frame');
+            iframe.style.display = 'block';
+            iframe.src = filename;
+        }
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                // Return to welcome screen
+                const menuItems = document.querySelectorAll('.menu-item');
+                menuItems.forEach(item => item.classList.remove('active'));
+                
+                document.getElementById('current-title').textContent = 'Welcome';
+                document.getElementById('welcome-message').style.display = 'flex';
+                document.getElementById('content-frame').style.display = 'none';
+            }
+        });
+
+        // Handle iframe load errors
+        document.getElementById('content-frame').addEventListener('error', function() {
+            alert('Error loading the example. Please check if the file exists.');
+        });
+    </script>
+</body>
+</html>

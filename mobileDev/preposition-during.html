@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: DURING</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/_0kHqjHjb" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Click the buttons below to watch activities that occur during a specific time period. Notice how they activate and deactivate based on timing.</p>
+    </div>    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+            <div id="controls">
+                <button onclick="startAnimation()">Start Animation</button>
+                <button onclick="resetAnimation()">Reset</button>
+            </div>
+            <div id="status">Animation: Ready to start</div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p>The preposition <strong>"during"</strong> indicates that something happens within the time span of another event or period. It describes concurrent or overlapping timeframes where one action occurs while another is taking place. In programming, this involves checking if the current time falls within a specific interval.</p>        <h3>Translation Strategy</h3>
+        <p>To create "during" relationships in time:</p>
+        <ul>
+            <li><strong>Time Periods:</strong> Define start and end times for intervals</li>
+            <li><strong>Range Checking:</strong> Use conditional logic to test if current time falls within period</li>
+            <li><strong>State Management:</strong> Activate/deactivate elements based on time intervals</li>
+        </ul>
+
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Time Management:</strong><br>
+            • <a href="https://p5js.org/reference/p5/millis" target="_blank">millis()</a> - tracks elapsed time for temporal calculations<br>
+            • Range checking: <code>time >= start && time <= end</code><br>
+            • <a href="https://p5js.org/reference/p5/frameCount" target="_blank">frameCount</a> - alternative timing method<br><br>
+            
+            <strong>Visual Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/map" target="_blank">map()</a> - converts time values to visual positions<br>
+            • <a href="https://p5js.org/reference/p5/sin" target="_blank">sin()</a> - creates wave animations for events<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect()</a> - draws time periods and progress bars<br>
+            • <a href="https://p5js.org/reference/p5/text" target="_blank">text()</a> - displays timing and status information<br><br>
+            
+            <strong>Animation:</strong><br>
+            • State-based animations during specific periods<br>
+            • Conditional particle systems<br>
+            • Timeline visualization with highlighted periods
+        </div>
+
+        <h3>Code Structure</h3>        <div class="code-section">
+            <strong>Basic Pattern for "During":</strong><br><br>
+            
+            1. <strong>Define time period:</strong> Set start and end times<br>
+            <code>let timeline = {</code><br>
+            <code>&nbsp;&nbsp;duringPeriod: {start: 2000, end: 6000}, // 2-6 seconds</code><br>
+            <code>&nbsp;&nbsp;activities: [...]</code><br>
+            <code>};</code><br><br>
+            
+            2. <strong>Calculate current time:</strong> Track elapsed time<br>
+            <code>let elapsed = millis() - timeline.startTime;</code><br><br>
+            
+            3. <strong>Check if currently during period:</strong> Range checking<br>
+            <code>let duringActive = elapsed >= timeline.duringPeriod.start &&</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elapsed <= timeline.duringPeriod.end;</code><br><br>
+            
+            4. <strong>Activate elements during period:</strong> State management<br>
+            <code>for (let activity of timeline.activities) {</code><br>
+            <code>&nbsp;&nbsp;activity.active = duringActive;</code><br>
+            <code>}</code>
+        </div>
+    </div>
+
+    <script src="jsFiles/sketch-during.js"></script>
+</body>
+</html>

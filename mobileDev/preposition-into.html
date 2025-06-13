@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: INTO</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/6EUFcUmF1" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Click to watch the yellow circle move into the blue container, entering from outside to inside.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>INTO</strong> means moving from outside to inside something, entering or penetrating a space, container, or boundary. This implies a transition from external to internal position.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "into" relationships on screen:</p>
+        <ul>
+            <li><strong>Boundary Crossing:</strong> Move an object from outside a defined area to inside it</li>
+            <li><strong>Entry Points:</strong> Define specific entrance locations or general boundary crossing</li>
+            <li><strong>State Transition:</strong> Track the change from "outside" to "inside" state</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Boundary Detection:</strong><br>
+            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist(x1, y1, x2, y2)</a> - Calculate distance from boundary center<br>
+            • For circular boundaries: <code>distance < radius</code> means inside<br>
+            • For rectangular boundaries: check X and Y ranges<br><br>
+            
+            <strong>Movement Control:</strong><br>
+            • <a href="https://p5js.org/reference/p5/lerp" target="_blank">lerp(start, stop, amount)</a> - Smooth movement toward interior<br>
+            • Vector calculation for entry direction<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw containers and moving objects<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw rectangular containers<br>
+            • <a href="https://p5js.org/reference/p5/fill" target="_blank">fill()</a> with transparency to show containment<br><br>
+            
+            <strong>State Management:</strong><br>
+            • Boolean flags to track inside/outside status<br>
+            • Entry detection and completion tracking<br><br>
+            
+            <strong>Mouse Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Trigger entry animation<br>
+            • Button controls for animation
+        </div>
+        
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Into":</strong><br><br>
+            
+            1. <strong>Define container and entry point:</strong> Set up boundary and starting position<br>
+            <code>let container = {x: 200, y: 150, radius: 80};</code><br>
+            <code>let startPoint = {x: 50, y: 150};</code><br>
+            <code>let endPoint = {x: 200, y: 150}; // Inside container</code><br><br>
+            
+            2. <strong>Check containment:</strong> Detect inside/outside status<br>
+            <code>let distance = dist(object.x, object.y, container.x, container.y);</code><br>
+            <code>let isInside = distance < container.radius;</code><br><br>
+            
+            3. <strong>Animate entry:</strong> Move from outside to inside<br>
+            <code>if (isMoving && progress < 1) {</code><br>
+            <code>&nbsp;&nbsp;progress += speed;</code><br>
+            <code>&nbsp;&nbsp;object.x = lerp(startPoint.x, endPoint.x, progress);</code><br>
+            <code>&nbsp;&nbsp;object.y = lerp(startPoint.y, endPoint.y, progress);</code><br>
+            <code>}</code><br><br>
+            
+            4. <strong>Track entry completion:</strong> Detect when fully inside<br>
+            <code>if (isInside && wasOutside) { hasEnteredContainer = true; }</code>
+        </div>
+    </div>
+
+    <script src="jsFiles/sketch-into.js"></script>
+</body>
+</html>

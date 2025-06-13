@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: UNDER</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/2a5R_KyKS" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+          <h3>Try It</h3>
+        <p>Click to watch the yellow circle move under the brown bridge, following an arc path that dips below the obstacle.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">        <h3>Concept</h3>
+        <p><strong>UNDER</strong> means passing below something, going beneath an obstacle or barrier. It involves movement that goes below and across something, creating an arc path that dips under the obstacle.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "under" relationships on screen:</p>
+        <ul>
+            <li><strong>Downward Arc Movement:</strong> Create bezier curve paths that dip below obstacles</li>
+            <li><strong>Depth Visualization:</strong> Show how far below ground level the movement goes</li>
+            <li><strong>Bridge/Tunnel Metaphor:</strong> Use overhead obstacles that must be passed beneath</li>
+        </ul>
+          <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Bezier Curve Movement:</strong><br>
+            • <a href="https://p5js.org/reference/p5/bezierPoint" target="_blank">bezierPoint()</a> - Calculate positions along curved path<br>
+            • Control points determine the depth of the arc that goes under<br><br>
+            
+            <strong>Path Calculation:</strong><br>
+            • <a href="https://p5js.org/reference/p5/lerp" target="_blank">lerp(start, stop, amount)</a> - Smooth interpolation along path<br>
+            • Progress tracking from 0 to 1 for complete traversal<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw moving circle and path points<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw bridge/barrier obstacle<br>
+            • <a href="https://p5js.org/reference/p5/beginShape" target="_blank">beginShape()/endShape()</a> - Draw the complete arc path<br><br>
+            
+            <strong>Depth Calculation:</strong><br>
+            • Calculate depth below ground level during passage<br>
+            • Visual indicators show how far "underground" the movement goes<br><br>
+            
+            <strong>Visual Feedback:</strong><br>
+            • Highlighting when passing directly under the obstacle<br>
+            • Depth measurements and progress indicators<br><br>
+            
+            <strong>Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> / <a href="https://p5js.org/reference/p5/touchStarted" target="_blank">touchStarted()</a> - Start animation<br>
+            • Keyboard controls for different arc depths (1, 2, 3)<br>
+            • SPACE to toggle path visibility, R to reset
+        </div>
+          <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Under":</strong><br><br>
+            
+            1. <strong>Define obstacle and path:</strong> Set bridge position and trajectory<br>
+            <code>let obstacle = { x: 200, y: 120, width: 80, height: 60 };</code><br>
+            <code>let startPoint = { x: 50, y: 200 };</code><br>
+            <code>let endPoint = { x: 350, y: 200 };</code><br>
+            <code>let controlPoint = { x: 200, y: 260 }; // Dip below ground</code><br><br>
+            
+            2. <strong>Calculate bezier path:</strong> Create smooth arc that goes under<br>
+            <code>movingCircle.x = bezierPoint(startPoint.x, startPoint.x, endPoint.x, endPoint.x, t);</code><br>
+            <code>movingCircle.y = bezierPoint(startPoint.y, controlPoint.y, controlPoint.y, endPoint.y, t);</code><br><br>
+            
+            3. <strong>Track progress:</strong> Monitor movement along the curve<br>
+            <code>if (isMoving && progress < 1) {</code><br>
+            <code>&nbsp;&nbsp;progress += 0.015;</code><br>
+            <code>&nbsp;&nbsp;// Update position using bezier calculation</code><br>
+            <code>}</code><br><br>
+            
+            4. <strong>Detect "under" state:</strong> Check when passing beneath obstacle<br>
+            <code>let isUnderObstacle = (movingCircle.x > obstacle.x - obstacle.width/2 &&</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;movingCircle.x < obstacle.x + obstacle.width/2);</code>
+        </div>
+    </div>
+
+    <script src="jsFiles/sketch-under.js"></script>
+</body>
+</html>

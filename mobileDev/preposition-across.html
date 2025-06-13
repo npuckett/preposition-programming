@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: ACROSS</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/3n6SHsUtS" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Click the "Start" button to watch the yellow circle move across the blue barrier from one side to the other.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>ACROSS</strong> means moving from one side of something to the other side, typically crossing over or through a barrier, space, or boundary.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "across" relationships on screen:</p>
+        <ul>
+            <li><strong>Start and End Points:</strong> Define clear starting and ending positions on opposite sides</li>
+            <li><strong>Barrier Crossing:</strong> Show movement that crosses over or through an obstacle</li>
+            <li><strong>Perpendicular Movement:</strong> Movement often goes perpendicular to the barrier being crossed</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Linear Movement:</strong><br>
+            • <a href="https://p5js.org/reference/p5/lerp" target="_blank">lerp(start, stop, amount)</a> - Smooth interpolation between start and end points<br>
+            • Calculate progress: <code>progress += speed</code> where speed is small increment<br><br>
+            
+            <strong>Path Planning:</strong><br>
+            • Define waypoints for complex crossing paths<br>
+            • Use arrays to store multiple crossing points<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw moving objects<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw barriers to cross<br>
+            • <a href="https://p5js.org/reference/p5/line" target="_blank">line(x1, y1, x2, y2)</a> - Draw crossing paths<br><br>
+            
+            <strong>State Management:</strong><br>
+            • Track crossing progress and completion<br>
+            • Use boolean flags for different crossing states<br><br>
+            
+            <strong>Mouse Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Start or reset crossing animation<br>
+            • Button-based controls for animation
+        </div>
+        
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Across":</strong><br><br>
+            
+            1. <strong>Define crossing path:</strong> Set start and end points<br>
+            <code>let startPoint = {x: 50, y: 150};</code><br>
+            <code>let endPoint = {x: 350, y: 150};</code><br>
+            <code>let barrier = {x: 180, y: 50, width: 40, height: 200};</code><br><br>
+            
+            2. <strong>Track progress:</strong> Use interpolation for smooth movement<br>
+            <code>let progress = 0; // 0 to 1</code><br>
+            <code>let currentX = lerp(startPoint.x, endPoint.x, progress);</code><br>
+            <code>let currentY = lerp(startPoint.y, endPoint.y, progress);</code><br><br>
+            
+            3. <strong>Update animation:</strong> Increment progress each frame<br>
+            <code>if (isMoving && progress < 1) {</code><br>
+            <code>&nbsp;&nbsp;progress += 0.02; // Speed of crossing</code><br>
+            <code>}</code><br><br>
+            
+            4. <strong>Detect crossing completion:</strong> Check when movement is done<br>
+            <code>if (progress >= 1) { isMoving = false; hasCrossed = true; }</code>
+        </div>
+    </div>
+
+    <script src="jsFiles/sketch-across.js"></script>
+</body>
+</html>

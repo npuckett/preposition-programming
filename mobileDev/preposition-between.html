@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>    <div class="description">
+        <h1>Preposition: BETWEEN</h1>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/zLIVDNbuF" target="_blank" class="web-editor-link">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Drag the circles in the canvas below. Notice how the green circle's position determines if it's between the blue and red circles.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>BETWEEN</strong> means positioned in the space that separates two other things. This requires checking if an element's coordinates fall within the range defined by two other elements.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "between" relationships on screen:</p>
+        <ul>
+            <li><strong>Horizontal Between:</strong> Check if X coordinate is between two other X coordinates</li>
+            <li><strong>Vertical Between:</strong> Check if Y coordinate is between two other Y coordinates</li>
+            <li><strong>Both Axes:</strong> Element must be between in both X and Y to be truly "between"</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Coordinate System:</strong><br>
+            • <a href="https://p5js.org/reference/p5/createCanvas" target="_blank">createCanvas(width, height)</a> - Creates coordinate system where (0,0) is top-left<br>
+            • Both X and Y coordinates matter for "between"<br><br>
+            
+            <strong>Position Comparison:</strong><br>
+            • <code>min(a.x, b.x) < c.x < max(a.x, b.x)</code> - Check if C is between A and B horizontally<br>
+            • <a href="https://p5js.org/reference/p5/min" target="_blank">min()</a> and <a href="https://p5js.org/reference/p5/max" target="_blank">max()</a> - Find minimum and maximum values<br><br>
+            
+            <strong>Drawing Elements:</strong><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw circles at specific positions<br>
+            • <a href="https://p5js.org/reference/p5/line" target="_blank">line(x1, y1, x2, y2)</a> - Draw connection lines<br><br>
+            
+            <strong>Collision Detection:</strong><br>
+            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist(x1, y1, x2, y2)</a> - Calculate distance between points for collision detection<br><br>
+            
+            <strong>Mouse Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Detect when mouse is clicked<br>
+            • <a href="https://p5js.org/reference/p5/mouseDragged" target="_blank">mouseDragged()</a> - Detect when mouse is dragged<br>
+            • <a href="https://p5js.org/reference/p5/mouseReleased" target="_blank">mouseReleased()</a> - Detect when mouse is released
+        </div>
+        
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Between":</strong><br><br>
+            
+            1. <strong>Store positions:</strong> Keep track of three element coordinates<br>
+            <code>let elementA = {x: 100, y: 150};</code><br>
+            <code>let elementB = {x: 300, y: 150};</code><br>
+            <code>let elementC = {x: 200, y: 150};</code><br><br>
+            
+            2. <strong>Calculate range:</strong> Find min and max coordinates<br>
+            <code>let minX = min(elementA.x, elementB.x);</code><br>
+            <code>let maxX = max(elementA.x, elementB.x);</code><br><br>
+            
+            3. <strong>Check if between:</strong> Test if coordinates fall within range<br>
+            <code>let isBetween = (elementC.x > minX && elementC.x < maxX);</code><br><br>
+            
+            4. <strong>For mouse interaction:</strong> Use mouse events for dragging<br>
+            <code>if (dist(mouseX, mouseY, circle.x, circle.y) < radius) {</code><br>
+            <code>&nbsp;&nbsp;circle.dragging = true; }</code>
+        </div>
+    </div>
+
+    <script src="jsFiles/sketch-between.js"></script>
+</body>
+</html>
