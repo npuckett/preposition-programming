@@ -10,14 +10,6 @@ This project explores the fascinating intersection between language and programm
 
 The collection serves as both an educational resource for understanding prepositions and a creative exploration of how natural language concepts can be expressed through code and visual design.
 
-## Features
-
-- **24 Interactive Examples**: Each preposition has its own dedicated sketch with explanations
-- **Mobile Responsive**: Optimized for both desktop and mobile viewing
-- **P5.js Web Editor Integration**: Direct links to edit and modify each sketch
-- **Educational Content**: Detailed explanations of coding strategies and P5.js methods
-- **Categorized Navigation**: Organized by spatial relationships, movement & direction, and time-based concepts
-
 ## Preposition Categories
 
 ### Spatial Relationships
