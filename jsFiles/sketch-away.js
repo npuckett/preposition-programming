@@ -51,7 +51,7 @@ let maxMovementFrames = 100; // Stop movement after this many frames
 let maxDistance = 120;       // Maximum distance to move away
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
   
   // Set initial position for the circle
   movingCircle.x = width / 2;
@@ -241,10 +241,22 @@ function drawArrow(fromX, fromY, toX, toY) {
   }
 }
 
-// Handle mouse clicks
-function mousePressed() {
-  // Check if reset button was clicked
-  if (mouseX > 10 && mouseX < 70 && mouseY > 90 && mouseY < 115) {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
+  // Check if reset button was clicked/touched
+  if (inputX > 10 && inputX < 70 && inputY > 90 && inputY < 115) {
     // Reset everything to initial state
     movingCircle.x = width / 2;
     movingCircle.y = height / 2;
@@ -255,15 +267,26 @@ function mousePressed() {
     return;
   }
   
-  // Set new source point where mouse was clicked
-  source.x = mouseX;
-  source.y = mouseY;
+  // Set new source point where input was detected
+  source.x = inputX;
+  source.y = inputY;
   source.visible = true;
   
   // Start movement away from the source
   movingCircle.isMoving = true;
   trail = []; // Clear previous trail
   movementFrames = 0; // Reset movement counter
+}
+
+// Handle mouse clicks
+function mousePressed() {
+  handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
 }
 
 /*

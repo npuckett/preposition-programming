@@ -34,7 +34,7 @@ let circles = [
 ];
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
   // Set consistent depth order - blue circle is always behind (depth 1)
   circles[0].depth = 1; // Blue circle - always behind
   circles[1].depth = 2; // Red circle - always in front
@@ -148,34 +148,79 @@ function draw() {
   text(relationship, width/2, height - 40);
   
   fill(0);
-  textSize(12);
-  text("Drag circles to change overlap • Blue is always behind, Red is always in front", width/2, height - 15);
+  textSize(12);  text("Drag circles • Blue is always behind, Red is always in front", width/2, height - 15);
 }
 
-function mousePressed() {
-  // Check which circle is clicked - only for dragging, not for changing depth
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
+  // Check which circle is clicked/touched - only for dragging, not for changing depth
   for (let i = circles.length - 1; i >= 0; i--) {
     let circle = circles[i];
-    if (dist(mouseX, mouseY, circle.x, circle.y) < circle.radius) {
+    if (dist(inputX, inputY, circle.x, circle.y) < circle.radius) {
       circle.dragging = true;
       break;
     }
   }
 }
 
-function mouseDragged() {
+// Handle input drag (both mouse and touch)
+function handleInputDrag() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   // Update position if dragging
   for (let circle of circles) {
     if (circle.dragging) {
-      circle.x = mouseX;
-      circle.y = mouseY;
+      circle.x = inputX;
+      circle.y = inputY;
     }
   }
 }
 
-function mouseReleased() {
+// Handle input end (both mouse and touch)
+function handleInputEnd() {
   // Stop dragging
   for (let circle of circles) {
     circle.dragging = false;
   }
+}
+
+function mousePressed() {
+  handleInputStart();
+}
+
+function mouseDragged() {
+  handleInputDrag();
+}
+
+function mouseReleased() {
+  handleInputEnd();
+}
+
+// Touch event handlers for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
+}
+
+function touchMoved() {
+  handleInputDrag();
+  return false; // Prevent scrolling
+}
+
+function touchEnded() {
+  handleInputEnd();
+  return false;
 }

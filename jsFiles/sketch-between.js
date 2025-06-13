@@ -57,7 +57,7 @@ let greenCircle = {
 };
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
@@ -206,7 +206,7 @@ function displayCoordinateInfo() {
   fill(255, 255, 255, 200);
   stroke(100);
   strokeWeight(1);
-  rect(10, 260, 200, 35);
+  rect(10, 210, 100, 35);
   
   fill(0);
   noStroke();
@@ -217,41 +217,87 @@ function displayCoordinateInfo() {
   let rightBoundary = max(blueCircle.x, redCircle.x);
   let distance = rightBoundary - leftBoundary;
   
-  text("Left boundary: " + Math.round(leftBoundary), 12, 272);
-  text("Right boundary: " + Math.round(rightBoundary), 12, 282);
-  text("Distance between: " + Math.round(distance), 12, 292);
+  text("Left boundary: " + Math.round(leftBoundary), 12, 222);
+  text("Right boundary: " + Math.round(rightBoundary), 12, 232);
+  text("Distance between: " + Math.round(distance), 12, 242);
 }
 
-function mousePressed() {
-  // Check which circle is clicked
-  if (dist(mouseX, mouseY, blueCircle.x, blueCircle.y) < blueCircle.radius) {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
+  // Check which circle is clicked/touched
+  if (dist(inputX, inputY, blueCircle.x, blueCircle.y) < blueCircle.radius) {
     blueCircle.dragging = true;
-  } else if (dist(mouseX, mouseY, redCircle.x, redCircle.y) < redCircle.radius) {
+  } else if (dist(inputX, inputY, redCircle.x, redCircle.y) < redCircle.radius) {
     redCircle.dragging = true;
-  } else if (dist(mouseX, mouseY, greenCircle.x, greenCircle.y) < greenCircle.radius) {
+  } else if (dist(inputX, inputY, greenCircle.x, greenCircle.y) < greenCircle.radius) {
     greenCircle.dragging = true;
   }
 }
 
-function mouseDragged() {
+// Handle input drag (both mouse and touch)
+function handleInputDrag() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   // Update position of dragged circle
   if (blueCircle.dragging) {
-    blueCircle.x = mouseX;
-    blueCircle.y = mouseY;
+    blueCircle.x = inputX;
+    blueCircle.y = inputY;
   }
   if (redCircle.dragging) {
-    redCircle.x = mouseX;
-    redCircle.y = mouseY;
+    redCircle.x = inputX;
+    redCircle.y = inputY;
   }
   if (greenCircle.dragging) {
-    greenCircle.x = mouseX;
-    greenCircle.y = mouseY;
+    greenCircle.x = inputX;
+    greenCircle.y = inputY;
   }
 }
 
-function mouseReleased() {
+// Handle input end (both mouse and touch)
+function handleInputEnd() {
   // Stop dragging all circles
   blueCircle.dragging = false;
   redCircle.dragging = false;
   greenCircle.dragging = false;
+}
+
+function mousePressed() {
+  handleInputStart();
+}
+
+function mouseDragged() {
+  handleInputDrag();
+}
+
+function mouseReleased() {
+  handleInputEnd();
+}
+
+// Touch event handlers for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
+}
+
+function touchMoved() {
+  handleInputDrag();
+  return false; // Prevent scrolling
+}
+
+function touchEnded() {
+  handleInputEnd();
+  return false;
 }

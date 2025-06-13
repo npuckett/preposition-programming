@@ -36,7 +36,7 @@ let wasOutside = true;
 let trail = [];
 
 function setup() {
-    createCanvas(400, 300);
+    createCanvas(400, 300).parent('canvas');;
 }
 
 function draw() {
@@ -123,15 +123,14 @@ function draw() {
         strokeWeight(3);
         line(movingCircle.x, movingCircle.y, 
              movingCircle.x + dirX, movingCircle.y + dirY);
-        
-        // Arrow head
-        pushMatrix();
+          // Arrow head
+        push();
         translate(movingCircle.x + dirX, movingCircle.y + dirY);
         rotate(atan2(dirY, dirX));
         fill(255, 100, 100);
         noStroke();
         triangle(0, 0, -8, -4, -8, 4);
-        popMatrix();
+        pop();
     }
     
     // Labels and status
@@ -154,12 +153,21 @@ function draw() {
     // Status indicator
     textAlign(LEFT, TOP);
     textSize(10);
-    text(`Status: ${isInside ? "INSIDE" : "OUTSIDE"}`, 10, 10);
-    text(`Distance from center: ${distance.toFixed(1)}px`, 10, 25);
-    text(`Container radius: ${container.radius}px`, 10, 40);
+    text(`Status: ${isInside ? "INSIDE" : "OUTSIDE"}`, 10, 40);
+    text(`Distance from center: ${distance.toFixed(1)}px`, 10, 65);    text(`Container radius: ${container.radius}px`, 10, 80);
 }
 
-function mousePressed() {
+// Helper functions for cross-platform input handling
+function getInputX() {
+    return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+    return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
     if (hasEntered || !isMoving) {
         // Reset animation
         progress = 0;
@@ -170,6 +178,16 @@ function mousePressed() {
         movingCircle.x = startPoint.x;
         movingCircle.y = startPoint.y;
     }
+}
+
+function mousePressed() {
+    handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+    handleInputStart();
+    return false; // Prevent default touch behavior
 }
 
 function keyPressed() {

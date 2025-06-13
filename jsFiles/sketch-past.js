@@ -53,7 +53,7 @@ let trail = [];
 let passedPoint = null; // Records when object passed the reference
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
@@ -327,36 +327,99 @@ function drawControls() {
   strokeWeight(1);
   rect(250, 35, 50, 20);
   fill(0);
-  noStroke();
-  text("Reset", 275, 48);
+  noStroke();  text("Reset", 275, 48);
 }
 
-function mousePressed() {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   // Check control buttons
-  if (mouseY >= 10 && mouseY <= 30) {
-    if (mouseX >= 250 && mouseX <= 310) {
+  if (inputY >= 10 && inputY <= 30) {
+    if (inputX >= 250 && inputX <= 310) {
       startMovement(-1); // Move left
       return;
     }
-    if (mouseX >= 320 && mouseX <= 380) {
+    if (inputX >= 320 && inputX <= 380) {
       startMovement(1); // Move right
       return;
     }
   }
   
-  if (mouseY >= 35 && mouseY <= 55 && mouseX >= 250 && mouseX <= 300) {
+  if (inputY >= 35 && inputY <= 55 && inputX >= 250 && inputX <= 300) {
     resetMovement();
     return;
   }
   
-  // Click to start movement in direction of click
+  // Click/touch to start movement in direction of input
   if (!movingObject.isMoving) {
-    if (mouseX < referencePoint.x) {
+    if (inputX < referencePoint.x) {
       startMovement(-1); // Click left, move left past reference
     } else {
       startMovement(1); // Click right, move right past reference
     }
   }
+}
+
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
+  // Check control buttons
+  if (inputY >= 10 && inputY <= 30) {
+    if (inputX >= 250 && inputX <= 310) {
+      startMovement(-1); // Move left
+      return;
+    }
+    if (inputX >= 320 && inputX <= 380) {
+      startMovement(1); // Move right
+      return;
+    }
+  }
+  
+  if (inputY >= 35 && inputY <= 55 && inputX >= 250 && inputX <= 300) {
+    resetMovement();
+    return;
+  }
+  
+  // Click/touch to start movement in direction of input
+  if (!movingObject.isMoving) {
+    if (inputX < referencePoint.x) {
+      startMovement(-1); // Click left, move left past reference
+    } else {
+      startMovement(1); // Click right, move right past reference
+    }
+  }
+}
+
+function mousePressed() {
+  handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
 }
 
 function startMovement(direction) {

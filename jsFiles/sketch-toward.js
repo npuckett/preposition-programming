@@ -50,7 +50,7 @@ let movingDot = {
 let isMoving = false;
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
   
   // Initialize target to center
   movingDot.targetX = width / 2;
@@ -223,19 +223,31 @@ function drawControls() {
   // Speed control label
   fill(0);
   textAlign(LEFT);
-  textSize(10);
-  text("Speed: Use +/- keys", 250, 60);
+  textSize(10);  text("Speed: Use +/- keys", 250, 60);
 }
 
-function mousePressed() {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   // Check button clicks
-  if (mouseX > 250 && mouseX < 310 && mouseY > 20 && mouseY < 45) {
+  if (inputX > 250 && inputX < 310 && inputY > 20 && inputY < 45) {
     // Start/Stop button
     isMoving = !isMoving;
     if (isMoving) {
       movingDot.trail = [];  // Clear trail when starting
     }
-  } else if (mouseX > 320 && mouseX < 380 && mouseY > 20 && mouseY < 45) {
+  } else if (inputX > 320 && inputX < 380 && inputY > 20 && inputY < 45) {
     // Reset button
     movingDot.x = width / 2;
     movingDot.y = height / 2;
@@ -245,13 +257,23 @@ function mousePressed() {
     isMoving = false;
   } else {
     // Set new target
-    movingDot.targetX = mouseX;
-    movingDot.targetY = mouseY;
+    movingDot.targetX = inputX;
+    movingDot.targetY = inputY;
     if (!isMoving) {
       isMoving = true;
       movingDot.trail = [];
     }
   }
+}
+
+function mousePressed() {
+  handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
 }
 
 function keyPressed() {

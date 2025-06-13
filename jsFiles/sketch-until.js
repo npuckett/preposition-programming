@@ -1,366 +1,165 @@
-/*
- * PREPOSITION: UNTIL
+/**
+ * P5.js Sketch: UNTIL - Continuing Until a Condition is Met
  * 
- * CONCEPT:
- * "Until" indicates that an action or state continues up to a specific 
- * point in time or condition, then stops. It defines the endpoint or 
- * terminating condition for an ongoing process.
+ * CONCEPT: "Until" means an action continues up to a specific point,
+ * then stops when that condition is reached. This shows the temporal
+ * boundary where something ongoing comes to an end.
  * 
  * LEARNING OBJECTIVES:
- * - Implement conditional termination and endpoints
- * - Create countdown and progress tracking systems
- * - Use loop conditions with exit criteria
- * - Manage state transitions at specific thresholds
- * - Build time-bounded and condition-bounded processes
+ * • Understand conditional termination and stopping points
+ * • Practice progress tracking toward a target
+ * • Learn state transitions (running → stopped)
+ * • Explore time-based or condition-based endings
  * 
- * KEY VARIABLES:
- * - process: object containing start time and activities
- * - activities: array of different processes with individual targets
- * - stopCondition: boolean for manual termination
+ * KEY VARIABLES & METHODS:
+ * • progress - tracks how close we are to the "until" point
+ * • isRunning - boolean state for the ongoing action
+ * • targetValue - the condition that ends the process
+ * • map() - convert progress to visual representation
  * 
- * KEY METHODS:
- * - millis(): time tracking for countdowns
- * - map(): progress visualization
- * - constrain(): limit values within bounds
- * - min()/max(): boundary calculations
- * 
- * HOW TO EXTEND:
- * 1. Add user-defined stopping conditions
- * 2. Create cascading stop conditions (one stops others)
- * 3. Implement pause/resume functionality
- * 4. Add visual warnings before stopping
- * 5. Create different types of stopping criteria
- * 6. Add sound effects for completions
- * 7. Implement save/load for process states
+ * EXTENSION IDEAS:
+ * • Multiple different "until" conditions
+ * • User-defined stopping points
+ * • Visual countdown indicators
+ * • Different types of progress (time, distance, count)
  */
 
-// Process management object
-let process = {
-  startTime: null,        // When processes started
-  running: false,         // Are processes currently running?
-  stopCondition: false,   // Manual stop trigger
-  activities: []          // Array of different activities
-};
-
-// Visual effects
-let particles = [];
+let progress = 0;
+let isRunning = false;
+let targetValue = 100; // Continue until we reach 100%
+let startTime = 0;
+let fillSpeed = 0.8; // How fast the progress increases
 
 function setup() {
-  createCanvas(600, 400);
-  
-  // Define different activities that run "until" their conditions are met
-  process.activities = [
-    {
-      name: "Countdown Timer",
-      target: 6000,           // 6 seconds until stop
-      active: false,
-      type: "timer"
-    },
-    {
-      name: "Progress Bar", 
-      target: 100,            // Until 100% complete
-      current: 0,
-      active: false,
-      type: "progress"
-    },
-    {
-      name: "Ball Movement",
-      target: 500,            // Until 500 pixels traveled
-      current: 0,
-      active: false,
-      type: "movement"
-    },
-    {
-      name: "Rotation",
-      target: 360,            // Until full rotation (360 degrees)
-      current: 0,
-      active: false,
-      type: "rotation"
-    }
-  ];
+  createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
-  background(240, 248, 255);
+  background(240);
   
-  if (process.running) {
-    updateActivities();
-    drawActivities();
-    updateParticles();
-    displayStatus();
-  } else {
-    drawInstructions();
-  }
-  
-  drawControls();
-}
-
-function updateActivities() {
-  if (!process.startTime) return;
-  
-  let elapsed = millis() - process.startTime;
-  
-  // Update each activity until its condition is met
-  for (let activity of process.activities) {
-    if (activity.active && !process.stopCondition) {
-      switch (activity.type) {
-        case "timer":
-          // Continue until time target reached
-          if (elapsed >= activity.target) {
-            activity.active = false;
-            addCompletionParticles(width/2, 80);
-          }
-          break;
-          
-        case "progress":
-          // Continue until progress reaches 100%
-          activity.current = Math.min(100, elapsed / 80);
-          if (activity.current >= activity.target) {
-            activity.active = false;
-            addCompletionParticles(width/2, 170);
-          }
-          break;
-          
-        case "movement":
-          // Continue until ball reaches target distance
-          activity.current = Math.min(activity.target, elapsed / 20);
-          if (activity.current >= activity.target) {
-            activity.active = false;
-            addCompletionParticles(100 + activity.current, 250);
-          }
-          break;
-          
-        case "rotation":
-          // Continue until full rotation completed
-          activity.current = (elapsed / 20) % 360;
-          if (elapsed >= 7200) { // 360 degrees worth of time
-            activity.active = false;
-            addCompletionParticles(width/2, 340);
-          }
-          break;
-      }
-    } else if (process.stopCondition) {
-      // Manual stop condition triggered
-      activity.active = false;
+  // Update progress if running
+  if (isRunning && progress < targetValue) {
+    progress += fillSpeed;
+    
+    // Check if we've reached the "until" condition
+    if (progress >= targetValue) {
+      isRunning = false; // Stop when condition is met
+      progress = targetValue; // Cap at target
     }
   }
+  
+  // Draw the progress container
+  drawProgressBar();
+  
+  // Draw status and instructions
+  drawInfo();
 }
 
-function drawActivities() {
-  let elapsed = millis() - process.startTime;
+function drawProgressBar() {
+  // Background container
+  fill(220);
+  stroke(150);
+  strokeWeight(2);
+  rect(50, 150, 300, 40, 5);
   
-  // Countdown Timer Activity
-  let timer = process.activities[0];
-  let timeRemaining = Math.max(0, timer.target - elapsed);
+  // Progress fill (grows until target is reached)
+  let fillWidth = map(progress, 0, targetValue, 0, 300);
   
-  fill(timer.active ? color(255, 100, 100) : color(150));
-  textSize(24);
-  textAlign(CENTER);
-  text("Timer: " + (timeRemaining/1000).toFixed(1) + "s", width/2, 80);
-  
-  textSize(14);
-  fill(100);
-  text(timer.active ? "(Running until 0)" : "(Stopped)", width/2, 105);
-  
-  // Progress Bar Activity
-  let progress = process.activities[1];
-  fill(0);
-  textSize(16);
-  text("Progress Bar (until 100%)", width/2, 140);
-  
-  // Progress bar background
-  fill(200);
-  noStroke();
-  rect(150, 155, 300, 25);
-  
-  // Progress bar fill
-  fill(progress.active ? color(100, 200, 100) : color(150));
-  rect(150, 155, map(progress.current, 0, 100, 0, 300), 25);
-  
-  // Progress percentage
-  fill(0);
-  textSize(14);
-  text(progress.current.toFixed(1) + "%", width/2, 170);
-  text(progress.active ? "(Filling until complete)" : "(Complete/Stopped)", width/2, 190);
-  
-  // Ball Movement Activity
-  let movement = process.activities[2];
-  fill(0);
-  textSize(16);
-  text("Ball Movement (until right edge)", width/2, 220);
-  
-  let ballX = 100 + movement.current;
-  fill(movement.active ? color(100, 150, 255) : color(150));
-  noStroke();
-  circle(ballX, 250, 20);
-  
-  fill(0);
-  textSize(14);
-  text(movement.active ? "(Moving until target)" : "(Reached target/Stopped)", width/2, 270);
-  
-  // Rotation Activity
-  let rotation = process.activities[3];
-  fill(0);
-  textSize(16);
-  text("Rotating Square (until full rotation)", width/2, 300);
-  
-  push();
-  translate(width/2, 340);
-  rotate(radians(rotation.current));
-  fill(rotation.active ? color(255, 150, 100) : color(150));
-  noStroke();
-  rectMode(CENTER);
-  rect(0, 0, 30, 30);
-  pop();
-  
-  fill(0);
-  textSize(14);
-  text(rotation.current.toFixed(0) + "°", width/2, 365);
-  text(rotation.active ? "(Rotating until 360°)" : "(Full rotation/Stopped)", width/2, 385);
-}
-
-function addCompletionParticles(x, y) {
-  // Add celebration particles when an activity completes
-  for (let i = 0; i < 15; i++) {
-    particles.push({
-      x: x,
-      y: y,
-      vx: random(-3, 3),
-      vy: random(-3, 3),
-      life: 60,
-      color: [random(100, 255), random(100, 255), random(100, 255)]
-    });
-  }
-}
-
-function updateParticles() {
-  // Update and draw completion particles
-  for (let i = particles.length - 1; i >= 0; i--) {
-    let p = particles[i];
-    
-    p.x += p.vx;
-    p.y += p.vy;
-    p.life--;
-    
-    if (p.life > 0) {
-      fill(p.color[0], p.color[1], p.color[2], map(p.life, 0, 60, 0, 255));
-      noStroke();
-      circle(p.x, p.y, 4);
-    } else {
-      particles.splice(i, 1);
-    }
-  }
-}
-
-function displayStatus() {
-  // Count active processes
-  let activeCount = process.activities.filter(a => a.active).length;
-  
-  fill(0);
-  textAlign(CENTER);
-  textSize(16);
-  
-  if (process.stopCondition) {
-    text("All activities stopped by manual trigger", width/2, 30);
-  } else if (activeCount > 0) {
-    text(activeCount + " activities running until their conditions are met", width/2, 30);
+  if (isRunning) {
+    fill(100, 150, 255); // Blue while running
+  } else if (progress >= targetValue) {
+    fill(100, 255, 100); // Green when complete
   } else {
-    text("All activities completed - reached their 'until' conditions", width/2, 30);
+    fill(200); // Gray when stopped
   }
-}
-
-function drawInstructions() {
-  fill(100);
-  textAlign(CENTER);
+  
+  noStroke();
+  rect(50, 150, fillWidth, 40, 5);
+  
+  // Progress percentage text
+  fill(50);
+  textAlign(CENTER, CENTER);
   textSize(16);
-  text("Click 'Start Process' to begin multiple activities", width/2, height/2 - 60);
-  text("Each will continue UNTIL its condition is met:", width/2, height/2 - 30);
+  text(`${progress.toFixed(1)}%`, 200, 170);
   
-  textSize(14);
-  text("• Timer counts down until 0", width/2, height/2);
-  text("• Progress bar fills until 100%", width/2, height/2 + 20);
-  text("• Ball moves until it reaches the edge", width/2, height/2 + 40);
-  text("• Square rotates until full circle", width/2, height/2 + 60);
+  // Target line
+  stroke(255, 100, 100);
+  strokeWeight(3);
+  line(350, 140, 350, 200);
   
-  text("Or click 'Trigger Stop' to stop all activities immediately", width/2, height/2 + 100);
-}
-
-function drawControls() {
-  // Start Process button
-  fill(process.running ? color(200, 100, 100) : color(100, 200, 100));
-  stroke(100);
-  strokeWeight(1);
-  rect(50, 50, 100, 30);
-  
-  fill(255);
+  // Target label
+  fill(255, 100, 100);
   noStroke();
   textAlign(CENTER);
+  textSize(10);
+  text("UNTIL", 350, 130);
+  text("100%", 350, 210);
+}
+
+function drawInfo() {
+  fill(50);
+  noStroke();
+  textAlign(CENTER);
+  textSize(16);
+  
+  if (progress >= targetValue) {
+    fill(0, 150, 0);
+    text("Process completed! It ran UNTIL 100%", width/2, 60);
+    text("Click to start again", width/2, 250);
+  } else if (isRunning) {
+    fill(0, 0, 150);
+    text("Process is running UNTIL it reaches 100%...", width/2, 60);
+    text("Watch it continue until the target", width/2, 250);
+  } else {
+    text("Click to start a process that runs UNTIL 100%", width/2, 60);
+    text("It will continue until the red line", width/2, 250);
+  }
+  
+  // Simple status
+  textAlign(LEFT);
   textSize(12);
-  text(process.running ? "Running..." : "Start Process", 100, 70);
-  
-  // Trigger Stop button
-  fill(process.running ? color(255, 150, 100) : color(200));
-  stroke(100);
-  rect(50, 90, 100, 30);
-  
-  fill(process.running ? color(255) : color(150));
-  text("Trigger Stop", 100, 110);
-  
-  // Reset button
-  fill(200);
-  stroke(100);
-  rect(50, 130, 100, 30);
-  
-  fill(0);
-  text("Reset", 100, 150);
+  fill(100);
+  text(`Status: ${isRunning ? "Running" : progress >= targetValue ? "Complete" : "Stopped"}`, 20, 30);
+}
+
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  if (progress >= targetValue || !isRunning) {
+    // Reset and start the process
+    progress = 0;
+    isRunning = true;
+    startTime = millis();
+  }
 }
 
 function mousePressed() {
-  // Handle button clicks
-  if (mouseX > 50 && mouseX < 150) {
-    if (mouseY > 50 && mouseY < 80) {
-      // Start Process button
-      startProcess();
-    } else if (mouseY > 90 && mouseY < 120) {
-      // Trigger Stop button
-      if (process.running) {
-        process.stopCondition = true;
-      }
-    } else if (mouseY > 130 && mouseY < 160) {
-      // Reset button
-      resetProcess();
-    }
-  }
+  handleInputStart();
 }
 
-function startProcess() {
-  process.startTime = millis();
-  process.running = true;
-  process.stopCondition = false;
-  
-  // Reset and activate all activities
-  for (let activity of process.activities) {
-    activity.active = true;
-    if (activity.hasOwnProperty('current')) {
-      activity.current = 0;
-    }
-  }
-  
-  particles = [];
+// Handle touch events for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
 }
 
-function resetProcess() {
-  process.running = false;
-  process.startTime = null;
-  process.stopCondition = false;
-  
-  // Reset all activities
-  for (let activity of process.activities) {
-    activity.active = false;
-    if (activity.hasOwnProperty('current')) {
-      activity.current = 0;
+function keyPressed() {
+  if (key === 'r' || key === 'R') {
+    // Reset
+    progress = 0;
+    isRunning = false;
+  } else if (key === ' ') {
+    // Start/stop toggle
+    if (progress < targetValue) {
+      isRunning = !isRunning;
     }
   }
-  
-  particles = [];
 }

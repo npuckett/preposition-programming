@@ -37,7 +37,7 @@ let path = [];
 let showPath = true;
 
 function setup() {
-    createCanvas(400, 300);
+    createCanvas(400, 300).parent('canvas');
     
     // Pre-calculate the path for visualization
     calculatePath();
@@ -214,11 +214,20 @@ function calculatePath() {
         let t = i / 100;
         let x = bezierPoint(startPoint.x, startPoint.x, endPoint.x, endPoint.x, t);
         let y = bezierPoint(startPoint.y, controlPoint.y, controlPoint.y, endPoint.y, t);
-        path.push({x: x, y: y});
-    }
+        path.push({x: x, y: y});    }
 }
 
-function mousePressed() {
+// Helper functions for cross-platform input handling
+function getInputX() {
+    return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+    return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
     if (hasCompleted || !isMoving) {
         // Reset animation
         progress = 0;
@@ -227,6 +236,16 @@ function mousePressed() {
         movingCircle.x = startPoint.x;
         movingCircle.y = startPoint.y;
     }
+}
+
+function mousePressed() {
+    handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+    handleInputStart();
+    return false; // Prevent default touch behavior
 }
 
 function keyPressed() {

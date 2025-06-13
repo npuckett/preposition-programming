@@ -33,7 +33,7 @@ let trail = [];
 let speed = 0.03;
 
 function setup() {
-    createCanvas(400, 300);
+    createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
@@ -117,11 +117,20 @@ function draw() {
         textAlign(LEFT, TOP);
         textSize(10);
         text(`Angle: ${(degrees(angle) % 360).toFixed(1)}°`, 10, 10);
-        text(`Speed: ${speed.toFixed(3)} rad/frame`, 10, 25);
-    }
+        text(`Speed: ${speed.toFixed(3)} rad/frame`, 10, 25);    }
 }
 
-function mousePressed() {
+// Helper functions for cross-platform input handling
+function getInputX() {
+    return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+    return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
     if (!isMoving) {
         isMoving = true;
         trail = []; // Clear any existing trail
@@ -133,6 +142,16 @@ function mousePressed() {
         movingCircle.x = obstacle.x + orbitRadius;
         movingCircle.y = obstacle.y;
     }
+}
+
+function mousePressed() {
+    handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+    handleInputStart();
+    return false; // Prevent default touch behavior
 }
 
 function keyPressed() {

@@ -67,7 +67,7 @@ let timelineScale = 50; // pixels per second
 let currentTime = 0;
 
 function setup() {
-    createCanvas(600, 400);
+    createCanvas(600, 400).parent('canvas');
     programStartTime = millis();
 }
 
@@ -259,7 +259,17 @@ function drawEventStatus() {
     text(`Events occurring DURING: ${activeCount}`, 30, 60);
 }
 
-function mousePressed() {
+// Helper functions for cross-platform input handling
+function getInputX() {
+    return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+    return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
     if (!isRunning && currentTime < mainEvent.startTime + mainEvent.duration) {
         // Start or reset
         if (currentTime === 0) {
@@ -280,28 +290,27 @@ function mousePressed() {
                 event.progress = 0;
             }
         }
-    }
-}
-
-function keyPressed() {
-    if (key === ' ') {
-        // Spacebar to pause/resume
-        if (isRunning) {
-            isRunning = false;
-        } else if (currentTime < mainEvent.startTime + mainEvent.duration) {
-            isRunning = true;
-            programStartTime = millis() - currentTime;
-        }
-    } else if (key === 'r' || key === 'R') {
-        // Reset
+    } else if (currentTime >= mainEvent.startTime + mainEvent.duration) {
+        // Timeline complete, reset
         isRunning = false;
         programStartTime = millis();
         currentTime = 0;
         
+        // Reset all events
         mainEvent.isActive = false;
         for (let event of duringEvents) {
             event.isActive = false;
             event.progress = 0;
         }
     }
+}
+
+function mousePressed() {
+    handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+    handleInputStart();
+    return false; // Prevent default touch behavior
 }

@@ -43,7 +43,7 @@ let events = [];           // Array to store all timed events
 let particles = [];        // Visual effects for events
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
   
   // Define events that happen BEFORE the main event
   events = [
@@ -311,13 +311,25 @@ function displayRelationshipInfo(currentTime) {
   textSize(14);
   text(relationship, width/2, height - 30);
   
-  textSize(12);
-  text("Current time: " + currentTime.toFixed(1) + "s", width/2, height - 10);
+  textSize(12);  text("Current time: " + currentTime.toFixed(1) + "s", width/2, height - 10);
 }
 
-function mousePressed() {
-  // Handle button clicks
-  if (mouseX > 280 && mouseX < 360 && mouseY > 120 && mouseY < 145) {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
+  // Handle button clicks/touches
+  if (inputX > 280 && inputX < 360 && inputY > 120 && inputY < 145) {
     // Start/Stop button
     if (!timerRunning) {
       startTime = millis();
@@ -325,7 +337,7 @@ function mousePressed() {
     } else {
       timerRunning = false;
     }
-  } else if (mouseX > 280 && mouseX < 360 && mouseY > 150 && mouseY < 175) {
+  } else if (inputX > 280 && inputX < 360 && inputY > 150 && inputY < 175) {
     // Reset button
     timerRunning = false;
     startTime = null;
@@ -336,4 +348,14 @@ function mousePressed() {
       event.triggered = false;
     }
   }
+}
+
+function mousePressed() {
+  handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
 }

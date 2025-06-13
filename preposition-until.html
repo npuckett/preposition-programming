@@ -13,354 +13,68 @@
                 Open this sketch in P5 Web Editor →
             </a>
         </p>
-        
-        <h3>Try It</h3>
-        <p>Click the buttons below to watch processes that continue until specific conditions are met. Notice how each stops at its target.</p>
-    </div>
-
-    <div class="container">
+          <h3>Try It</h3>
+        <p>Click on the canvas to start a process that continues until it reaches 100%. Watch how it runs until the target condition is met.</p>
+    </div>    <div class="container">
         <div class="canvas-container">
-            <div id="sketch-holder"></div>
-            <div id="controls">
-                <button onclick="startProcess()">Start Process</button>
-                <button onclick="triggerStopCondition()">Trigger Stop</button>
-                <button onclick="resetProcess()">Reset</button>
-            </div>
-            <div id="status">Process: Ready to start</div>
+            <div id="canvas"></div>
         </div>
     </div>
 
-    <div class="description">
-        <h3>Concept</h3>
-        <p>The preposition <strong>"until"</strong> indicates that an action or state continues up to a specific point in time or condition, then stops. It defines the endpoint or terminating condition for an ongoing process. In programming, this involves maintaining a state or activity while continuously checking for a stopping condition.</p>        <h3>Translation Strategy</h3>
-        <p>To create "until" relationships in time:</p>
+    <div class="description">        <h3>Concept</h3>
+        <p>The preposition <strong>"until"</strong> indicates that an action continues up to a specific point, then stops when that condition is reached. This shows the temporal boundary where something ongoing comes to an end.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "until" relationships in programming:</p>
         <ul>
-            <li><strong>Termination Conditions:</strong> Define specific endpoints for ongoing processes</li>
-            <li><strong>Loop Control:</strong> Use conditional logic to maintain state while checking exit criteria</li>
-            <li><strong>Target Monitoring:</strong> Continuously evaluate whether stopping conditions are met</li>
-        </ul>
-
-        <h3>Key P5.js Methods</h3>
+            <li><strong>Progress Tracking:</strong> Monitor how close a process is to its target</li>
+            <li><strong>Conditional Termination:</strong> Stop the process when the target is reached</li>
+            <li><strong>State Transitions:</strong> Change from "running" to "stopped" at the endpoint</li>
+        </ul>        <h3>Key P5.js Methods</h3>
         <div class="code-section">
-            <strong>Time Management:</strong><br>
-            • <a href="https://p5js.org/reference/p5/millis" target="_blank">millis()</a> - tracks time for countdown timers<br>
-            • Conditional logic: <code>while (condition !== met)</code><br>
-            • <a href="https://p5js.org/reference/p5/frameCount" target="_blank">frameCount</a> - alternative timing method<br><br>
+            <strong>Progress Management:</strong><br>
+            • <a href="https://p5js.org/reference/p5/map" target="_blank">map(value, start1, stop1, start2, stop2)</a> - Convert progress to visual width<br>
+            • Conditional logic: <code>if (progress >= targetValue)</code> - Check until condition<br>
+            • State tracking with boolean variables<br><br>
             
             <strong>Visual Elements:</strong><br>
-            • <a href="https://p5js.org/reference/p5/map" target="_blank">map()</a> - creates progress visualizations<br>
-            • <a href="https://p5js.org/reference/p5/constrain" target="_blank">constrain()</a> - limits values within bounds<br>
-            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect()</a> - draws progress bars and timers<br>
-            • <a href="https://p5js.org/reference/p5/text" target="_blank">text()</a> - displays countdown and status information<br><br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw progress bar container and fill<br>
+            • <a href="https://p5js.org/reference/p5/text" target="_blank">text()</a> - Display progress percentage and status<br>
+            • <a href="https://p5js.org/reference/p5/line" target="_blank">line()</a> - Draw target indicator<br><br>
+            
+            <strong>Interaction:</strong><br>
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> / <a href="https://p5js.org/reference/p5/touchStarted" target="_blank">touchStarted()</a> - Start/restart process<br>
+            • Keyboard controls (R to reset, SPACE to toggle)<br><br>
             
             <strong>Process Control:</strong><br>
-            • State management with boolean flags<br>
-            • Multiple concurrent processes with individual targets<br>
-            • Termination logic for different conditions
-        </div>
-
-        <h3>Code Structure</h3>        <div class="code-section">
+            • Incremental progress updates each frame<br>
+            • Automatic termination when target reached
+        </div>        <h3>Code Structure</h3>
+        <div class="code-section">
             <strong>Basic Pattern for "Until":</strong><br><br>
             
-            1. <strong>Setup process variables:</strong> Track state and targets<br>
-            <code>let process = {</code><br>
-            <code>&nbsp;&nbsp;running: false,</code><br>
-            <code>&nbsp;&nbsp;activities: [</code><br>
-            <code>&nbsp;&nbsp;&nbsp;&nbsp;{name: "Timer", target: 5000, active: true}</code><br>
-            <code>&nbsp;&nbsp;]</code><br>
-            <code>};</code><br><br>
+            1. <strong>Setup variables:</strong> Track progress toward target<br>
+            <code>let progress = 0;</code><br>
+            <code>let isRunning = false;</code><br>
+            <code>let targetValue = 100; // Continue until 100%</code><br><br>
             
-            2. <strong>Monitor conditions:</strong> Check targets continuously<br>
-            <code>let elapsed = millis() - process.startTime;</code><br><br>
+            2. <strong>Update progress:</strong> Increment while running<br>
+            <code>if (isRunning && progress < targetValue) {</code><br>
+            <code>&nbsp;&nbsp;progress += fillSpeed;</code><br>
+            <code>}</code><br><br>
             
-            3. <strong>Apply until logic:</strong> Continue while condition not met<br>
-            <code>for (let activity of process.activities) {</code><br>
-            <code>&nbsp;&nbsp;if (activity.active) {</code><br>
-            <code>&nbsp;&nbsp;&nbsp;&nbsp;// Continue until target reached</code><br>
-            <code>&nbsp;&nbsp;&nbsp;&nbsp;if (elapsed >= activity.target) {</code><br>
-            <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;activity.active = false;</code><br>
-            <code>&nbsp;&nbsp;&nbsp;&nbsp;}</code><br>
-            <code>&nbsp;&nbsp;}</code><br>
-            <code>}</code>
+            3. <strong>Check termination:</strong> Stop when target reached<br>
+            <code>if (progress >= targetValue) {</code><br>
+            <code>&nbsp;&nbsp;isRunning = false; // Stop the process</code><br>
+            <code>&nbsp;&nbsp;progress = targetValue; // Cap at target</code><br>
+            <code>}</code><br><br>
+            
+            4. <strong>Visual feedback:</strong> Show progress and completion<br>
+            <code>let fillWidth = map(progress, 0, targetValue, 0, 300);</code><br>
+            <code>rect(50, 150, fillWidth, 40); // Progress bar</code>
         </div>
     </div>
 
-    <script>
-        let process = {
-            startTime: null,
-            running: false,
-            stopCondition: false,
-            activities: [
-                {
-                    name: "Countdown Timer",
-                    target: 6000, // 6 seconds
-                    active: false,
-                    type: "timer"
-                },
-                {
-                    name: "Progress Bar", 
-                    target: 100,
-                    current: 0,
-                    active: false,
-                    type: "progress"
-                },
-                {
-                    name: "Ball Movement",
-                    target: 500, // pixels
-                    current: 0,
-                    active: false,
-                    type: "movement"
-                },
-                {
-                    name: "Rotation",
-                    target: 360, // degrees
-                    current: 0,
-                    active: false,
-                    type: "rotation"
-                }
-            ]
-        };
-
-        let particles = [];
-
-        function setup() {
-            let canvas = createCanvas(600, 400);
-            canvas.parent('sketch-holder');
-            textAlign(CENTER, CENTER);
-            textSize(14);
-        }
-
-        function draw() {
-            background(240, 248, 255);
-            
-            if (process.running) {
-                updateActivities();
-                drawActivities();
-                updateStatus();
-            } else {
-                drawInstructions();
-            }
-        }
-
-        function updateActivities() {
-            if (!process.startTime) return;
-            
-            let elapsed = millis() - process.startTime;
-            
-            for (let activity of process.activities) {
-                if (activity.active && !process.stopCondition) {
-                    switch (activity.type) {
-                        case "timer":
-                            // Continue until time target reached
-                            if (elapsed >= activity.target) {
-                                activity.active = false;
-                            }
-                            break;
-                            
-                        case "progress":
-                            // Continue until progress reaches 100
-                            activity.current = Math.min(100, elapsed / 80);
-                            if (activity.current >= activity.target) {
-                                activity.active = false;
-                            }
-                            break;
-                            
-                        case "movement":
-                            // Continue until ball reaches right side
-                            activity.current = Math.min(activity.target, elapsed / 20);
-                            if (activity.current >= activity.target) {
-                                activity.active = false;
-                            }
-                            break;
-                            
-                        case "rotation":
-                            // Continue until full rotation
-                            activity.current = (elapsed / 20) % 360;
-                            if (elapsed >= 7200) { // 360 degrees worth of time
-                                activity.active = false;
-                            }
-                            break;
-                    }
-                } else if (process.stopCondition) {
-                    activity.active = false;
-                }
-            }
-        }
-
-        function drawActivities() {
-            let elapsed = millis() - process.startTime;
-            
-            // Countdown Timer
-            let timer = process.activities[0];
-            let timeRemaining = Math.max(0, timer.target - elapsed);
-            fill(timer.active ? [255, 100, 100] : [150, 150, 150]);
-            textSize(24);
-            text("Timer: " + (timeRemaining/1000).toFixed(1) + "s", width/2, 80);
-            text(timer.active ? "(Running until 0)" : "(Stopped)", width/2, 105);
-            
-            // Progress Bar
-            let progress = process.activities[1];
-            fill(0);
-            textSize(16);
-            text("Progress Bar (until 100%)", width/2, 140);
-            
-            // Progress bar background
-            fill(200);
-            noStroke();
-            rect(150, 155, 300, 25);
-            
-            // Progress bar fill
-            if (progress.active) {
-                fill(100, 200, 100);
-            } else {
-                fill(150);
-            }
-            rect(150, 155, map(progress.current, 0, 100, 0, 300), 25);
-            
-            // Progress text
-            fill(0);
-            textSize(14);
-            text(progress.current.toFixed(1) + "%", width/2, 170);
-            text(progress.active ? "(Filling until complete)" : "(Complete/Stopped)", width/2, 190);
-            
-            // Ball Movement
-            let movement = process.activities[2];
-            fill(0);
-            textSize(16);
-            text("Ball Movement (until right edge)", width/2, 220);
-            
-            let ballX = 100 + movement.current;
-            if (movement.active) {
-                fill(100, 150, 255);
-            } else {
-                fill(150);
-            }
-            noStroke();
-            circle(ballX, 250, 20);
-            
-            fill(0);
-            textSize(14);
-            text(movement.active ? "(Moving until target)" : "(Reached target/Stopped)", width/2, 270);
-            
-            // Rotation
-            let rotation = process.activities[3];
-            fill(0);
-            textSize(16);
-            text("Rotating Square (until full rotation)", width/2, 300);
-            
-            push();
-            translate(width/2, 340);
-            rotate(radians(rotation.current));
-            if (rotation.active) {
-                fill(255, 150, 100);
-            } else {
-                fill(150);
-            }
-            noStroke();
-            rectMode(CENTER);
-            rect(0, 0, 30, 30);
-            pop();
-            
-            fill(0);
-            textSize(14);
-            text(rotation.current.toFixed(0) + "°", width/2, 365);
-            text(rotation.active ? "(Rotating until 360°)" : "(Full rotation/Stopped)", width/2, 385);
-            
-            // Add particles if any activity is running
-            let anyActive = process.activities.some(a => a.active);
-            if (anyActive && frameCount % 15 === 0) {
-                particles.push({
-                    x: random(width),
-                    y: 0,
-                    vy: random(2, 4),
-                    life: 60,
-                    color: [random(100, 255), random(100, 255), random(100, 255)]
-                });
-            }
-            
-            // Draw and update particles
-            for (let i = particles.length - 1; i >= 0; i--) {
-                let p = particles[i];
-                fill(p.color[0], p.color[1], p.color[2], map(p.life, 0, 60, 0, 255));
-                noStroke();
-                circle(p.x, p.y, 4);
-                
-                p.y += p.vy;
-                p.life--;
-                
-                if (p.life <= 0) {
-                    particles.splice(i, 1);
-                }
-            }
-        }
-
-        function drawInstructions() {
-            fill(100);
-            textSize(16);
-            text("Click 'Start Process' to begin multiple activities", width/2, height/2 - 60);
-            text("Each will continue UNTIL its condition is met:", width/2, height/2 - 30);
-            
-            textSize(14);
-            text("• Timer counts down until 0", width/2, height/2);
-            text("• Progress bar fills until 100%", width/2, height/2 + 20);
-            text("• Ball moves until it reaches the edge", width/2, height/2 + 40);
-            text("• Square rotates until full circle", width/2, height/2 + 60);
-            
-            text("Or click 'Trigger Stop' to stop all activities immediately", width/2, height/2 + 100);
-        }
-
-        function updateStatus() {
-            let activeCount = process.activities.filter(a => a.active).length;
-            let status = "";
-            
-            if (process.stopCondition) {
-                status = "All activities stopped by condition trigger";
-            } else if (activeCount > 0) {
-                status = activeCount + " activities running until their conditions are met";
-            } else {
-                status = "All activities completed - reached their 'until' conditions";
-            }
-            
-            document.getElementById('status').innerHTML = status;
-        }
-
-        function startProcess() {
-            process.startTime = millis();
-            process.running = true;
-            process.stopCondition = false;
-            
-            // Reset and activate all activities
-            for (let activity of process.activities) {
-                activity.active = true;
-                if (activity.type === "progress" || activity.type === "movement" || activity.type === "rotation") {
-                    activity.current = 0;
-                }
-            }
-            
-            particles = [];
-        }
-
-        function triggerStopCondition() {
-            if (process.running) {
-                process.stopCondition = true;
-            }
-        }
-
-        function resetProcess() {
-            process.running = false;
-            process.startTime = null;
-            process.stopCondition = false;
-            
-            for (let activity of process.activities) {
-                activity.active = false;
-                if (activity.type === "progress" || activity.type === "movement" || activity.type === "rotation") {
-                    activity.current = 0;
-                }
-            }
-            
-            particles = [];
-            document.getElementById('status').innerHTML = "Process: Ready to start";
-        }
-    </script>
+    <script src="jsFiles/sketch-until.js"></script>
 </body>
 </html>

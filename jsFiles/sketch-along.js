@@ -46,7 +46,7 @@ let hasCompleted = false;   // Whether path traversal is complete
 let trail = [];             // Trail showing movement history
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
   
   // Create a curved path using sine wave
   // This creates an interesting winding path to follow
@@ -159,7 +159,7 @@ function draw() {
   noStroke();
   textAlign(CENTER);
   textSize(12);
-  text("Moving Circle", movingCircle.x, movingCircle.y - 20);
+  text("Moving Circle", movingCircle.x, movingCircle.y - 30);
   
   // Determine relationship status
   let relationship = "";
@@ -219,10 +219,22 @@ function drawArrow(fromX, fromY, toX, toY) {
        arrowY - sin(angle + 0.5) * arrowSize);
 }
 
-// Handle mouse clicks
-function mousePressed() {
-  // Check if reset button was clicked
-  if (mouseX > 10 && mouseX < 70 && mouseY > 75 && mouseY < 100) {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
+  // Check if reset button was clicked/touched
+  if (inputX > 10 && inputX < 70 && inputY > 75 && inputY < 100) {
     // Reset to initial state
     pathProgress = 0;
     isMoving = false;
@@ -246,6 +258,17 @@ function mousePressed() {
     movingCircle.y = pathPoints[0].y;
     trail = [];
   }
+}
+
+// Handle mouse clicks
+function mousePressed() {
+  handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
 }
 
 /*

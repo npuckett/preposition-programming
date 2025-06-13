@@ -52,7 +52,7 @@ let redCircle = {
 
 function setup() {
   // Create a 400x300 pixel canvas
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
@@ -113,38 +113,83 @@ function drawYLevelLine(circle, lineColor) {
   fill(lineColor);
   noStroke();
   textAlign(LEFT);
-  textSize(10);
-  text("Y: " + Math.round(circle.y), 5, circle.y - 3);
+  textSize(10);  text("Y: " + Math.round(circle.y), 5, circle.y - 3);
 }
 
-// Detect when mouse is first pressed
-function mousePressed() {
-  // Check if mouse is over blue circle
-  if (dist(mouseX, mouseY, blueCircle.x, blueCircle.y) < blueCircle.radius) {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
+  // Check if input is over blue circle
+  if (dist(inputX, inputY, blueCircle.x, blueCircle.y) < blueCircle.radius) {
     blueCircle.dragging = true;
   }
-  // Check if mouse is over red circle  
-  else if (dist(mouseX, mouseY, redCircle.x, redCircle.y) < redCircle.radius) {
+  // Check if input is over red circle  
+  else if (dist(inputX, inputY, redCircle.x, redCircle.y) < redCircle.radius) {
     redCircle.dragging = true;
   }
 }
 
-// Detect when mouse is moved while pressed (dragging)
-function mouseDragged() {
+// Handle input drag (both mouse and touch)
+function handleInputDrag() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   // Update position if circle is being dragged
   if (blueCircle.dragging) {
-    blueCircle.x = mouseX;
-    blueCircle.y = mouseY;
+    blueCircle.x = inputX;
+    blueCircle.y = inputY;
   }
   if (redCircle.dragging) {
-    redCircle.x = mouseX;
-    redCircle.y = mouseY;
+    redCircle.x = inputX;
+    redCircle.y = inputY;
   }
+}
+
+// Handle input end (both mouse and touch)
+function handleInputEnd() {
+  // Stop dragging both circles
+  blueCircle.dragging = false;
+  redCircle.dragging = false;
+}
+
+// Detect when mouse is first pressed
+function mousePressed() {
+  handleInputStart();
+}
+
+// Detect when mouse is moved while pressed (dragging)
+function mouseDragged() {
+  handleInputDrag();
 }
 
 // Detect when mouse button is released
 function mouseReleased() {
-  // Stop dragging both circles
-  blueCircle.dragging = false;
-  redCircle.dragging = false;
+  handleInputEnd();
+}
+
+// Touch event handlers for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
+}
+
+function touchMoved() {
+  handleInputDrag();
+  return false; // Prevent scrolling
+}
+
+function touchEnded() {
+  handleInputEnd();
+  return false;
 }

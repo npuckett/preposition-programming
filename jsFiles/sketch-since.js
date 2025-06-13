@@ -55,7 +55,7 @@ let growingCircle = {
 let particles = [];
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
   textAlign(CENTER, CENTER);
 }
 
@@ -274,18 +274,30 @@ function drawInfo() {
   if (isTracking && currentTime > 0) {
     textSize(12);
     fill(0);
-    text("Duration: " + nf(currentTime/1000, 1, 1) + " seconds", width/2, height - 115);
-  }
+    text("Duration: " + nf(currentTime/1000, 1, 1) + " seconds", width/2, height - 115);  }
 }
 
-function mousePressed() {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   // Check control buttons
-  if (mouseY >= 70 && mouseY <= 95) {
-    if (mouseX >= 250 && mouseX <= 310) {
+  if (inputY >= 70 && inputY <= 95) {
+    if (inputX >= 250 && inputX <= 310) {
       toggleTracking();
       return;
     }
-    if (mouseX >= 320 && mouseX <= 380) {
+    if (inputX >= 320 && inputX <= 380) {
       resetTracking();
       return;
     }
@@ -295,6 +307,16 @@ function mousePressed() {
   if (!isTracking) {
     startTracking();
   }
+}
+
+function mousePressed() {
+  handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
 }
 
 function toggleTracking() {

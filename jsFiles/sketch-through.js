@@ -56,7 +56,7 @@ let movingCircle = {
 };
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
@@ -196,31 +196,47 @@ function displayRelationship(isInsideBarrier) {
   fill(0);
   textAlign(CENTER);
   textSize(16);
-  text(relationship, width/2, height - 40);
-  text("Drag the circle through the barrier", width/2, height - 15);
+  text(relationship, width/2, height - 40);  text("Drag the circle through the barrier", width/2, height - 15);
 }
 
-function mousePressed() {
-  // Check if reset button was clicked
-  if (mouseX > 10 && mouseX < 90 && mouseY > 80 && mouseY < 105) {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
+  // Check if reset button was clicked/touched
+  if (inputX > 10 && inputX < 90 && inputY > 80 && inputY < 105) {
     resetMovement();
     return;
   }
   
-  // Check if mouse is over the moving circle
-  if (dist(mouseX, mouseY, movingCircle.x, movingCircle.y) < movingCircle.radius) {
+  // Check if input is over the moving circle
+  if (dist(inputX, inputY, movingCircle.x, movingCircle.y) < movingCircle.radius) {
     movingCircle.dragging = true;
   }
 }
 
-function mouseDragged() {
+// Handle input drag (both mouse and touch)
+function handleInputDrag() {
   // Update circle position if being dragged
   if (movingCircle.dragging) {
-    movingCircle.x = mouseX;
-    movingCircle.y = mouseY;
+    let inputX = getInputX();
+    let inputY = getInputY();
+    
+    movingCircle.x = inputX;
+    movingCircle.y = inputY;
     
     // Add current position to the path trail
-    movingCircle.path.push({x: mouseX, y: mouseY});
+    movingCircle.path.push({x: inputX, y: inputY});
     
     // Limit path length to prevent memory issues
     if (movingCircle.path.length > 100) {
@@ -229,8 +245,37 @@ function mouseDragged() {
   }
 }
 
-function mouseReleased() {
+// Handle input end (both mouse and touch)
+function handleInputEnd() {
   movingCircle.dragging = false;
+}
+
+function mousePressed() {
+  handleInputStart();
+}
+
+function mouseDragged() {
+  handleInputDrag();
+}
+
+function mouseReleased() {
+  handleInputEnd();
+}
+
+// Touch event handlers for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
+}
+
+function touchMoved() {
+  handleInputDrag();
+  return false; // Prevent scrolling
+}
+
+function touchEnded() {
+  handleInputEnd();
+  return false;
 }
 
 function resetMovement() {

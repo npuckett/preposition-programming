@@ -28,7 +28,7 @@ let hasCrossed = false;     // Whether crossing is complete
 let crossingPath = [];      // Trail of movement
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
   
   // Set initial position
   movingCircle.x = startPoint.x;
@@ -154,14 +154,26 @@ function draw() {
   textAlign(CENTER);
   textSize(16);
   fill(0);
-  text(relationship, width/2, height - 40);
+  text(relationship, width/2, height - 30);
   text("Click anywhere to start crossing", width/2, height - 15);
 }
 
-// Handle mouse clicks
-function mousePressed() {
-  // Check if reset button was clicked
-  if (mouseX > 10 && mouseX < 70 && mouseY > 75 && mouseY < 100) {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
+  // Check if reset button was clicked/touched
+  if (inputX > 10 && inputX < 70 && inputY > 75 && inputY < 100) {
     // Reset to initial state
     progress = 0;
     isMoving = false;
@@ -177,7 +189,7 @@ function mousePressed() {
     isMoving = true;
     crossingPath = []; // Clear previous trail
   } else if (hasCrossed) {
-    // If already crossed, reset and start again
+    // Reset and start again
     progress = 0;
     isMoving = true;
     hasCrossed = false;
@@ -185,6 +197,17 @@ function mousePressed() {
     movingCircle.y = startPoint.y;
     crossingPath = [];
   }
+}
+
+// Handle mouse clicks
+function mousePressed() {
+  handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
 }
 
 /*

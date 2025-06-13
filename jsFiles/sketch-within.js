@@ -66,7 +66,7 @@ let showDistances = false;
 let dragOffset = { x: 0, y: 0 };
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
@@ -267,8 +267,7 @@ function drawRelationshipInfo() {
   text(relationship, width/2, height - 60);
   
   // Additional information
-  fill(0);
-  textSize(12);
+  
   text("Green circle is " + (isOutsideWithin ? "WITHIN" : "OUTSIDE") + " container", 
        width/2, height - 40);
   
@@ -331,47 +330,63 @@ function checkCompletelyWithinContainer(obj) {
   // Check if entire object including radius is within container
   return (obj.x - obj.radius >= container.x && 
           obj.x + obj.radius <= container.x + container.width &&
-          obj.y - obj.radius >= container.y && 
-          obj.y + obj.radius <= container.y + container.height);
+          obj.y - obj.radius >= container.y &&          obj.y + obj.radius <= container.y + container.height);
 }
 
-function mousePressed() {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   // Check control buttons
-  if (mouseY >= 10 && mouseY <= 30) {
-    if (mouseX >= 250 && mouseX <= 340) {
+  if (inputY >= 10 && inputY <= 30) {
+    if (inputX >= 250 && inputX <= 340) {
       showBoundaries = !showBoundaries;
       return;
     }
-    if (mouseX >= 350 && mouseX <= 390) {
+    if (inputX >= 350 && inputX <= 390) {
       resetObjects();
       return;
     }
   }
   
-  if (mouseY >= 35 && mouseY <= 55 && mouseX >= 250 && mouseX <= 340) {
+  if (inputY >= 35 && inputY <= 55 && inputX >= 250 && inputX <= 340) {
     showDistances = !showDistances;
     return;
   }
   
   // Check object selection
-  let distToMoving = dist(mouseX, mouseY, movingObject.x, movingObject.y);
-  let distToOutside = dist(mouseX, mouseY, outsideObject.x, outsideObject.y);
+  let distToMoving = dist(inputX, inputY, movingObject.x, movingObject.y);
+  let distToOutside = dist(inputX, inputY, outsideObject.x, outsideObject.y);
   
   if (distToMoving <= movingObject.radius) {
     movingObject.dragging = true;
-    dragOffset.x = mouseX - movingObject.x;
-    dragOffset.y = mouseY - movingObject.y;
+    dragOffset.x = inputX - movingObject.x;
+    dragOffset.y = inputY - movingObject.y;
   } else if (distToOutside <= outsideObject.radius) {
     outsideObject.dragging = true;
-    dragOffset.x = mouseX - outsideObject.x;
-    dragOffset.y = mouseY - outsideObject.y;
+    dragOffset.x = inputX - outsideObject.x;
+    dragOffset.y = inputY - outsideObject.y;
   }
 }
 
-function mouseDragged() {
+// Handle input drag (both mouse and touch)
+function handleInputDrag() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   if (movingObject.dragging) {
-    movingObject.x = mouseX - dragOffset.x;
-    movingObject.y = mouseY - dragOffset.y;
+    movingObject.x = inputX - dragOffset.x;
+    movingObject.y = inputY - dragOffset.y;
     
     // Keep within canvas bounds
     movingObject.x = constrain(movingObject.x, movingObject.radius, width - movingObject.radius);
@@ -379,8 +394,8 @@ function mouseDragged() {
   }
   
   if (outsideObject.dragging) {
-    outsideObject.x = mouseX - dragOffset.x;
-    outsideObject.y = mouseY - dragOffset.y;
+    outsideObject.x = inputX - dragOffset.x;
+    outsideObject.y = inputY - dragOffset.y;
     
     // Keep within canvas bounds
     outsideObject.x = constrain(outsideObject.x, outsideObject.radius, width - outsideObject.radius);
@@ -388,9 +403,38 @@ function mouseDragged() {
   }
 }
 
-function mouseReleased() {
+// Handle input end (both mouse and touch)
+function handleInputEnd() {
   movingObject.dragging = false;
   outsideObject.dragging = false;
+}
+
+function mousePressed() {
+  handleInputStart();
+}
+
+function mouseDragged() {
+  handleInputDrag();
+}
+
+function mouseReleased() {
+  handleInputEnd();
+}
+
+// Touch event handlers for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
+}
+
+function touchMoved() {
+  handleInputDrag();
+  return false; // Prevent scrolling
+}
+
+function touchEnded() {
+  handleInputEnd();
+  return false;
 }
 
 function resetObjects() {

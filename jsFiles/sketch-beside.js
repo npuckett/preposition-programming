@@ -34,7 +34,7 @@ let snapDistance = 80; // Distance for "beside" detection
 let alignmentTolerance = 30; // Y-axis alignment tolerance
 
 function setup() {
-    createCanvas(400, 300);
+    createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
@@ -122,13 +122,10 @@ function draw() {
         text("Green connection shows the beside relationship", width/2, 45);
     } else {
         text("Drag the yellow circle to place it BESIDE the blue square", width/2, 30);
-        text("Try to align it horizontally and position it to the left or right", width/2, 45);
+        text("Green zones show where 'beside' positioning workst", width/2, 45);
     }
     
-    // Controls
-    textAlign(CENTER, BOTTOM);
-    textSize(10);
-    text("Drag the circle • Green zones show where 'beside' positioning works", width/2, height - 10);
+
 }
 
 function checkBesideRelationship() {
@@ -186,24 +183,21 @@ function drawAlignmentGuides() {
 
 function drawPositionInfo() {
     // Info panel
-    fill(255, 255, 255, 200);
-    stroke(150);
-    strokeWeight(1);
-    rect(10, 10, 180, 80);
+    
     
     fill(50);
     noStroke();
     textAlign(LEFT, TOP);
     textSize(10);
-    text("Position Information:", 15, 20);
+    text("Position Information:", 15, 220);
     
-    text(`Circle: (${movingCircle.x.toFixed(0)}, ${movingCircle.y.toFixed(0)})`, 15, 35);
-    text(`Square: (${blueSquare.x}, ${blueSquare.y})`, 15, 50);
+    text(`Circle: (${movingCircle.x.toFixed(0)}, ${movingCircle.y.toFixed(0)})`, 15, 235);
+    text(`Square: (${blueSquare.x}, ${blueSquare.y})`, 15, 250);
     
     let hDist = abs(movingCircle.x - blueSquare.x);
     let vDist = abs(movingCircle.y - blueSquare.y);
-    text(`H-Distance: ${hDist.toFixed(0)}px`, 15, 65);
-    text(`V-Distance: ${vDist.toFixed(0)}px`, 15, 80);
+    text(`H-Distance: ${hDist.toFixed(0)}px`, 15, 265);
+    text(`V-Distance: ${vDist.toFixed(0)}px`, 15, 280);
     
     // Status indicator
     if (isBeside) {
@@ -211,22 +205,38 @@ function drawPositionInfo() {
         text("STATUS: BESIDE (" + besideDirection + ")", 15, 5);
     } else {
         fill(255, 100, 100);
-        text("STATUS: NOT BESIDE", 15, 5);
-    }
+        text("STATUS: NOT BESIDE", 15, 5);    }
 }
 
-function mousePressed() {
-    // Check if mouse is over the circle
-    let distance = dist(mouseX, mouseY, movingCircle.x, movingCircle.y);
+// Helper functions for cross-platform input handling
+function getInputX() {
+    return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+    return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+    let inputX = getInputX();
+    let inputY = getInputY();
+    
+    // Check if input is over the circle
+    let distance = dist(inputX, inputY, movingCircle.x, movingCircle.y);
     if (distance < movingCircle.radius) {
         isDragging = true;
     }
 }
 
-function mouseDragged() {
+// Handle input drag (both mouse and touch)
+function handleInputDrag() {
     if (isDragging) {
-        movingCircle.x = mouseX;
-        movingCircle.y = mouseY;
+        let inputX = getInputX();
+        let inputY = getInputY();
+        
+        movingCircle.x = inputX;
+        movingCircle.y = inputY;
         
         // Keep circle within canvas bounds
         movingCircle.x = constrain(movingCircle.x, movingCircle.radius, 
@@ -236,7 +246,8 @@ function mouseDragged() {
     }
 }
 
-function mouseReleased() {
+// Handle input end (both mouse and touch)
+function handleInputEnd() {
     if (isDragging) {
         // Snap to beside position if close enough
         let horizontalDistance = abs(movingCircle.x - blueSquare.x);
@@ -260,6 +271,34 @@ function mouseReleased() {
     }
     
     isDragging = false;
+}
+
+function mousePressed() {
+    handleInputStart();
+}
+
+function mouseDragged() {
+    handleInputDrag();
+}
+
+function mouseReleased() {
+    handleInputEnd();
+}
+
+// Touch event handlers for mobile
+function touchStarted() {
+    handleInputStart();
+    return false; // Prevent default touch behavior
+}
+
+function touchMoved() {
+    handleInputDrag();
+    return false; // Prevent scrolling
+}
+
+function touchEnded() {
+    handleInputEnd();
+    return false;
 }
 
 function keyPressed() {

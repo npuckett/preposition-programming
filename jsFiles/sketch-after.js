@@ -20,7 +20,7 @@ let particles = [];
 let timelineY = 200;
 
 function setup() {
-  createCanvas(600, 400);
+  createCanvas(600, 400).parent('canvas');
   textAlign(CENTER, CENTER);
   textSize(14);
 }
@@ -261,14 +261,26 @@ function drawInstructions() {
   text("After 2.5s", 400, 230);
   
   fill(255, 100, 255);
-  ellipse(500, 250, 12, 12);
-  text("After 4s", 500, 230);
+  ellipse(500, 250, 12, 12);  text("After 4s", 500, 230);
 }
 
-function mousePressed() {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   // Check reset button
-  if (timeline.running && mouseX > width - 100 && mouseX < width - 20 && 
-      mouseY > 20 && mouseY < 50) {
+  if (timeline.running && inputX > width - 100 && inputX < width - 20 && 
+      inputY > 20 && inputY < 50) {
     resetTimeline();
     return;
   }
@@ -277,6 +289,16 @@ function mousePressed() {
   if (!timeline.running) {
     startTimeline();
   }
+}
+
+function mousePressed() {
+  handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
 }
 
 function startTimeline() {

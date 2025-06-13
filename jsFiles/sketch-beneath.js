@@ -53,7 +53,7 @@ let showContactLines = true;
 let dragOffset = { x: 0, y: 0 };
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
@@ -309,57 +309,103 @@ function drawControls() {
   text("Reset", 365, 23);
 }
 
-function mousePressed() {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   // Check control buttons
-  if (mouseY >= 10 && mouseY <= 30) {
-    if (mouseX >= 250 && mouseX <= 330) {
+  if (inputY >= 10 && inputY <= 30) {
+    if (inputX >= 250 && inputX <= 330) {
       showDepthLayers = !showDepthLayers;
       return;
     }
-    if (mouseX >= 340 && mouseX <= 390) {
+    if (inputX >= 340 && inputX <= 390) {
       resetObjects();
       return;
     }
   }
   
-  if (mouseY >= 35 && mouseY <= 55 && mouseX >= 250 && mouseX <= 330) {
+  if (inputY >= 35 && inputY <= 55 && inputX >= 250 && inputX <= 330) {
     showContactLines = !showContactLines;
     return;
   }
   
   // Check object selection (surface object has priority for visibility)
-  if (mouseX >= surfaceObject.x && mouseX <= surfaceObject.x + surfaceObject.width &&
-      mouseY >= surfaceObject.y && mouseY <= surfaceObject.y + surfaceObject.height) {
+  if (inputX >= surfaceObject.x && inputX <= surfaceObject.x + surfaceObject.width &&
+      inputY >= surfaceObject.y && inputY <= surfaceObject.y + surfaceObject.height) {
     surfaceObject.dragging = true;
-    dragOffset.x = mouseX - surfaceObject.x;
-    dragOffset.y = mouseY - surfaceObject.y;
+    dragOffset.x = inputX - surfaceObject.x;
+    dragOffset.y = inputY - surfaceObject.y;
     return;
   }
   
-  if (mouseX >= beneathObject.x && mouseX <= beneathObject.x + beneathObject.width &&
-      mouseY >= beneathObject.y && mouseY <= beneathObject.y + beneathObject.height) {
+  if (inputX >= beneathObject.x && inputX <= beneathObject.x + beneathObject.width &&
+      inputY >= beneathObject.y && inputY <= beneathObject.y + beneathObject.height) {
     beneathObject.dragging = true;
-    dragOffset.x = mouseX - beneathObject.x;
-    dragOffset.y = mouseY - beneathObject.y;
+    dragOffset.x = inputX - beneathObject.x;
+    dragOffset.y = inputY - beneathObject.y;
     return;
   }
 }
 
-function mouseDragged() {
+// Handle input drag (both mouse and touch)
+function handleInputDrag() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   if (surfaceObject.dragging) {
-    surfaceObject.x = constrain(mouseX - dragOffset.x, 0, width - surfaceObject.width);
-    surfaceObject.y = constrain(mouseY - dragOffset.y, 0, height - surfaceObject.height);
+    surfaceObject.x = constrain(inputX - dragOffset.x, 0, width - surfaceObject.width);
+    surfaceObject.y = constrain(inputY - dragOffset.y, 0, height - surfaceObject.height);
   }
   
   if (beneathObject.dragging) {
-    beneathObject.x = constrain(mouseX - dragOffset.x, 0, width - beneathObject.width);
-    beneathObject.y = constrain(mouseY - dragOffset.y, 0, height - beneathObject.height);
+    beneathObject.x = constrain(inputX - dragOffset.x, 0, width - beneathObject.width);
+    beneathObject.y = constrain(inputY - dragOffset.y, 0, height - beneathObject.height);
   }
 }
 
-function mouseReleased() {
+// Handle input end (both mouse and touch)
+function handleInputEnd() {
   surfaceObject.dragging = false;
   beneathObject.dragging = false;
+}
+
+function mousePressed() {
+  handleInputStart();
+}
+
+function mouseDragged() {
+  handleInputDrag();
+}
+
+function mouseReleased() {
+  handleInputEnd();
+}
+
+// Touch event handlers for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
+}
+
+function touchMoved() {
+  handleInputDrag();
+  return false; // Prevent scrolling
+}
+
+function touchEnded() {
+  handleInputEnd();
+  return false;
 }
 
 function resetObjects() {

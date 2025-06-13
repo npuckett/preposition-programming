@@ -49,7 +49,7 @@ let orangeCircle = {
 };
 
 function setup() {
-  createCanvas(400, 300);
+  createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
@@ -106,33 +106,78 @@ function drawYLevelLine(circle, lineColor) {
   fill(lineColor);
   noStroke();
   textAlign(LEFT);
-  textSize(10);
-  text("Y: " + Math.round(circle.y), 5, circle.y - 3);
+  textSize(10);  text("Y: " + Math.round(circle.y), 5, circle.y - 3);
 }
 
-function mousePressed() {
-  // Check which circle is clicked
-  if (dist(mouseX, mouseY, greenCircle.x, greenCircle.y) < greenCircle.radius) {
+// Helper functions for cross-platform input handling
+function getInputX() {
+  return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+  return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
+  // Check which circle is clicked/touched
+  if (dist(inputX, inputY, greenCircle.x, greenCircle.y) < greenCircle.radius) {
     greenCircle.dragging = true;
-  } else if (dist(mouseX, mouseY, orangeCircle.x, orangeCircle.y) < orangeCircle.radius) {
+  } else if (dist(inputX, inputY, orangeCircle.x, orangeCircle.y) < orangeCircle.radius) {
     orangeCircle.dragging = true;
   }
 }
 
-function mouseDragged() {
+// Handle input drag (both mouse and touch)
+function handleInputDrag() {
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
   // Update position of dragged circle
   if (greenCircle.dragging) {
-    greenCircle.x = mouseX;
-    greenCircle.y = mouseY;
+    greenCircle.x = inputX;
+    greenCircle.y = inputY;
   }
   if (orangeCircle.dragging) {
-    orangeCircle.x = mouseX;
-    orangeCircle.y = mouseY;
+    orangeCircle.x = inputX;
+    orangeCircle.y = inputY;
   }
 }
 
-function mouseReleased() {
+// Handle input end (both mouse and touch)
+function handleInputEnd() {
   // Stop dragging
   greenCircle.dragging = false;
   orangeCircle.dragging = false;
+}
+
+function mousePressed() {
+  handleInputStart();
+}
+
+function mouseDragged() {
+  handleInputDrag();
+}
+
+function mouseReleased() {
+  handleInputEnd();
+}
+
+// Touch event handlers for mobile
+function touchStarted() {
+  handleInputStart();
+  return false; // Prevent default touch behavior
+}
+
+function touchMoved() {
+  handleInputDrag();
+  return false; // Prevent scrolling
+}
+
+function touchEnded() {
+  handleInputEnd();
+  return false;
 }

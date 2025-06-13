@@ -34,7 +34,7 @@ let currentPosition = { x: 200, y: 150 };
 let progress = 0;
 
 function setup() {
-    createCanvas(400, 300);
+    createCanvas(400, 300).parent('canvas');
     
     // Create group of blue circles
     for (let i = 0; i < numCircles; i++) {
@@ -164,17 +164,36 @@ function draw() {
     textAlign(LEFT, TOP);
     textSize(10);
     text(`Status: ${movingCircle.isAmong ? "AMONG" : "SEPARATE"}`, 10, 10);
-    text(`Nearby circles: ${nearbyCount}`, 10, 25);
-    text(`Min distance: ${minDistanceToGroup.toFixed(1)}px`, 10, 40);
+    text(`Nearby circles: ${nearbyCount}`, 10, 25);    text(`Min distance: ${minDistanceToGroup.toFixed(1)}px`, 10, 40);
 }
 
-function mousePressed() {
+// Helper functions for cross-platform input handling
+function getInputX() {
+    return touches.length > 0 ? touches[0].x : mouseX;
+}
+
+function getInputY() {
+    return touches.length > 0 ? touches[0].y : mouseY;
+}
+
+// Handle input start (both mouse and touch)
+function handleInputStart() {
     if (!isMoving) {
-        targetPosition.x = mouseX;
-        targetPosition.y = mouseY;
+        targetPosition.x = getInputX();
+        targetPosition.y = getInputY();
         isMoving = true;
         progress = 0;
     }
+}
+
+function mousePressed() {
+    handleInputStart();
+}
+
+// Handle touch events for mobile
+function touchStarted() {
+    handleInputStart();
+    return false; // Prevent default touch behavior
 }
 
 function keyPressed() {
