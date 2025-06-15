@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P5.js Prepositions</title>
+    <title>P5.js Preposition Examples</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="index-body">
-    <div class="index-container">        <div class="sidebar">
+    <div class="index-container">
+        <div class="sidebar">
             <div class="header">
                 <h1>P5.js Prepositions</h1>
                 <p>Methods for converting language to code</p>
-                <button class="mobile-toggle" id="mobile-toggle" onclick="toggleSidebar()">☰ Menu</button>
             </div>
 
             <div class="menu-group">
@@ -65,21 +65,9 @@
                 <iframe id="content-frame" style="display: none;"></iframe>
             </div>
         </div>
-    </div>    <script>
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const menuGroups = document.querySelectorAll('.menu-group');
-            const isCollapsed = sidebar.classList.contains('collapsed');
-            
-            if (isCollapsed) {
-                sidebar.classList.remove('collapsed');
-                menuGroups.forEach(group => group.style.display = 'block');
-            } else {
-                sidebar.classList.add('collapsed');
-                menuGroups.forEach(group => group.style.display = 'none');
-            }
-        }
+    </div>
 
+    <script>
         function loadExample(filename, title, buttonElement) {
             // Remove active class from all menu items
             const menuItems = document.querySelectorAll('.menu-item');
@@ -96,14 +84,6 @@
             const iframe = document.getElementById('content-frame');
             iframe.style.display = 'block';
             iframe.src = filename;
-
-            // On mobile, auto-collapse sidebar after selection
-            if (window.innerWidth <= 768) {
-                const sidebar = document.querySelector('.sidebar');
-                const menuGroups = document.querySelectorAll('.menu-group');
-                sidebar.classList.add('collapsed');
-                menuGroups.forEach(group => group.style.display = 'none');
-            }
         }
 
         // Add keyboard navigation
