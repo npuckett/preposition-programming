@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>P5.js Preposition Examples</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
 </head>
 <body class="index-body">
     <div class="index-container">        <div class="sidebar">
@@ -52,20 +53,58 @@
         <div class="content">
             <div class="content-header">
                 <h2 id="current-title">Welcome</h2>
+                <div class="web-editor-link" id="web-editor-link" style="display: none;">
+                    <a id="web-editor-button" href="#" target="_blank" class="web-editor-btn">
+                        📝 Open this sketch in P5 Web Editor
+                    </a>
+                </div>
             </div>
             <div class="frame-container">
                 <div class="welcome-message" id="welcome-message">
                     <div class="welcome-content">
                         <h3>Welcome to P5.js Prepositions</h3>
                         <p>This collection contains interactive examples showing how spatial, directional, and temporal prepositions can be translated into P5.js sketches.</p>
-                        <p>Select a preposition from the menu to explore its interactive example.</p>                        <p><strong>24 examples total:</strong></p>
+                        <p>Select a preposition from the menu to explore its interactive example.</p>
+                        <p><strong>24 examples total:</strong></p>
                         <p>• 9 Spatial Relationships<br>• 10 Movement & Direction<br>• 5 Time-based</p>
                     </div>
                 </div>
-                <iframe id="content-frame" style="display: none;"></iframe>
+                <div id="canvas-container" style="display: none;">
+                    <div id="canvas"></div>
+                </div>
             </div>
         </div>
     </div>    <script>
+        let currentSketch = null;
+        
+        // Preposition to JS file mapping
+        const prepositionFiles = {
+            'preposition-above.html': { js: 'jsFiles/sketch-above.js', webEditor: 'webeditorjs/sketch-above.js' },
+            'preposition-across.html': { js: 'jsFiles/sketch-across.js', webEditor: 'webeditorjs/sketch-across.js' },
+            'preposition-after.html': { js: 'jsFiles/sketch-after.js', webEditor: 'webeditorjs/sketch-after.js' },
+            'preposition-along.html': { js: 'jsFiles/sketch-along.js', webEditor: 'webeditorjs/sketch-along.js' },
+            'preposition-among.html': { js: 'jsFiles/sketch-among.js', webEditor: 'webeditorjs/sketch-among.js' },
+            'preposition-around.html': { js: 'jsFiles/sketch-around.js', webEditor: 'webeditorjs/sketch-around.js' },
+            'preposition-away.html': { js: 'jsFiles/sketch-away.js', webEditor: 'webeditorjs/sketch-away.js' },
+            'preposition-before.html': { js: 'jsFiles/sketch-before.js', webEditor: 'webeditorjs/sketch-before.js' },
+            'preposition-behind.html': { js: 'jsFiles/sketch-behind.js', webEditor: 'webeditorjs/sketch-behind.js' },
+            'preposition-below.html': { js: 'jsFiles/sketch-below.js', webEditor: 'webeditorjs/sketch-below.js' },
+            'preposition-beneath.html': { js: 'jsFiles/sketch-beneath.js', webEditor: 'webeditorjs/sketch-beneath.js' },
+            'preposition-beside.html': { js: 'jsFiles/sketch-beside.js', webEditor: 'webeditorjs/sketch-beside.js' },
+            'preposition-between.html': { js: 'jsFiles/sketch-between.js', webEditor: 'webeditorjs/sketch-between.js' },
+            'preposition-during.html': { js: 'jsFiles/sketch-during.js', webEditor: 'webeditorjs/sketch-during.js' },
+            'preposition-into.html': { js: 'jsFiles/sketch-into.js', webEditor: 'webeditorjs/sketch-into.js' },
+            'preposition-onto.html': { js: 'jsFiles/sketch-onto.js', webEditor: 'webeditorjs/sketch-onto.js' },
+            'preposition-over.html': { js: 'jsFiles/sketch-over.js', webEditor: 'webeditorjs/sketch-over.js' },
+            'preposition-past.html': { js: 'jsFiles/sketch-past.js', webEditor: 'webeditorjs/sketch-past.js' },
+            'preposition-since.html': { js: 'jsFiles/sketch-since.js', webEditor: 'webeditorjs/sketch-since.js' },
+            'preposition-through.html': { js: 'jsFiles/sketch-through.js', webEditor: 'webeditorjs/sketch-through.js' },
+            'preposition-toward.html': { js: 'jsFiles/sketch-toward.js', webEditor: 'webeditorjs/sketch-toward.js' },
+            'preposition-under.html': { js: 'jsFiles/sketch-under.js', webEditor: 'webeditorjs/sketch-under.js' },
+            'preposition-until.html': { js: 'jsFiles/sketch-until.js', webEditor: 'webeditorjs/sketch-until.js' },
+            'preposition-within.html': { js: 'jsFiles/sketch-within.js', webEditor: 'webeditorjs/sketch-within.js' }
+        };
+
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
             const menuGroups = document.querySelectorAll('.menu-group');
@@ -80,48 +119,149 @@
             }
         }
 
-        function loadExample(filename, title, buttonElement) {
+        async function loadExample(filename, title, buttonElement) {
+            try {
+                // Remove active class from all menu items
+                const menuItems = document.querySelectorAll('.menu-item');
+                menuItems.forEach(item => item.classList.remove('active'));
+                
+                // Add active class to clicked item
+                buttonElement.classList.add('active');
+                
+                // Update title
+                document.getElementById('current-title').textContent = 'Preposition: ' + title;
+                
+                // Hide welcome message and show canvas container
+                document.getElementById('welcome-message').style.display = 'none';
+                document.getElementById('canvas-container').style.display = 'block';
+                
+                // Show web editor link
+                const webEditorLink = document.getElementById('web-editor-link');
+                webEditorLink.style.display = 'block';
+                
+                // Clear any existing sketch
+                if (currentSketch) {
+                    currentSketch.remove();
+                    currentSketch = null;
+                }
+                
+                // Clear the canvas div and stop any running sketches
+                const canvasDiv = document.getElementById('canvas');
+                canvasDiv.innerHTML = '';
+                
+                // Remove any existing sketch script
+                const existingScript = document.getElementById('current-sketch-script');
+                if (existingScript) {
+                    existingScript.remove();
+                }
+                
+                // Remove any global p5 sketch if it exists
+                if (window.remove && typeof window.remove === 'function') {
+                    window.remove();
+                }
+                
+                // Get file paths
+                const fileInfo = prepositionFiles[filename];
+                if (!fileInfo) {
+                    throw new Error('File mapping not found for: ' + filename);
+                }
+                
+                // Set up web editor button - fetch the web editor version for the link
+                const webEditorResponse = await fetch(fileInfo.webEditor + '?t=' + Date.now());
+                if (webEditorResponse.ok) {
+                    const webEditorCode = await webEditorResponse.text();
+                    const encodedCode = encodeURIComponent(webEditorCode);
+                    const webEditorBtn = document.getElementById('web-editor-button');
+                    webEditorBtn.href = `https://editor.p5js.org/new?code=${encodedCode}`;
+                } else {
+                    console.warn('Could not load web editor version');
+                }
+                  // Load and execute the p5 sketch using dynamic script loading
+                // First remove any existing sketch script
+                let existingSketchScript = document.getElementById('current-sketch-script');
+                if (existingSketchScript) {
+                    existingSketchScript.remove();
+                }
+                
+                // Create a new script element
+                const script = document.createElement('script');
+                script.id = 'current-sketch-script';
+                script.src = fileInfo.js + '?t=' + Date.now();
+                
+                // Add error handling
+                script.onerror = function() {
+                    console.error('Failed to load sketch:', fileInfo.js);
+                    alert('Error loading the sketch file');
+                };
+                
+                script.onload = function() {
+                    console.log('Successfully loaded sketch:', title);
+                };
+                
+                // Append to document head
+                document.head.appendChild(script);
+                
+                console.log('Successfully loaded sketch:', title);
+                
+                // On mobile, auto-collapse sidebar after selection
+                if (window.innerWidth <= 768) {
+                    const sidebar = document.querySelector('.sidebar');
+                    const menuGroups = document.querySelectorAll('.menu-group');
+                    sidebar.classList.add('collapsed');
+                    menuGroups.forEach(group => group.style.display = 'none');
+                }
+                
+            } catch (error) {
+                console.error('Error loading example:', error);
+                alert('Error loading the example: ' + error.message);
+            }
+        }
+
+        function returnToWelcome() {
+            // Clear any existing sketch
+            if (currentSketch) {
+                currentSketch.remove();
+                currentSketch = null;
+            }
+            
+            // Remove any global p5 sketch if it exists
+            if (window.remove && typeof window.remove === 'function') {
+                window.remove();
+            }
+            
+            // Clear the canvas div
+            const canvasDiv = document.getElementById('canvas');
+            canvasDiv.innerHTML = '';
+            
+            // Remove any existing sketch script
+            const existingScript = document.getElementById('current-sketch-script');
+            if (existingScript) {
+                existingScript.remove();
+            }
+            
             // Remove active class from all menu items
             const menuItems = document.querySelectorAll('.menu-item');
             menuItems.forEach(item => item.classList.remove('active'));
             
-            // Add active class to clicked item
-            buttonElement.classList.add('active');
-            
-            // Update title
-            document.getElementById('current-title').textContent = 'Preposition: ' + title;
-            
-            // Hide welcome message and show iframe
-            document.getElementById('welcome-message').style.display = 'none';
-            const iframe = document.getElementById('content-frame');
-            iframe.style.display = 'block';
-            iframe.src = filename;
-
-            // On mobile, auto-collapse sidebar after selection
-            if (window.innerWidth <= 768) {
-                const sidebar = document.querySelector('.sidebar');
-                const menuGroups = document.querySelectorAll('.menu-group');
-                sidebar.classList.add('collapsed');
-                menuGroups.forEach(group => group.style.display = 'none');
-            }
+            // Hide canvas and web editor link, show welcome
+            document.getElementById('current-title').textContent = 'Welcome';
+            document.getElementById('welcome-message').style.display = 'flex';
+            document.getElementById('canvas-container').style.display = 'none';
+            document.getElementById('web-editor-link').style.display = 'none';
         }
 
         // Add keyboard navigation
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
-                // Return to welcome screen
-                const menuItems = document.querySelectorAll('.menu-item');
-                menuItems.forEach(item => item.classList.remove('active'));
-                
-                document.getElementById('current-title').textContent = 'Welcome';
-                document.getElementById('welcome-message').style.display = 'flex';
-                document.getElementById('content-frame').style.display = 'none';
+                returnToWelcome();
             }
         });
 
-        // Handle iframe load errors
-        document.getElementById('content-frame').addEventListener('error', function() {
-            alert('Error loading the example. Please check if the file exists.');
+        // Handle window resize to adjust canvas
+        window.addEventListener('resize', function() {
+            if (currentSketch && typeof currentSketch.windowResized === 'function') {
+                currentSketch.windowResized();
+            }
         });
     </script>
 </body>
