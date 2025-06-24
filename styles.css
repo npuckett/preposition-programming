@@ -284,6 +284,7 @@ iframe {
     height: 100%;
     border: none;
     overflow: auto;
+    -webkit-overflow-scrolling: touch; /* for momentum scrolling on iOS */
 }
 
 .welcome-message {
@@ -591,7 +592,7 @@ iframe {
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-.index-body .web-editor-btn {
+.index_body .web-editor-btn {
     background: #4CAF50;
     color: white;
     padding: 10px 20px;
@@ -602,9 +603,48 @@ iframe {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.index-body .web-editor-btn:hover {
+.index_body .web-editor-btn:hover {
     background: #45a049;
     text-decoration: none;
     color: white;
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+#menu-button {
+    display: none; /* hidden by default */
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    #sidebar {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: -100%;
+        transition: left 0.3s ease-in-out;
+        z-index: 1000;
+        background-color: #f4f4f4;
+        overflow-y: auto;
+    }
+
+    #sidebar.open {
+        left: 0;
+    }
+
+    #menu-button {
+        display: block; /* show on mobile */
+    }
+
+    #content {
+        width: 100%;
+        height: 100vh; /* Full viewport height */
+    }
 }

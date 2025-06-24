@@ -1,12 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Mobile touch optimization */
+        body {
+            touch-action: manipulation;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        canvas {
+            touch-action: none !important;
+        }
+        
+        /* Ensure content is scrollable on mobile */
+        @media (max-width: 768px) {
+            body {
+                height: auto !important;
+                min-height: 100vh !important;
+                overflow-y: auto !important;
+                padding: 10px !important;
+            }
+            
+            .container {
+                min-height: auto !important;
+                flex-direction: column !important;
+            }
+            
+            .description {
+                margin: 5px auto !important;
+                padding: 10px !important;
+            }
+            
+            /* Ensure Web Editor button is touchable */
+            .web-editor-link {
+                display: inline-block !important;
+                padding: 10px 15px !important;
+                margin: 10px 0 !important;
+                background: #4CAF50 !important;
+                color: white !important;
+                text-decoration: none !important;
+                border-radius: 4px !important;
+                font-size: 14px !important;
+                cursor: pointer !important;
+                touch-action: manipulation !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="description">
-        <h1>Preposition: ABOVE</h1>
         
         <p class="web-editor-link-container">
             <a href="https://editor.p5js.org/npuckett/sketches/ddWIriyOk" target="_blank" class="web-editor-link">
