@@ -5,59 +5,109 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Mobile touch optimization */
-        body {
-            touch-action: manipulation;
-            -webkit-overflow-scrolling: touch;
+        /* Ensure proper document structure for scrolling */
+        html, body {
+            height: auto;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: manipulation;
         }
         
+        /* P5.js canvas touch interaction */
         canvas {
             touch-action: none !important;
         }
         
-        /* Ensure content is scrollable on mobile */
+        /* Mobile optimizations */
         @media (max-width: 768px) {
             body {
-                height: auto !important;
-                min-height: 100vh !important;
-                overflow-y: auto !important;
                 padding: 10px !important;
+                font-size: 14px;
             }
             
             .container {
-                min-height: auto !important;
                 flex-direction: column !important;
+                height: auto !important;
+                min-height: auto !important;
             }
             
             .description {
-                margin: 5px auto !important;
-                padding: 10px !important;
+                margin: 10px 0 !important;
+                padding: 15px !important;
+                line-height: 1.6;
             }
             
-            /* Fix Web Editor button for mobile */
+            .canvas-container {
+                width: 100% !important;
+                height: auto !important;
+                margin: 20px 0 !important;
+            }
+            
+            /* Ensure links are touch-friendly */
+            a {
+                min-height: 44px;
+                min-width: 44px;
+                display: inline-block;
+                padding: 8px;
+                margin: 4px 0;
+                touch-action: manipulation;
+            }
+            
+            /* Style the Web Editor button */
             .web-editor-link {
                 display: inline-block !important;
-                padding: 12px 20px !important;
-                margin: 15px 0 !important;
+                padding: 15px 25px !important;
+                margin: 20px 0 !important;
                 background: #4CAF50 !important;
                 color: white !important;
                 text-decoration: none !important;
-                border-radius: 6px !important;
+                border-radius: 8px !important;
                 font-size: 16px !important;
                 font-weight: bold !important;
                 cursor: pointer !important;
                 touch-action: manipulation !important;
                 min-height: 44px !important;
                 box-sizing: border-box !important;
+                text-align: center !important;
+                line-height: 1.2 !important;
+                border: none !important;
+                width: auto !important;
             }
             
             .web-editor-link:hover,
-            .web-editor-link:active {
+            .web-editor-link:active,
+            .web-editor-link:visited {
                 background: #45a049 !important;
                 color: white !important;
                 text-decoration: none !important;
             }
+            
+            /* Make code sections more readable on mobile */
+            .code-section {
+                font-size: 13px !important;
+                padding: 15px !important;
+                margin: 15px 0 !important;
+                overflow-x: auto !important;
+            }
+        }
+        
+        /* Ensure content flows properly */
+        .description {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Make sure the page can scroll past the content */
+        body::after {
+            content: "";
+            display: block;
+            height: 50px;
+            width: 100%;
         }
     </style>
 </head>
@@ -65,7 +115,11 @@
     <div class="description">
         
         <p class="web-editor-link-container">
-            <a href="https://editor.p5js.org/npuckett/sketches/ddWIriyOk" onclick="if(window.top) { window.top.open(this.href, '_blank'); return false; } return true;" class="web-editor-link">
+            <a href="https://editor.p5js.org/npuckett/sketches/ddWIriyOk" 
+               class="web-editor-link" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               onclick="openWebEditor(event, this.href)">
                 Open this sketch in P5 Web Editor →
             </a>
         </p>
@@ -132,7 +186,106 @@
             <code>if (dist(mouseX, mouseY, circle.x, circle.y) < radius) {</code><br>
             <code>&nbsp;&nbsp;circle.dragging = true; }</code>
         </div>
+        
+        <h3>Additional Examples</h3>
+        <p>Here are some variations you can try with the "above" concept:</p>
+        <ul>
+            <li><strong>Multiple objects:</strong> Create several circles and make them all stay above a target line</li>
+            <li><strong>Gravity simulation:</strong> Make objects fall but stop when they reach a certain Y position</li>
+            <li><strong>Layered interface:</strong> Create UI elements that stack above each other</li>
+            <li><strong>Following behavior:</strong> Make one object always stay above another moving object</li>
+        </ul>
+        
+        <h3>Common Patterns</h3>
+        <div class="code-section">
+            <strong>Boundary checking:</strong><br>
+            <code>if (ball.y > groundLevel) { ball.y = groundLevel; }</code><br><br>
+            
+            <strong>Relative positioning:</strong><br>
+            <code>follower.y = leader.y - offset;</code><br><br>
+            
+            <strong>Animation with constraints:</strong><br>
+            <code>if (moving && target.y > minHeight) { target.y -= speed; }</code>
+        </div>
+        
+        <h3>Try These Challenges</h3>
+        <p>Experiment with these ideas to deepen your understanding:</p>
+        <ol>
+            <li>Make the blue circle always stay exactly 50 pixels above the red circle when dragged</li>
+            <li>Add a third circle that positions itself above both others</li>
+            <li>Create an animation where circles "float up" to an above position when clicked</li>
+            <li>Implement a simple stacking system where objects settle above each other</li>
+        </ol>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/ddWIriyOk" 
+               class="web-editor-link" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               onclick="openWebEditor(event, this.href)">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
     </div>
+
+    <script>
+        // Robust link handler that works in iframe and standalone contexts
+        function openWebEditor(event, url) {
+            event.preventDefault();
+            
+            // Try multiple methods to open the link
+            const methods = [
+                () => window.top.open(url, '_blank', 'noopener,noreferrer'),
+                () => window.parent.open(url, '_blank', 'noopener,noreferrer'),
+                () => window.open(url, '_blank', 'noopener,noreferrer'),
+                () => {
+                    // Fallback: try to navigate the top window
+                    if (window.top && window.top !== window) {
+                        window.top.location.href = url;
+                    } else {
+                        window.location.href = url;
+                    }
+                }
+            ];
+            
+            // Try each method until one works
+            for (let method of methods) {
+                try {
+                    const result = method();
+                    if (result) {
+                        console.log('Successfully opened Web Editor');
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Method failed, trying next:', e.message);
+                    continue;
+                }
+            }
+            
+            // If all else fails, show a message
+            alert('Please copy this URL to open the sketch:\n' + url);
+        }
+        
+        // Ensure proper touch scrolling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Force proper document height calculation
+            document.body.style.minHeight = (document.body.scrollHeight + 100) + 'px';
+            
+            // Ensure all links work with touch
+            const links = document.querySelectorAll('a[href^="http"]');
+            links.forEach(link => {
+                if (!link.onclick) {
+                    link.addEventListener('click', function(e) {
+                        // If it's not the web editor link, handle normally
+                        if (!link.classList.contains('web-editor-link')) {
+                            e.preventDefault();
+                            window.open(link.href, '_blank', 'noopener,noreferrer');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 
     <script src="jsFiles/sketch-above.js"></script>
 </body>

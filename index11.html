@@ -150,15 +150,41 @@
             }
         }
         
-        /* Enhance iframe for better mobile touch support */
+        /* Enhance iframe for better mobile touch support and scrolling */
         iframe {
             pointer-events: auto;
-            touch-action: manipulation;
+            touch-action: pan-y pinch-zoom;
+            -webkit-overflow-scrolling: touch;
+            overflow: auto;
+            border: none;
         }
         
-        /* Prevent zooming on mobile when interacting with iframe */
         .frame-container {
             touch-action: pan-y;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .frame-container iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            border: none;
+            display: block;
+        }
+        
+        /* Mobile iframe adjustments */
+        @media (max-width: 768px) {
+            .frame-container {
+                height: calc(100vh - 60px) !important;
+                overflow: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            
+            .frame-container iframe {
+                height: auto !important;
+                min-height: calc(100vh - 60px) !important;
+            }
         }
     </style>
 </head>
@@ -324,9 +350,57 @@
         const iframe = document.getElementById('content-frame');
         
         iframe.addEventListener('load', function() {
-            // Simple approach - just ensure iframe is scrollable
-            iframe.style.overflow = 'auto';
-            iframe.style.webkitOverflowScrolling = 'touch';
+            try {
+                // Enhanced iframe content handling
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                // Ensure proper scrolling
+                iframeDoc.body.style.overflow = 'auto';
+                iframeDoc.body.style.webkitOverflowScrolling = 'touch';
+                iframeDoc.body.style.height = 'auto';
+                iframeDoc.body.style.minHeight = '100vh';
+                
+                // Adjust iframe height to content on mobile
+                if (window.innerWidth <= 768) {
+                    const resizeIframe = () => {
+                        try {
+                            const contentHeight = iframeDoc.body.scrollHeight;
+                            iframe.style.height = Math.max(contentHeight + 50, window.innerHeight - 60) + 'px';
+                        } catch (e) {
+                            // Cross-origin restrictions - fallback
+                            iframe.style.height = '100vh';
+                        }
+                    };
+                    
+                    resizeIframe();
+                    
+                    // Re-resize after a short delay to account for dynamic content
+                    setTimeout(resizeIframe, 500);
+                    setTimeout(resizeIframe, 1000);
+                }
+                
+                // Handle external links in iframe content
+                const links = iframeDoc.querySelectorAll('a[href^="http"]');
+                links.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        if (link.href.includes('p5js.org') || link.href.includes('editor.p5js.org')) {
+                            e.preventDefault();
+                            // Open P5.js links in the parent window
+                            window.open(link.href, '_blank', 'noopener,noreferrer');
+                        }
+                    });
+                });
+                
+            } catch (e) {
+                // Cross-origin restrictions - use fallback approach
+                console.log('Cross-origin iframe - using fallback touch support');
+                iframe.style.overflow = 'auto';
+                iframe.style.webkitOverflowScrolling = 'touch';
+                
+                if (window.innerWidth <= 768) {
+                    iframe.style.height = 'calc(100vh - 60px)';
+                }
+            }
         });
 
         iframe.addEventListener('error', function() {
