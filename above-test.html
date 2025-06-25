@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <title>Above - P5.js Preposition Programming</title>
+</head>
+<body>
+    <div class="description">
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/ddWIriyOk" 
+               class="web-editor-link" 
+               rel="noopener noreferrer"
+               onclick="openWebEditor(event, this.href)">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+        
+        <h3>Try It</h3>
+        <p>Drag the circles in the canvas below. Notice how the relationship changes based on their Y coordinates.</p>
+    </div>
+
+    <div class="container">
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <div class="description">
+        <h3>Concept</h3>
+        <p><strong>ABOVE</strong> means positioned at a higher level than something else. In screen coordinates, this translates to having a smaller Y value, since Y increases downward from the top of the screen.</p>
+        
+        <h3>Translation Strategy</h3>
+        <p>To create "above" relationships on screen:</p>
+        <ul>
+            <li><strong>Static Above:</strong> Position one element with a smaller Y coordinate than another</li>
+            <li><strong>Dynamic Above:</strong> Make elements move to positions above other elements</li>
+            <li><strong>Conditional Above:</strong> Check if one element is above another using coordinate comparison</li>
+        </ul>
+        
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Basic positioning:</strong><br>
+            <a href="https://p5js.org/reference/p5/circle/" target="_blank" rel="noopener noreferrer"><code>circle(x, y, diameter)</code></a> - Draw a circle at coordinates (x, y)<br><br>
+            
+            <strong>Coordinate comparison:</strong><br>
+            <code>if (circle1.y &lt; circle2.y) { /* circle1 is above circle2 */ }</code><br><br>
+            
+            <strong>Mouse/touch interaction:</strong><br>
+            <a href="https://p5js.org/reference/p5/mousePressed/" target="_blank" rel="noopener noreferrer"><code>mousePressed()</code></a>, <a href="https://p5js.org/reference/p5/mouseDragged/" target="_blank" rel="noopener noreferrer"><code>mouseDragged()</code></a> - Handle user input<br><br>
+            
+            <strong>Distance calculation:</strong><br>
+            <a href="https://p5js.org/reference/p5/dist/" target="_blank" rel="noopener noreferrer"><code>dist(x1, y1, x2, y2)</code></a> - Calculate distance between two points
+        </div>
+        
+        <h3>Common Patterns</h3>
+        <div class="code-section">
+            <strong>Boundary checking:</strong><br>
+            <code>if (ball.y > groundLevel) { ball.y = groundLevel; }</code><br><br>
+            
+            <strong>Relative positioning:</strong><br>
+            <code>follower.y = leader.y - offset;</code><br><br>
+            
+            <strong>Animation with constraints:</strong><br>
+            <code>if (moving && target.y > minHeight) { target.y -= speed; }</code>
+        </div>
+        
+        <h3>Try These Challenges</h3>
+        <p>Experiment with these ideas to deepen your understanding:</p>
+        <ol>
+            <li>Make the blue circle always stay exactly 50 pixels above the red circle when dragged</li>
+            <li>Add a third circle that positions itself above both others</li>
+            <li>Create an animation where circles "float up" to an above position when clicked</li>
+            <li>Implement a simple stacking system where objects settle above each other</li>
+        </ol>
+        
+        <p class="web-editor-link-container">
+            <a href="https://editor.p5js.org/npuckett/sketches/ddWIriyOk" 
+               class="web-editor-link" 
+               rel="noopener noreferrer"
+               onclick="openWebEditor(event, this.href)">
+                Open this sketch in P5 Web Editor →
+            </a>
+        </p>
+    </div>
+
+    <script>
+        // Robust link handler that works in iframe and standalone contexts
+        function openWebEditor(event, url) {
+            event.preventDefault();
+            
+            // Try multiple methods to open the link
+            const methods = [
+                () => window.top.open(url, '_blank', 'noopener,noreferrer'),
+                () => window.parent.open(url, '_blank', 'noopener,noreferrer'),
+                () => window.open(url, '_blank', 'noopener,noreferrer'),
+                () => {
+                    // Fallback: try to navigate the top window
+                    if (window.top && window.top !== window) {
+                        window.top.location.href = url;
+                    } else {
+                        window.location.href = url;
+                    }
+                }
+            ];
+            
+            // Try each method until one works
+            for (let method of methods) {
+                try {
+                    const result = method();
+                    if (result) {
+                        console.log('Successfully opened Web Editor');
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Method failed, trying next:', e.message);
+                    continue;
+                }
+            }
+            
+            // If all else fails, show a message
+            alert('Please copy this URL to open the sketch:\n' + url);
+        }
+        
+        // Ensure proper touch scrolling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Force proper document height calculation
+            document.body.style.minHeight = (document.body.scrollHeight + 100) + 'px';
+            
+            // Ensure all external links work with touch (but not web editor links)
+            const links = document.querySelectorAll('a[href^="http"]:not(.web-editor-link)');
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.open(link.href, '_blank', 'noopener,noreferrer');
+                });
+            });
+        });
+
+        // ===== EMBEDDED P5.JS SKETCH =====
+        
+        // Circle objects to store position, size, and interaction state
+        let blueCircle = { 
+          x: 120,           // X position
+          y: 100,           // Y position  
+          radius: 20,       // Circle radius
+          dragging: false   // Is this circle being dragged?
+        };
+
+        let redCircle = { 
+          x: 280, 
+          y: 180, 
+          radius: 20, 
+          dragging: false 
+        };
+
+        function setup() {
+          // Create a 400x300 pixel canvas
+          createCanvas(400, 300).parent('canvas');
+        }
+
+        function draw() {
+          // Clear the background each frame
+          background(240);
+          
+          // Draw horizontal reference lines for each circle
+          drawYLevelLine(blueCircle, color(100, 150, 255));
+          drawYLevelLine(redCircle, color(255, 100, 100));
+          
+          // Determine which circle is above the other
+          let relationship = "";
+          if (blueCircle.y < redCircle.y) {
+            // Remember: smaller Y = higher on screen = "above"
+            relationship = "Blue is ABOVE red";
+          } else if (redCircle.y < blueCircle.y) {
+            relationship = "Red is ABOVE blue";
+          } else {
+            // Y positions are equal
+            relationship = "Circles are at SAME level";
+          }
+          
+          // Draw the circles with labels
+          drawCircle(blueCircle, color(100, 150, 255), "Blue");
+          drawCircle(redCircle, color(255, 100, 100), "Red");
+          
+          // Display the current relationship
+          fill(0);
+          noStroke();
+          textAlign(CENTER);
+          textSize(16);
+          text(relationship, width/2, 30);
+          text("Drag the circles to change the relationship", width/2, height - 15);
+        }
+
+        // Helper function to draw a circle with label
+        function drawCircle(circle, circleColor, label) {
+          // Draw the main circle
+          fill(circleColor);
+          noStroke();
+          ellipse(circle.x, circle.y, circle.radius * 2, circle.radius * 2);
+          
+          // Draw the label above the circle
+          fill(0);
+          textAlign(CENTER);
+          textSize(12);
+          text(label, circle.x, circle.y - circle.radius - 8);
+        }
+
+        // Helper function to draw Y-level reference lines
+        function drawYLevelLine(circle, lineColor) {
+          // Draw a thin horizontal line across the screen at the circle's Y position
+          stroke(lineColor);
+          strokeWeight(1);
+          line(0, circle.y, width, circle.y);
+          
+          // Show the Y coordinate value
+          fill(lineColor);
+          noStroke();
+          textAlign(LEFT);
+          textSize(10);
+          text("Y: " + Math.round(circle.y), 5, circle.y - 3);
+        }
+
+        // Helper functions for cross-platform input handling
+        function getInputX() {
+          return touches.length > 0 ? touches[0].x : mouseX;
+        }
+
+        function getInputY() {
+          return touches.length > 0 ? touches[0].y : mouseY;
+        }
+
+        // Handle input start (both mouse and touch)
+        function handleInputStart() {
+          let inputX = getInputX();
+          let inputY = getInputY();
+          
+          // Check if input is over blue circle
+          if (dist(inputX, inputY, blueCircle.x, blueCircle.y) < blueCircle.radius) {
+            blueCircle.dragging = true;
+          }
+          // Check if input is over red circle  
+          else if (dist(inputX, inputY, redCircle.x, redCircle.y) < redCircle.radius) {
+            redCircle.dragging = true;
+          }
+        }
+
+        // Handle input drag (both mouse and touch)
+        function handleInputDrag() {
+          let inputX = getInputX();
+          let inputY = getInputY();
+          
+          // Update position if circle is being dragged
+          if (blueCircle.dragging) {
+            blueCircle.x = inputX;
+            blueCircle.y = inputY;
+          }
+          if (redCircle.dragging) {
+            redCircle.x = inputX;
+            redCircle.y = inputY;
+          }
+        }
+
+        // Handle input end (both mouse and touch)
+        function handleInputEnd() {
+          // Stop dragging both circles
+          blueCircle.dragging = false;
+          redCircle.dragging = false;
+        }
+
+        // Detect when mouse is first pressed
+        function mousePressed() {
+          handleInputStart();
+        }
+
+        // Detect when mouse is moved while pressed (dragging)
+        function mouseDragged() {
+          handleInputDrag();
+        }
+
+        // Detect when mouse button is released
+        function mouseReleased() {
+          handleInputEnd();
+        }
+
+        // Touch event handlers for mobile
+        function touchStarted() {
+          handleInputStart();
+          return false; // Prevent default touch behavior
+        }
+
+        function touchMoved() {
+          handleInputDrag();
+          return false; // Prevent scrolling
+        }
+
+        function touchEnded() {
+          handleInputEnd();
+          return false;
+        }
+    </script>
+</body>
+</html>

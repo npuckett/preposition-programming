@@ -648,3 +648,112 @@ iframe {
         height: 100vh; /* Full viewport height */
     }
 }
+
+/* Mobile optimizations for single preposition pages */
+html, body {
+    height: auto;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation;
+}
+
+/* P5.js canvas touch interaction */
+canvas {
+    touch-action: none !important;
+    max-width: 100%;
+}
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+    body {
+        padding: 20px;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    .container {
+        flex-direction: column;
+        height: auto;
+        margin: 20px 0;
+    }
+    
+    .description {
+        margin: 20px 0;
+        padding: 20px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .canvas-container {
+        width: 100%;
+        height: auto;
+        margin: 20px 0;
+    }
+    
+    /* Touch-friendly Web Editor button */
+    .web-editor-link {
+        display: inline-block !important;
+        padding: 15px 25px !important;
+        margin: 20px 0 !important;
+        background: #4CAF50 !important;
+        color: white !important;
+        text-decoration: none !important;
+        border-radius: 8px !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        min-height: 44px !important;
+        box-sizing: border-box !important;
+        line-height: 1.2 !important;
+        cursor: pointer !important;
+        touch-action: manipulation !important;
+        border: none !important;
+        width: auto !important;
+    }
+    
+    .web-editor-link:hover,
+    .web-editor-link:active {
+        background: #45a049 !important;
+        color: white !important;
+        text-decoration: none !important;
+    }
+    
+    /* Code sections */
+    .code-section {
+        font-size: 13px !important;
+        padding: 15px !important;
+        margin: 15px 0 !important;
+        overflow-x: auto !important;
+        background: #f8f9fa !important;
+        border-radius: 6px !important;
+        border: 1px solid #e9ecef !important;
+    }
+    
+    code {
+        background: #f8f9fa !important;
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+        font-family: 'Courier New', monospace !important;
+        font-size: 12px !important;
+    }
+    
+    /* Ensure links are touch-friendly */
+    a {
+        min-height: 44px;
+        min-width: 44px;
+        display: inline-block;
+        padding: 8px;
+        margin: 4px 0;
+        touch-action: manipulation;
+    }
+}
+
+/* Add bottom padding for scroll space */
+body::after {
+    content: "";
+    display: block;
+    height: 50px;
+    width: 100%;
+}
