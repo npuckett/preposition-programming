@@ -188,32 +188,21 @@ function draw() {
     relationship = "Click to set a source point";
   }
   
-  // Draw measurement information
-  textAlign(LEFT);
-  textSize(10);
-  fill(0);
-  text("Distance from source: " + Math.round(distance), 10, 20);
-  text("Max distance: " + maxDistance, 10, 35);
-  text("Speed: " + movingCircle.speed + " pixels/frame", 10, 50);
-  text("Moving: " + movingCircle.isMoving, 10, 65);
-  text("Movement frames: " + movementFrames + "/" + maxMovementFrames, 10, 80);
-  
-  // Draw reset button
-  fill(200);
-  stroke(100);
-  strokeWeight(1);
-  rect(10, 90, 60, 25);
-  fill(0);
-  noStroke();
-  textAlign(CENTER);
-  text("Reset", 40, 107);
+  // Remove measurement information and reset button for cleaner design
   
   // Draw relationship status
   textAlign(CENTER);
-  textSize(16);
+  textSize(14);
   fill(0);
-  text(relationship, width/2, height - 40);
-  text("Click anywhere to set a source point", width/2, height - 15);
+  
+  let statusText = "";
+  if (movingCircle.isMoving) {
+    statusText = "Circle is moving AWAY from the source point";
+  } else {
+    statusText = "Click anywhere to set source - circle will move away";
+  }
+  
+  text(statusText, width/2, height - 20);
 }
 
 // Function to draw an arrow showing direction
@@ -254,18 +243,6 @@ function getInputY() {
 function handleInputStart() {
   let inputX = getInputX();
   let inputY = getInputY();
-  
-  // Check if reset button was clicked/touched
-  if (inputX > 10 && inputX < 70 && inputY > 90 && inputY < 115) {
-    // Reset everything to initial state
-    movingCircle.x = width / 2;
-    movingCircle.y = height / 2;
-    movingCircle.isMoving = false;
-    source.visible = false;
-    trail = [];
-    movementFrames = 0;
-    return;
-  }
   
   // Set new source point where input was detected
   source.x = inputX;

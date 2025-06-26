@@ -104,20 +104,20 @@ function draw() {
              movingCircle.x + dirX, movingCircle.y + dirY);
     }
     
-    // Draw labels
-    fill(50);
+    // Draw simple status text
+    fill(0);
     noStroke();
-    textAlign(CENTER, CENTER);
-    textSize(12);
-    text("Click to start orbital motion", width/2, 30);
-    text("Yellow circle moves AROUND blue obstacle", width/2, height - 30);
+    textAlign(CENTER);
+    textSize(14);
     
-    // Show angle information
+    let statusText = "";
     if (isMoving) {
-        textAlign(LEFT, TOP);
-        textSize(10);
-        text(`Angle: ${(degrees(angle) % 360).toFixed(1)}°`, 10, 10);
-        text(`Speed: ${speed.toFixed(3)} rad/frame`, 10, 25);    }
+        statusText = "Yellow circle moves AROUND blue obstacle";
+    } else {
+        statusText = "Click to start orbital motion around the obstacle";
+    }
+    
+    text(statusText, width/2, height - 20);
 }
 
 // Helper functions for cross-platform input handling

@@ -140,29 +140,22 @@ function drawCircle() {
 }
 
 function drawInfo() {
-  fill(50);
+  // Simple status text at bottom
+  fill(0);
   noStroke();
   textAlign(CENTER);
-  textSize(16);
+  textSize(14);
   
+  let statusText = "";
   if (circle.isOnSurface) {
-    fill(0, 150, 0);
-    text("Circle is now ONTO the surface!", width/2, 40);
-    text("Click to reset and try again", width/2, height - 30);
+    statusText = "Circle moved ONTO the surface";
   } else if (isAnimating) {
-    fill(0, 0, 150);
-    text("Circle is moving ONTO the surface...", width/2, 40);
-    text(`Progress: ${(animationProgress * 100).toFixed(0)}%`, width/2, height - 30);
+    statusText = "Circle is moving ONTO the surface";
   } else {
-    text("Click to move the circle ONTO the surface", width/2, 40);
-    text("Watch it move from OFF to ON", width/2, height - 30);
+    statusText = "Click to move circle ONTO the surface";
   }
   
-  // Simple status
-  textAlign(LEFT);
-  textSize(12);
-  fill(100);
-  text(`Status: ${circle.isOnSurface ? "ON surface" : "OFF surface"}`, 20, height - 60);
+  text(statusText, width/2, height - 20);
 }
 
 // Helper functions for cross-platform input handling
@@ -176,14 +169,18 @@ function getInputY() {
 
 // Handle input start (both mouse and touch)
 function handleInputStart() {
-  // Start or reset the animation
-  if (circle.isOnSurface || !isAnimating) {
-    // Randomize starting X position (but keep some margin from edges)
-    circle.startX = random(40, width - 40);
+  let inputX = getInputX();
+  let inputY = getInputY();
+  
+  // Only start animation if click is above the surface
+  // Allow restarting if circle is already on surface or if not currently animating
+  if (inputY < surface.y - circle.size/2 && (circle.isOnSurface || !isAnimating)) {
+    // Set starting position to click location
+    circle.startX = inputX;
+    circle.x = inputX;
+    circle.y = inputY;
     
-    // Reset to new starting position
-    circle.x = circle.startX;
-    circle.y = 80;
+    // Reset animation state
     circle.isOnSurface = false;
     animationProgress = 0;
     isAnimating = true;
