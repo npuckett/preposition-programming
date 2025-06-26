@@ -12,7 +12,7 @@
         </p>
         
         <h3>Try It</h3>
-        <p>Drag the circles in the canvas below. Notice how the relationship changes based on their Y coordinates.</p>
+        <p>Click anywhere to watch the circle move past the reference point.</p>
     </div>
 
     <div class="container">
@@ -23,67 +23,59 @@
 
     <div class="description">
         <h3>Concept</h3>
-        <p><strong>PAST</strong> means moving alongside and beyond something, continuing in the same direction after passing by an object or landmark.</p>
+        <p><strong>PAST</strong> means moving beyond a reference point, continuing movement after reaching and passing by it.</p>
         
         <h3>Translation Strategy</h3>
         <p>To create "past" relationships on screen:</p>
         <ul>
-            <li><strong>Reference Point:</strong> Define a clear landmark or obstacle to pass by</li>
-            <li><strong>Continuation:</strong> Show movement that doesn't stop at the reference but continues beyond</li>
-            <li><strong>Proximity Detection:</strong> Track when the object is alongside and when it has moved beyond</li>
+            <li><strong>Reference Point:</strong> Define a clear landmark to move past</li>
+            <li><strong>Continuation:</strong> Show movement that continues beyond the reference</li>
+            <li><strong>Visual Trail:</strong> Display the path to show movement progression</li>
         </ul>
         
         <h3>Key P5.js Methods</h3>
         <div class="code-section">
             <strong>Position Tracking:</strong><br>
-            • Compare coordinates to determine relative position<br>
-            • <code>object.x > landmark.x</code> - Check if object has moved past landmark horizontally<br>
-            • Track position history to confirm passing motion<br><br>
+            • <code>object.x > reference.x</code> - Check if object has moved past reference<br>
+            • Simple position comparison for clean state tracking<br><br>
             
             <strong>Movement Animation:</strong><br>
-            • <a href="https://p5js.org/reference/p5/lerp" target="_blank">lerp(start, stop, amount)</a> - Smooth movement past landmarks<br>
-            • Constant velocity for realistic passing motion<br><br>
+            • <code>object.x += speed</code> - Constant movement speed<br>
+            • Smooth animation with position updates<br><br>
             
             <strong>Drawing Elements:</strong><br>
-            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw moving objects and landmarks<br>
-            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw reference obstacles<br>
-            • <a href="https://p5js.org/reference/p5/line" target="_blank">line(x1, y1, x2, y2)</a> - Draw movement paths<br><br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw moving circle and reference point<br>
+            • <a href="https://p5js.org/reference/p5/line" target="_blank">line(x1, y1, x2, y2)</a> - Draw reference line<br><br>
             
-            <strong>State Management:</strong><br>
-            • Track approach, alongside, and past phases<br>
-            • Boolean flags for different passing stages<br><br>
-            
-            <strong>Visual Indicators:</strong><br>
-            • Motion trails to show continuous movement<br>
-            • Reference lines to clarify spatial relationships<br><br>
+            <strong>Visual Feedback:</strong><br>
+            • Trail dots to show movement path<br>
+            • Color changes based on state (approaching/past)<br><br>
             
             <strong>Mouse Interaction:</strong><br>
-            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Start passing animation<br>
-            • Button controls for demonstration
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Start movement animation
         </div>
         
         <h3>Code Structure</h3>
         <div class="code-section">
             <strong>Basic Pattern for "Past":</strong><br><br>
             
-            1. <strong>Define landmark and path:</strong> Set up reference point and movement route<br>
-            <code>let landmark = {x: 200, y: 150, width: 40, height: 80};</code><br>
-            <code>let startPoint = {x: 50, y: 150};</code><br>
-            <code>let endPoint = {x: 350, y: 150};</code><br><br>
+            1. <strong>Define reference and moving object:</strong><br>
+            <code>let reference = {x: 200, y: 150, size: 40};</code><br>
+            <code>let circle = {x: 50, y: 150, size: 25, isMoving: false, hasPassed: false};</code><br><br>
             
-            2. <strong>Track passing phases:</strong> Monitor position relative to landmark<br>
-            <code>let isApproaching = object.x < landmark.x;</code><br>
-            <code>let isAlongside = (object.x >= landmark.x && object.x <= landmark.x + landmark.width);</code><br>
-            <code>let hasPassed = object.x > landmark.x + landmark.width;</code><br><br>
-            
-            3. <strong>Animate movement:</strong> Continuous motion past landmark<br>
-            <code>if (isMoving && progress < 1) {</code><br>
-            <code>&nbsp;&nbsp;progress += speed;</code><br>
-            <code>&nbsp;&nbsp;object.x = lerp(startPoint.x, endPoint.x, progress);</code><br>
+            2. <strong>Track passing state:</strong><br>
+            <code>if (!circle.hasPassed && circle.x > reference.x) {</code><br>
+            <code>&nbsp;&nbsp;circle.hasPassed = true;</code><br>
             <code>}</code><br><br>
             
-            4. <strong>Detect completion:</strong> Confirm object has moved past<br>
-            <code>if (hasPassed && !wasAlongside) { hasMovedPast = true; }</code>
+            3. <strong>Animate movement:</strong><br>
+            <code>if (circle.isMoving) {</code><br>
+            <code>&nbsp;&nbsp;circle.x += circle.speed;</code><br>
+            <code>}</code><br><br>
+            
+            4. <strong>Visual feedback:</strong><br>
+            <code>// Color changes: orange → yellow → green</code><br>
+            <code>if (circle.hasPassed) fill(100, 255, 100);</code>
         </div>
     </div>
 
