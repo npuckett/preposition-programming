@@ -172,9 +172,13 @@ function drawSimpleStatus(isInsideBarrier) {
   
   let statusText = "";
   if (movingCircle.hasPassed) {
-    statusText = "Circle has moved through the barrier";
+    // Show direction of completed movement
+    let direction = movingCircle.x < barrier.x + barrier.width / 2 ? "right to left" : "left to right";
+    statusText = `Circle moved through barrier (${direction})`;
   } else if (isInsideBarrier) {
-    statusText = "Circle is passing through the barrier";
+    // Show current movement direction when inside
+    let entryDirection = movingCircle.entryFromLeft ? "left" : "right";
+    statusText = `Inside barrier - entered from ${entryDirection}`;
   } else if (movingCircle.hasEnteredBarrier) {
     statusText = "Circle entered but hasn't exited";
   } else {

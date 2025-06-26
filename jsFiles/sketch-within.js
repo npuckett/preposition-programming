@@ -86,6 +86,22 @@ function drawContainer() {
   stroke(container.borderColor[0], container.borderColor[1], container.borderColor[2]);
   strokeWeight(3);
   rect(container.x, container.y, container.width, container.height, 10);
+  
+  // Count and display number of objects within container
+  let objectsWithin = 0;
+  if (checkWithinContainer(movingObject)) objectsWithin++;
+  if (checkWithinContainer(outsideObject)) objectsWithin++;
+  
+  // Draw count in center of container
+  fill(50, 50, 50, 180);
+  noStroke();
+  textAlign(CENTER, CENTER);
+  textSize(36);
+  let centerX = container.x + container.width / 2;
+  let centerY = container.y + container.height / 2;
+  text(objectsWithin, centerX, centerY);
+  
+ 
 }
 
 function drawMovingObject() {
