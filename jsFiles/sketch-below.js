@@ -78,9 +78,9 @@ function draw() {
   fill(0);
   noStroke();
   textAlign(CENTER);
-  textSize(16);
+  textSize(14);
   text(relationship, width/2, 30);
-  text("Drag the circles to change the relationship", width/2, height - 15);
+  text("Drag the circles to change the relationship", width/2, height - 20);
 }
 
 function drawCircle(circle, circleColor, label) {

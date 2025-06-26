@@ -41,8 +41,8 @@
             • Both X and Y coordinates matter for "between"<br><br>
             
             <strong>Position Comparison:</strong><br>
-            • <code>min(a.x, b.x) < c.x < max(a.x, b.x)</code> - Check if C is between A and B horizontally<br>
-            • <a href="https://p5js.org/reference/p5/min" target="_blank">min()</a> and <a href="https://p5js.org/reference/p5/max" target="_blank">max()</a> - Find minimum and maximum values<br><br>
+            • <a href="https://p5js.org/reference/p5/if" target="_blank"><code>elementA.x < elementC.x && elementC.x < elementB.x</code></a> - Check if C is between A and B horizontally<br>
+            • <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND" target="_blank">&&</a> - Logical AND operator for compound conditions<br><br>
             
             <strong>Drawing Elements:</strong><br>
             • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw circles at specific positions<br>
@@ -66,12 +66,11 @@
             <code>let elementB = {x: 300, y: 150};</code><br>
             <code>let elementC = {x: 200, y: 150};</code><br><br>
             
-            2. <strong>Calculate range:</strong> Find min and max coordinates<br>
-            <code>let minX = min(elementA.x, elementB.x);</code><br>
-            <code>let maxX = max(elementA.x, elementB.x);</code><br><br>
+            2. <strong>Calculate range:</strong> Determine left and right boundaries using if statements<br>
+            <code>if (elementA.x < elementB.x) { leftBoundary = elementA.x; }</code><br><br>
             
-            3. <strong>Check if between:</strong> Test if coordinates fall within range<br>
-            <code>let isBetween = (elementC.x > minX && elementC.x < maxX);</code><br><br>
+            3. <strong>Check if between:</strong> Test if coordinates fall within range using compound && statement<br>
+            <code>let isBetween = (elementC.x > leftBoundary && elementC.x < rightBoundary);</code><br><br>
             
             4. <strong>For mouse interaction:</strong> Use mouse events for dragging<br>
             <code>if (dist(mouseX, mouseY, circle.x, circle.y) < radius) {</code><br>

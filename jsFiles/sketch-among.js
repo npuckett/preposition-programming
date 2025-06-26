@@ -147,17 +147,18 @@ function draw() {
     fill(50);
     noStroke();
     textAlign(CENTER, CENTER);
-    textSize(12);
+    textSize(14);
     
     if (movingCircle.isAmong) {
         text("Yellow circle is AMONG the blue circles!", width/2, 25);
-        textSize(10);
+        textSize(12);
         text(`Nearby circles: ${nearbyCount}`, width/2, 40);
     } else {
         text("Click anywhere to move the yellow circle", width/2, 25);
         text("Try to place it AMONG the blue circles", width/2, 40);
     }
     
+    textSize(14);
     text("Green = among the group, Yellow = separate from group", width/2, height - 20);
     
     // Status information

@@ -13,7 +13,7 @@
         </p>
         
         <h3>Try It</h3>
-        <p>Drag the circles in the canvas below. Notice how the relationship changes based on their Y coordinates.</p>
+        <p>Drag the yellow circle in the canvas below. Watch how it changes color when its center point enters the blue "beside" zones. Notice the crosshairs showing the exact center point and coordinates being tracked.</p>
     </div>
 
     <div class="container">
@@ -24,14 +24,14 @@
 
     <div class="description">
         <h3>Concept</h3>
-        <p><strong>BESIDE</strong> means positioned next to something, typically to the left or right. This involves checking horizontal proximity while considering vertical alignment.</p>
+        <p><strong>BESIDE</strong> means positioned next to something, typically to the left or right. In this example, "beside" is determined by checking if an object's center point falls within defined rectangular zones adjacent to the main object.</p>
         
         <h3>Translation Strategy</h3>
         <p>To create "beside" relationships on screen:</p>
         <ul>
-            <li><strong>Horizontal Proximity:</strong> Check if elements are close in X coordinates</li>
-            <li><strong>Vertical Alignment:</strong> Elements should be roughly aligned in Y coordinates</li>
-            <li><strong>Side Detection:</strong> Determine if one element is to the left or right of another</li>
+            <li><strong>Zone-based Detection:</strong> Create rectangular zones to the left and right of the main object</li>
+            <li><strong>Center Point Tracking:</strong> Check if the moving object's center coordinates fall within these zones</li>
+            <li><strong>Immediate Feedback:</strong> Provide visual confirmation when the "beside" relationship is achieved</li>
         </ul>
         
         <h3>Key P5.js Methods</h3>
@@ -41,9 +41,10 @@
             • X coordinates: 0 = left, width = right<br><br>
             
             <strong>Position Comparison:</strong><br>
-            • <code>abs(elementA.y - elementB.y) < threshold</code> - Check vertical alignment<br>
-            • <code>abs(elementA.x - elementB.x) < threshold</code> - Check horizontal proximity<br>
-            • <a href="https://p5js.org/reference/p5/abs" target="_blank">abs()</a> - Get absolute value for distance calculations<br><br>
+            • <a href="https://p5js.org/reference/p5/if-else" target="_blank"><code>if (x < leftBound) { return false; }</code></a> - Check if X coordinate is too far left<br>
+            • <a href="https://p5js.org/reference/p5/if-else" target="_blank"><code>if (x > rightBound) { return false; }</code></a> - Check if X coordinate is too far right<br>
+            • <a href="https://p5js.org/reference/p5/if-else" target="_blank"><code>if (y < topBound) { return false; }</code></a> - Check if Y coordinate is too high<br>
+            • <a href="https://p5js.org/reference/p5/if-else" target="_blank"><code>if (y > bottomBound) { return false; }</code></a> - Check if Y coordinate is too low<br><br>
             
             <strong>Drawing Elements:</strong><br>
             • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw circles at specific positions<br>
@@ -62,17 +63,20 @@
         <div class="code-section">
             <strong>Basic Pattern for "Beside":</strong><br><br>
             
-            1. <strong>Store positions:</strong> Keep track of element coordinates<br>
-            <code>let elementA = {x: 150, y: 100};</code><br>
-            <code>let elementB = {x: 200, y: 105};</code><br><br>
+            1. <strong>Define beside zones:</strong> Create rectangular areas adjacent to the main object<br>
+            <code>let leftZoneX = mainObject.x - mainObject.width/2 - zoneWidth/2;</code><br>
+            <code>let rightZoneX = mainObject.x + mainObject.width/2 + zoneWidth/2;</code><br><br>
             
-            2. <strong>Check alignment:</strong> Test if elements are roughly aligned vertically<br>
-            <code>let verticalDiff = abs(elementA.y - elementB.y);</code><br>
-            <code>let isAligned = verticalDiff < 30;</code><br><br>
+            2. <strong>Calculate zone boundaries:</strong> Determine the bounds of each zone<br>
+            <code>let leftBound = leftZoneX - zoneWidth/2;</code><br>
+            <code>let rightBound = leftZoneX + zoneWidth/2;</code><br><br>
             
-            3. <strong>Check proximity:</strong> Test if elements are close horizontally<br>
-            <code>let horizontalDist = abs(elementA.x - elementB.x);</code><br>
-            <code>let isBeside = isAligned && horizontalDist < 100;</code><br><br>
+            3. <strong>Check if object is in zone:</strong> Test each boundary separately<br>
+            <code>if (x < leftBound) { return false; }</code><br>
+            <code>if (x > rightBound) { return false; }</code><br>
+            <code>if (y < topBound) { return false; }</code><br>
+            <code>if (y > bottomBound) { return false; }</code><br>
+            <code>return true; // Point is inside zone</code><br><br>
             
             4. <strong>For mouse interaction:</strong> Use mouse events for dragging<br>
             <code>if (dist(mouseX, mouseY, circle.x, circle.y) < radius) {</code><br>

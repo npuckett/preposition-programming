@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="description">
+        <h2>About Programming with Prepositions</h2>
+        <p>This site teaches programming concepts through spatial relationships and natural language. Learn how to translate everyday words into code logic.</p>
+    </div>
+
+    <div class="description">
+        <h3>JavaScript Objects vs Individual Variables</h3>
+        <p>One of the powerful features of JavaScript is its ability to create <strong>objects</strong> that group related information together. This makes code much more organized and easier to understand.</p>
+        
+        <h4>The Object-Based Approach (Recommended)</h4>
+        <p>In our "Between" example, we define circles as objects that contain all their properties:</p>
+        
+        <div class="code-section">
+            <strong>Clean and Organized:</strong><br><br>
+            <code>let blueCircle = {</code><br>
+            <code>&nbsp;&nbsp;x: 100,</code><br>
+            <code>&nbsp;&nbsp;y: 150,</code><br>
+            <code>&nbsp;&nbsp;radius: 25,</code><br>
+            <code>&nbsp;&nbsp;dragging: false</code><br>
+            <code>};</code><br><br>
+            
+            <code>let redCircle = {</code><br>
+            <code>&nbsp;&nbsp;x: 300,</code><br>
+            <code>&nbsp;&nbsp;y: 150,</code><br>
+            <code>&nbsp;&nbsp;radius: 25,</code><br>
+            <code>&nbsp;&nbsp;dragging: false</code><br>
+            <code>};</code><br><br>
+            
+            <code>let greenCircle = {</code><br>
+            <code>&nbsp;&nbsp;x: 200,</code><br>
+            <code>&nbsp;&nbsp;y: 150,</code><br>
+            <code>&nbsp;&nbsp;radius: 20,</code><br>
+            <code>&nbsp;&nbsp;dragging: false</code><br>
+            <code>};</code>
+        </div>
+        
+        <h4>The Individual Variable Approach (Harder to Manage)</h4>
+        <p>Without objects, you'd need separate variables for every property of every circle:</p>
+        
+        <div class="code-section">
+            <strong>Cluttered and Confusing:</strong><br><br>
+            <code>let blueCircleX = 100;</code><br>
+            <code>let blueCircleY = 150;</code><br>
+            <code>let blueCircleRadius = 25;</code><br>
+            <code>let blueCircleDragging = false;</code><br><br>
+            
+            <code>let redCircleX = 300;</code><br>
+            <code>let redCircleY = 150;</code><br>
+            <code>let redCircleRadius = 25;</code><br>
+            <code>let redCircleDragging = false;</code><br><br>
+            
+            <code>let greenCircleX = 200;</code><br>
+            <code>let greenCircleY = 150;</code><br>
+            <code>let greenCircleRadius = 20;</code><br>
+            <code>let greenCircleDragging = false;</code>
+        </div>
+        
+        <h4>Why Objects Are Better</h4>
+        <p>Compare how you'd use these variables in your code:</p>
+        
+        <div class="code-section">
+            <strong>With Objects (Clear):</strong><br><br>
+            <code>ellipse(blueCircle.x, blueCircle.y, blueCircle.radius * 2);</code><br>
+            <code>if (blueCircle.dragging) { /* move the circle */ }</code><br><br>
+            
+            <strong>With Individual Variables (Messy):</strong><br><br>
+            <code>ellipse(blueCircleX, blueCircleY, blueCircleRadius * 2);</code><br>
+            <code>if (blueCircleDragging) { /* move the circle */ }</code>
+        </div>
+        
+        <h4>Key Benefits of Objects</h4>
+        <ul>
+            <li><strong>Organization:</strong> Related data stays together</li>
+            <li><strong>Clarity:</strong> <code>blueCircle.x</code> is clearer than <code>blueCircleX</code></li>
+            <li><strong>Flexibility:</strong> Easy to add new properties to objects</li>
+            <li><strong>Reusability:</strong> You can create functions that work with any circle object</li>
+            <li><strong>Less Typing:</strong> Shorter, more readable variable names</li>
+        </ul>
+        
+        <h4>Real-World Example</h4>
+        <p>In the "Between" example, when we check if a circle is being clicked, compare these approaches:</p>
+        
+        <div class="code-section">
+            <strong>With Objects:</strong><br><br>
+            <code>if (dist(mouseX, mouseY, blueCircle.x, blueCircle.y) < blueCircle.radius) {</code><br>
+            <code>&nbsp;&nbsp;blueCircle.dragging = true;</code><br>
+            <code>}</code><br><br>
+            
+            <strong>With Individual Variables:</strong><br><br>
+            <code>if (dist(mouseX, mouseY, blueCircleX, blueCircleY) < blueCircleRadius) {</code><br>
+            <code>&nbsp;&nbsp;blueCircleDragging = true;</code><br>
+            <code>}</code>
+        </div>
+        
+        <p>The object-based approach makes it immediately clear that all these values belong to the same blue circle, while the individual variables require you to mentally group them together.</p>
+        
+        <h4>When You'll Use This</h4>
+        <p>As you build more complex programs, you'll often need to manage multiple related pieces of information. Objects help you:</p>
+        <ul>
+            <li>Keep track of game characters with position, health, and abilities</li>
+            <li>Manage user interface elements with size, color, and behavior</li>
+            <li>Store data about real-world things like students, products, or locations</li>
+            <li>Organize any collection of related properties and actions</li>
+        </ul>
+    </div>
+
+    <div class="description">
+        <p><a href="index.html">← Back to Examples</a></p>
+    </div>
+</body>
+</html>

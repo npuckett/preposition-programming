@@ -13,7 +13,7 @@
         </p>
         
         <h3>Try It</h3>
-        <p>Drag the circles in the canvas below. Notice how the relationship changes based on their Y coordinates.</p>
+        <p>Drag the circles in the canvas below. The blue circle is always drawn first (behind), and the red circle is always drawn second (in front). Notice how overlap is detected and percentage is calculated.</p>
     </div>
 
     <div class="container">
@@ -36,21 +36,22 @@
         
         <h3>Key P5.js Methods</h3>
         <div class="code-section">
+            <strong>Overlap Detection:</strong><br>
+            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist(x1, y1, x2, y2)</a> - Calculate distance between circle centers<br>
+            • Compare distance to sum of radii to detect overlap<br><br>
+            
+            <strong>Percentage Calculation:</strong><br>
+            • Calculate how much circles overlap<br>
+            • Use overlap distance relative to maximum possible overlap<br><br>
+            
             <strong>Drawing Order:</strong><br>
             • Elements drawn first appear behind elements drawn later<br>
-            • Use arrays to control rendering sequence<br><br>
+            • Blue circle drawn first = always behind<br>
+            • Red circle drawn second = always in front<br><br>
             
-            <strong>Position Comparison:</strong><br>
-            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist(x1, y1, x2, y2)</a> - Check if circles overlap<br>
-            • Overlap occurs when distance < sum of radii<br><br>
-            
-            <strong>Visual Depth Cues:</strong><br>
-            • <a href="https://p5js.org/reference/p5/fill" target="_blank">fill(r, g, b, alpha)</a> - Use transparency for depth<br>
-            • Size variation to suggest distance<br><br>
-            
-            <strong>Drawing Elements:</strong><br>
-            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw circles at specific positions<br>
-            • <a href="https://p5js.org/reference/p5/stroke" target="_blank">stroke()</a> - Add outlines for clarity<br><br>
+            <strong>Visual Feedback:</strong><br>
+            • <a href="https://p5js.org/reference/p5/stroke" target="_blank">stroke()</a> - Change outline colors when overlapping<br>
+            • <a href="https://p5js.org/reference/p5/text" target="_blank">text()</a> - Display percentage on behind circle<br><br>
             
             <strong>Mouse Interaction:</strong><br>
             • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Detect when mouse is clicked<br>
@@ -58,22 +59,44 @@
             • <a href="https://p5js.org/reference/p5/mouseReleased" target="_blank">mouseReleased()</a> - Detect when mouse is released
         </div>
         
+        <h3>Overlap Detection & Percentage</h3>
+        <div class="code-section">
+            <strong>Step 1: Check if circles overlap</strong><br>
+            <code>let distance = dist(blueCircle.x, blueCircle.y, redCircle.x, redCircle.y);</code><br>
+            <code>let radiusSum = blueCircle.radius + redCircle.radius;</code><br>
+            <code>let isOverlapping = distance < radiusSum;</code><br><br>
+            
+            <strong>Step 2: Calculate overlap percentage</strong><br>
+            <code>if (isOverlapping) {</code><br>
+            <code>&nbsp;&nbsp;let overlapDistance = radiusSum - distance;</code><br>
+            <code>&nbsp;&nbsp;let maxPossibleOverlap = Math.min(blueCircle.radius, redCircle.radius) * 2;</code><br>
+            <code>&nbsp;&nbsp;percentOverlap = (overlapDistance / maxPossibleOverlap) * 100;</code><br>
+            <code>}</code><br><br>
+            
+            <strong>Step 3: Simple drawing order</strong><br>
+            <code>// Draw blue circle FIRST (behind)</code><br>
+            <code>fill(100, 150, 255);</code><br>
+            <code>ellipse(blueCircle.x, blueCircle.y, blueCircle.radius * 2);</code><br><br>
+            <code>// Draw red circle SECOND (in front)</code><br>
+            <code>fill(255, 100, 100);</code><br>
+            <code>ellipse(redCircle.x, redCircle.y, redCircle.radius * 2);</code>
+        </div>
+        
         <h3>Code Structure</h3>
         <div class="code-section">
-            <strong>Basic Pattern for "Behind":</strong><br><br>
+            <strong>Simplified "Behind" Pattern:</strong><br><br>
             
-            1. <strong>Define depth order:</strong> Create array with depth values<br>
-            <code>let circles = [{x: 100, y: 100, depth: 1}, {x: 120, y: 110, depth: 2}];</code><br><br>
+            1. <strong>Define two circles:</strong> No arrays needed<br>
+            <code>let blueCircle = {x: 120, y: 150, radius: 55};</code><br>
+            <code>let redCircle = {x: 280, y: 150, radius: 55};</code><br><br>
             
-            2. <strong>Sort by depth:</strong> Arrange elements for proper drawing order<br>
-            <code>circles.sort((a, b) => a.depth - b.depth);</code><br><br>
+            2. <strong>Draw in specific order:</strong> Blue first, then red<br>
+            <code>ellipse(blueCircle.x, blueCircle.y, blueCircle.radius * 2); // Behind</code><br>
+            <code>ellipse(redCircle.x, redCircle.y, redCircle.radius * 2); // In front</code><br><br>
             
-            3. <strong>Draw in order:</strong> Render elements from back to front<br>
-            <code>for (let circle of circles) { ellipse(circle.x, circle.y, 30, 30); }</code><br><br>
-            
-            4. <strong>Check overlap:</strong> Detect when one is behind another<br>
-            <code>let distance = dist(circleA.x, circleA.y, circleB.x, circleB.y);</code><br>
-            <code>let isOverlapping = distance < (circleA.radius + circleB.radius);</code>
+            3. <strong>Calculate relationship:</strong> Distance and overlap detection<br>
+            <code>let distance = dist(blueCircle.x, blueCircle.y, redCircle.x, redCircle.y);</code><br>
+            <code>let isOverlapping = distance < (blueCircle.radius + redCircle.radius);</code>
         </div>
     </div>    <script src="jsFiles/sketch-behind.js"></script>
 </body>

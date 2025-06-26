@@ -22,7 +22,7 @@ let surfaceObject = {
 // Object beneath the surface
 let beneathObject = {
   x: 170,
-  y: 30,
+  y: 130,
   width: 60,
   height: 40,
   color: [255, 150, 100],
@@ -35,9 +35,6 @@ function setup() {
 
 function draw() {
   background(240);
-  
-  // Draw beneath zone indicators first
-  drawBeneathZone();
   
   // Draw objects in correct depth order (beneath first, then surface)
   drawBeneathObject();
@@ -53,84 +50,11 @@ function drawSurfaceObject() {
 }
 
 function drawBeneathObject() {
-  // Check if object is fully beneath
-  let zoneY = surfaceObject.y + surfaceObject.height;
-  let zoneHeight = 60;
-  let isFullyBeneath = (beneathObject.y >= zoneY && 
-                       beneathObject.y + beneathObject.height <= zoneY + zoneHeight &&
-                       beneathObject.x >= surfaceObject.x &&
-                       beneathObject.x + beneathObject.width <= surfaceObject.x + surfaceObject.width);
-  
-  // Draw the beneath object with different appearance based on position
+  // Draw the beneath object
   fill(beneathObject.color[0], beneathObject.color[1], beneathObject.color[2]);
-  if (isFullyBeneath) {
-    stroke(0, 150, 0); // Green border when properly beneath
-    strokeWeight(3);
-  } else {
-    stroke(beneathObject.color[0] - 50, beneathObject.color[1] - 50, beneathObject.color[2] - 50);
-    strokeWeight(2);
-  }
-  rect(beneathObject.x, beneathObject.y, beneathObject.width, beneathObject.height, 5);
-}
-
-function drawBeneathZone() {
-  // Define beneath zone - extends down from the surface
-  let zoneHeight = 60;
-  let zoneY = surfaceObject.y + surfaceObject.height;
-  
-  // Check if beneath object is fully within the zone
-  let isFullyBeneath = (beneathObject.y >= zoneY && 
-                       beneathObject.y + beneathObject.height <= zoneY + zoneHeight &&
-                       beneathObject.x >= surfaceObject.x &&
-                       beneathObject.x + beneathObject.width <= surfaceObject.x + surfaceObject.width);
-  
-  // Draw zone background
-  if (isFullyBeneath) {
-    fill(100, 255, 100, 30); // Light green when object is beneath
-  } else {
-    fill(200, 200, 200, 30); // Light gray when empty
-  }
-  noStroke();
-  rect(surfaceObject.x, zoneY, surfaceObject.width, zoneHeight);
-  
-  // Draw zone border
-  stroke(150);
-  strokeWeight(1);
-  noFill();
-  rect(surfaceObject.x, zoneY, surfaceObject.width, zoneHeight);
-  
-  // Draw arrows pointing down from surface
-  stroke(100);
+  stroke(beneathObject.color[0] - 50, beneathObject.color[1] - 50, beneathObject.color[2] - 50);
   strokeWeight(2);
-  let arrowSpacing = 40;
-  for (let x = surfaceObject.x + 20; x < surfaceObject.x + surfaceObject.width - 20; x += arrowSpacing) {
-    // Arrow line
-    line(x, surfaceObject.y + surfaceObject.height, x, zoneY + 25);
-    
-    // Arrow head
-    let arrowSize = 6;
-    let arrowY = zoneY + 25;
-    line(x, arrowY, x - arrowSize, arrowY - arrowSize);
-    line(x, arrowY, x + arrowSize, arrowY - arrowSize);
-  }
-  
-  // Draw "BENEATH ZONE" label
-  fill(0);
-  noStroke();
-  textAlign(CENTER);
-  textSize(10);
-  text("BENEATH ZONE", surfaceObject.x + surfaceObject.width/2, zoneY + zoneHeight - 5);
-  
-  // Display status
-  textAlign(CENTER);
-  textSize(14);
-  if (isFullyBeneath) {
-    fill(0, 150, 0);
-    text("Orange is BENEATH blue surface", width/2, height - 20);
-  } else {
-    fill(150, 0, 0);
-    text("Orange is NOT beneath (must be fully in zone)", width/2, height - 20);
-  }
+  rect(beneathObject.x, beneathObject.y, beneathObject.width, beneathObject.height, 5);
 }
 
 // Helper functions for cross-platform input handling

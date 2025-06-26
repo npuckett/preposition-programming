@@ -13,7 +13,7 @@
         </p>
         
         <h3>Try It</h3>
-        <p>Drag the circles in the canvas below. Notice how the relationship changes based on their Y coordinates.</p>
+        <p>Drag the circle through the blue barrier. Watch how the color changes to show movement progress and final position.</p>
     </div>
 
     <div class="container">
@@ -29,32 +29,30 @@
         <h3>Translation Strategy</h3>
         <p>To create "through" relationships on screen:</p>
         <ul>
-            <li><strong>Path Tracking:</strong> Record the movement path of an element</li>
             <li><strong>Boundary Crossing:</strong> Detect when an element crosses from one side of a barrier to another</li>
-            <li><strong>Transit Detection:</strong> Check if movement passes through a defined area</li>
+            <li><strong>State Tracking:</strong> Track entry and exit from the barrier area</li>
+            <li><strong>Position-based Feedback:</strong> Use position to determine visual appearance</li>
         </ul>
         
         <h3>Key P5.js Methods</h3>
         <div class="code-section">
-            <strong>Movement Tracking:</strong><br>
-            • Store previous positions to track movement paths<br>
-            • Use arrays to record position history<br><br>
+            <strong>Coordinate System:</strong><br>
+            • <a href="https://p5js.org/reference/p5/createCanvas" target="_blank">createCanvas(width, height)</a> - Creates coordinate system where (0,0) is top-left<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw rectangular barrier<br><br>
             
             <strong>Boundary Detection:</strong><br>
-            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist(x1, y1, x2, y2)</a> - Calculate distance to barriers<br>
-            • Check if element crosses specific coordinates<br><br>
-            
-            <strong>Drawing Path:</strong><br>
-            • <a href="https://p5js.org/reference/p5/line" target="_blank">line(x1, y1, x2, y2)</a> - Draw movement trails<br>
-            • <a href="https://p5js.org/reference/p5/beginShape" target="_blank">beginShape()</a> and <a href="https://p5js.org/reference/p5/endShape" target="_blank">endShape()</a> - Draw complex paths<br><br>
-            
-            <strong>Drawing Elements:</strong><br>
-            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw moving elements<br>
-            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw barriers<br><br>
+            • Compare object position with barrier edges<br>
+            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist(x1, y1, x2, y2)</a> - Calculate distance from barriers<br>
+            • Track which side of barrier the object is on<br><br>
             
             <strong>State Management:</strong><br>
-            • Track whether element has entered/exited barriers<br>
-            • Use boolean flags for transit states<br><br>
+            • Use boolean flags to track entry and exit states<br>
+            • Check if movement crosses from one side to another<br><br>
+            
+            <strong>Visual Feedback:</strong><br>
+            • <a href="https://p5js.org/reference/p5/fill" target="_blank">fill(r, g, b)</a> - Change colors based on position and state<br>
+            • <a href="https://p5js.org/reference/p5/stroke" target="_blank">stroke(r, g, b)</a> - Change border colors<br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw moving circle<br><br>
             
             <strong>Mouse Interaction:</strong><br>
             • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Detect when mouse is clicked<br>
@@ -66,19 +64,26 @@
         <div class="code-section">
             <strong>Basic Pattern for "Through":</strong><br><br>
             
-            1. <strong>Define barrier:</strong> Create obstacle or boundary<br>
-            <code>let barrier = {x: 200, y: 100, width: 50, height: 100};</code><br><br>
+            1. <strong>Define barrier:</strong> Create rectangular boundary<br>
+            <code>let barrier = {x: 180, y: 50, width: 40, height: 200};</code><br><br>
             
-            2. <strong>Track movement:</strong> Store position history<br>
-            <code>let movingElement = {x: 100, y: 150, path: [], hasPassedThrough: false};</code><br><br>
+            2. <strong>Track state:</strong> Monitor entry and exit<br>
+            <code>let movingCircle = {hasEnteredBarrier: false, hasExitedBarrier: false, hasPassed: false};</code><br><br>
             
-            3. <strong>Check transit:</strong> Detect crossing of barrier<br>
-            <code>let isInside = (element.x > barrier.x && element.x < barrier.x + barrier.width);</code><br>
-            <code>if (wasOutside && isInside) element.hasEnteredBarrier = true;</code><br><br>
+            3. <strong>Check crossing:</strong> Detect complete traversal<br>
+            <code>if (isInsideBarrier && !hasEnteredBarrier) {</code><br>
+            <code>&nbsp;&nbsp;hasEnteredBarrier = true;</code><br>
+            <code>&nbsp;&nbsp;entryFromLeft = (x < barrier.x + barrier.width/2);</code><br>
+            <code>}</code><br><br>
             
-            4. <strong>Record path:</strong> Add positions to trail<br>
-            <code>movingElement.path.push({x: mouseX, y: mouseY});</code><br>
-            <code>if (movingElement.path.length > 50) movingElement.path.shift();</code>
+            4. <strong>Position-based colors:</strong> Visual feedback based on location<br>
+            <code>if (isInsideBarrier) {</code><br>
+            <code>&nbsp;&nbsp;fill(255, 255, 100); // Yellow - passing through</code><br>
+            <code>} else if (x < barrier.center) {</code><br>
+            <code>&nbsp;&nbsp;fill(255, 150, 100); // Orange - left side</code><br>
+            <code>} else {</code><br>
+            <code>&nbsp;&nbsp;fill(100, 255, 100); // Green - right side</code><br>
+            <code>}</code>
         </div>
     </div>
 
