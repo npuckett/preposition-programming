@@ -13,69 +13,73 @@
         </p>
         
         <h3>Try It</h3>
-        <p>Click to trigger the main event and see what happens after it.</p>
-    </div>    <div class="container">
+        <p>Click to launch a projectile toward the impact point. Watch what happens after the collision!</p>
+    </div>
+
+    <div class="container">
         <div class="canvas-container">
             <div id="canvas"></div>
-        </div>
-    </div>
-                <button onclick="startTimeline()">Start Timeline</button>
-                <button onclick="resetTimeline()">Reset</button>
-            </div>
-            <div id="status">Timeline: Ready to start</div>
         </div>
     </div>
 
     <div class="description">
         <h3>Concept</h3>
-        <p>The preposition <strong>"after"</strong> indicates that something happens following a specific point in time or event. It establishes a temporal sequence where one action or state occurs subsequent to another. In programming, this often involves tracking time or counting events to trigger actions in sequence.</p>        <h3>Translation Strategy</h3>
-        <p>To create "after" relationships in time:</p>
+        <p>The preposition <strong>"after"</strong> indicates that something happens following a specific event or action. It establishes a sequence where one action occurs subsequent to another. In this visualization, particles scatter in different directions after a collision occurs, demonstrating the consequences that follow an impact.</p>
+
+        <h3>Visual Translation Strategy</h3>
+        <p>To represent "after" relationships through movement:</p>
         <ul>
-            <li><strong>Event Sequencing:</strong> Schedule events to occur following a main event</li>
-            <li><strong>Time Delays:</strong> Use elapsed time calculations to trigger delayed actions</li>
-            <li><strong>State Management:</strong> Track which events have occurred and when</li>
+            <li><strong>Sequential Actions:</strong> One event triggers the next in a clear sequence</li>
+            <li><strong>Collision Effects:</strong> Impact creates consequences that spread outward</li>
+            <li><strong>State Transitions:</strong> Clear visual changes show before/during/after states</li>
+            <li><strong>Radial Scattering:</strong> Effects emanate from the central event point</li>
         </ul>
 
-        <h3>Key P5.js Methods</h3>        <div class="code-section">
-            <strong>Time Management:</strong><br>
-            • <a href="https://p5js.org/reference/p5/millis" target="_blank">millis()</a> - tracks elapsed time since sketch started<br>
-            • Time calculations: <code>elapsedTime = millis() - startTime</code><br>
-            • <a href="https://p5js.org/reference/p5/frameCount" target="_blank">frameCount</a> - alternative timing method<br><br>
+        <h3>Key P5.js Methods</h3>
+        <div class="code-section">
+            <strong>Movement and Physics:</strong><br>
+            • <a href="https://p5js.org/reference/p5/atan2" target="_blank">atan2()</a> - calculates angle for projectile movement<br>
+            • <a href="https://p5js.org/reference/p5/cos" target="_blank">cos()</a> and <a href="https://p5js.org/reference/p5/sin" target="_blank">sin()</a> - for directional movement<br>
+            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist()</a> - measures distance for collision detection<br>
+            • <a href="https://p5js.org/reference/p5/TWO_PI" target="_blank">TWO_PI</a> - for evenly distributed scatter angles<br><br>
             
             <strong>Visual Elements:</strong><br>
-            • <a href="https://p5js.org/reference/p5/fill" target="_blank">fill()</a> - sets colors for visual feedback<br>
-            • <a href="https://p5js.org/reference/p5/circle" target="_blank">circle()</a> - draws event markers<br>
-            • <a href="https://p5js.org/reference/p5/text" target="_blank">text()</a> - displays timing information<br>
-            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect()</a> - creates timeline visualization<br><br>
+            • <a href="https://p5js.org/reference/p5/fill" target="_blank">fill()</a> - color coding for different states<br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse()</a> - draws projectile, impact point, and particles<br>
+            • <a href="https://p5js.org/reference/p5/beginShape" target="_blank">beginShape()</a> - creates movement trails<br>
+            • <a href="https://p5js.org/reference/p5/vertex" target="_blank">vertex()</a> - builds trail paths<br><br>
             
-            <strong>Animation:</strong><br>
-            • Progress bars and timeline indicators<br>
-            • State-based color changes<br>
-            • Sequential event triggering
+            <strong>State Management:</strong><br>
+            • Boolean flags to track collision state<br>
+            • Array methods for particle management<br>
+            • Velocity dampening for realistic physics
         </div>
 
-        <h3>Code Structure</h3>        <div class="code-section">
-            <strong>Basic Pattern for "After":</strong><br><br>
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "After" Effects:</strong><br><br>
             
-            1. <strong>Setup timing variables:</strong> Track start time and main event<br>
-            <code>let timeline = {</code><br>
-            <code>&nbsp;&nbsp;startTime: null,</code><br>
-            <code>&nbsp;&nbsp;mainEventTime: 3000, // 3 seconds</code><br>
-            <code>&nbsp;&nbsp;afterEvents: [...]</code><br>
-            <code>};</code><br><br>
+            1. <strong>Setup initial state:</strong> Position projectile and target<br>
+            <code>let projectile = { x: 50, y: 150, isMoving: false };</code><br>
+            <code>let impact = { x: 200, y: 150, hasHappened: false };</code><br><br>
             
-            2. <strong>Calculate elapsed time:</strong> Monitor current time<br>
-            <code>let elapsed = millis() - timeline.startTime;</code><br><br>
+            2. <strong>Move toward collision:</strong> Update projectile position<br>
+            <code>let angle = atan2(dy, dx);</code><br>
+            <code>projectile.x += cos(angle) * speed;</code><br>
+            <code>projectile.y += sin(angle) * speed;</code><br><br>
             
-            3. <strong>Check temporal relationships:</strong> Compare times<br>
-            <code>let mainEventPassed = elapsed >= timeline.mainEventTime;</code><br><br>
+            3. <strong>Detect collision:</strong> Check for impact<br>
+            <code>if (distance < projectile.speed + impact.size/2) {</code><br>
+            <code>&nbsp;&nbsp;impact.hasHappened = true;</code><br>
+            <code>&nbsp;&nbsp;// Start "after" effects here</code><br>
+            <code>}</code><br><br>
             
-            4. <strong>Trigger after events:</strong> Schedule delayed actions<br>
-            <code>if (mainEventPassed) {</code><br>
-            <code>&nbsp;&nbsp;let afterTime = timeline.mainEventTime + event.delay;</code><br>
-            <code>&nbsp;&nbsp;if (elapsed >= afterTime) {</code><br>
-            <code>&nbsp;&nbsp;&nbsp;&nbsp;// This happens AFTER the main event</code><br>
-            <code>&nbsp;&nbsp;&nbsp;&nbsp;event.triggered = true;</code><br>
+            4. <strong>Trigger scatter effects:</strong> Particles move after impact<br>
+            <code>for (let particle of particles) {</code><br>
+            <code>&nbsp;&nbsp;if (impact.hasHappened) {</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;particle.x += particle.vx;</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;particle.y += particle.vy;</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;particle.vx *= 0.98; // Slow down over time</code><br>
             <code>&nbsp;&nbsp;}</code><br>
             <code>}</code>
         </div>

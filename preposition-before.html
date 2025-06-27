@@ -13,7 +13,7 @@
         </p>
         
         <h3>Try It</h3>
-        <p>Click to start the sequence and see preparations that happen before the main event.</p>
+        <p>Click to watch obstacles clear the path before the main movement begins.</p>
     </div>
 
     <div class="container">
@@ -24,62 +24,87 @@
 
     <div class="description">
         <h3>Concept</h3>
-        <p><strong>BEFORE</strong> means occurring earlier in time than a reference point. In programming, this involves comparing timestamps, managing event sequences, and creating time-based conditions.</p>
+        <p><strong>BEFORE</strong> means occurring earlier than a reference event. This shows obstacles moving out of the way before a main movement can begin, demonstrating that one action must complete before another can start.</p>
         
         <h3>Translation Strategy</h3>
-        <p>To create "before" relationships in time:</p>
+        <p>To create "before" relationships in programming:</p>
         <ul>
-            <li><strong>Time Tracking:</strong> Monitor elapsed time from a starting point</li>
-            <li><strong>Event Sequencing:</strong> Schedule events to occur before a main event</li>
-            <li><strong>Conditional Logic:</strong> Use time comparisons to trigger actions</li>
+            <li><strong>Prerequisites:</strong> Check that conditions are met before proceeding</li>
+            <li><strong>Sequential Stages:</strong> Complete setup actions before main actions</li>
+            <li><strong>State Management:</strong> Track completion of prerequisite tasks</li>
+            <li><strong>Automatic Progression:</strong> Move to next stage when ready</li>
         </ul>
         
         <h3>Key P5.js Methods</h3>
         <div class="code-section">
-            <strong>Time Management:</strong><br>
-            • <a href="https://p5js.org/reference/p5/millis" target="_blank">millis()</a> - Get current time in milliseconds<br>
-            • Time calculations: <code>elapsedTime = (millis() - startTime) / 1000</code><br>
-            • <a href="https://p5js.org/reference/p5/frameCount" target="_blank">frameCount</a> - Track frames for timing<br><br>
+            <strong>State Tracking:</strong><br>
+            • Boolean flags: <code>let isClearing = false;</code><br>
+            • <a href="https://p5js.org/reference/p5/Array" target="_blank">Arrays</a> - Store multiple objects to check<br>
+            • Object properties: <code>obstacle.hasCleared</code><br><br>
+            
+            <strong>Loop Types - Working with Arrays:</strong><br>
+            • <strong>for...of loop:</strong> <code>for (let item of array)</code> - gives you each item directly<br>
+            • <strong>Traditional for loop:</strong> <code>for (let i = 0; i < array.length; i++)</code> - uses index numbers<br>
+            • Use for...of when you just need to work with each item<br>
+            • Use traditional for when you need the position/index number<br><br>
+            
+            <strong>Movement & Animation:</strong><br>
+            • <a href="https://p5js.org/reference/p5/lerp" target="_blank">lerp(start, stop, amount)</a> - Smooth interpolation between values<br>
+            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist()</a> - Check if objects reached targets<br>
+            • <a href="https://p5js.org/reference/p5/random" target="_blank">random()</a> - Generate scatter positions<br><br>
+            
+            <strong>Visual Feedback:</strong><br>
+            • <a href="https://p5js.org/reference/p5/fill" target="_blank">fill(r, g, b)</a> - Color changes for states<br>
+            • Progress counters: <code>${cleared}/4 cleared</code><br>
+            • Trail visualization with <a href="https://p5js.org/reference/p5/map" target="_blank">map()</a><br><br>
             
             <strong>Conditional Logic:</strong><br>
-            • Time comparisons: <code>if (currentTime < eventTime)</code><br>
-            • Boolean flags for event states: <code>let eventHappened = false</code><br>
-            • Multiple condition checks for sequences<br><br>
-            
-            <strong>Visual Elements:</strong><br>
-            • <a href="https://p5js.org/reference/p5/fill" target="_blank">fill(r, g, b, alpha)</a> - Change colors based on time<br>
-            • <a href="https://p5js.org/reference/p5/textAlign" target="_blank">textAlign()</a> - Position time displays<br>
-            • Progress bars and timeline visualizations<br><br>
-            
-            <strong>Animation:</strong><br>
-            • State-based animations depending on time<br>
-            • Smooth transitions using time interpolation<br><br>
-            
-            <strong>User Interaction:</strong><br>
-            • Button controls for starting/stopping timers<br>
-            • Reset functionality to restart sequences
+            • Check all prerequisites: <code>if (allCleared)</code><br>
+            • State transitions: <code>isClearing = false; isMoving = true;</code>
         </div>
         
         <h3>Code Structure</h3>
         <div class="code-section">
             <strong>Basic Pattern for "Before":</strong><br><br>
             
-            1. <strong>Setup time variables:</strong> Track start time and target event time<br>
-            <code>let startTime;</code><br>
-            <code>let mainEventTime = 3; // seconds</code><br>
-            <code>let timerRunning = false;</code><br><br>
+            1. <strong>Create obstacles:</strong> Objects that must move before main action<br>
+            <code>obstacles.push({x: startX, y: startY, hasCleared: false});</code><br><br>
             
-            2. <strong>Calculate elapsed time:</strong> Monitor current time<br>
-            <code>let elapsedTime = (millis() - startTime) / 1000;</code><br><br>
+            2. <strong>Check prerequisites using for...of loop:</strong><br>
+            <code>let allCleared = true;</code><br>
+            <code>for (let obstacle of obstacles) {</code><br>
+            <code>&nbsp;&nbsp;if (!obstacle.hasCleared) allCleared = false;</code><br>
+            <code>}</code><br><br>
             
-            3. <strong>Check temporal relationships:</strong> Compare times<br>
-            <code>if (elapsedTime < mainEventTime) {</code><br>
-            <code>&nbsp;&nbsp;// This happens BEFORE the main event</code><br>
-            <code>&nbsp;&nbsp;triggerPreEvents();</code><br>
-            <code>} else {</code><br>
-            <code>&nbsp;&nbsp;// Main event or after</code><br>
-            <code>&nbsp;&nbsp;triggerMainEvent();</code><br>
-            <code>}</code>
+            3. <strong>Progress when ready:</strong> Start main action only after setup<br>
+            <code>if (allCleared) {</code><br>
+            <code>&nbsp;&nbsp;isClearing = false;</code><br>
+            <code>&nbsp;&nbsp;isMoving = true; // Main action starts</code><br>
+            <code>}</code><br><br>
+            
+            4. <strong>Visual feedback with for...of loop:</strong><br>
+            <code>for (let obstacle of obstacles) {</code><br>
+            <code>&nbsp;&nbsp;if (obstacle.hasCleared) cleared++;</code><br>
+            <code>}</code><br>
+            <code>text(`Clearing path (${cleared}/4 cleared)`, x, y);</code><br><br>
+            
+            <strong>Loop Comparison Example:</strong><br>
+            <code>// for...of: easier to read, gives you the item directly</code><br>
+            <code>for (let obstacle of obstacles) {</code><br>
+            <code>&nbsp;&nbsp;obstacle.x = lerp(obstacle.x, obstacle.targetX, 0.1);</code><br>
+            <code>}</code><br><br>
+            <code>// Traditional for: when you need the index position</code><br>
+            <code>for (let i = 0; i < obstacles.length; i++) {</code><br>
+            <code>&nbsp;&nbsp;obstacles[i].x = 120 + (i * 60); // Position based on index</code><br>
+            <code>}</code><br><br>
+            
+            <strong>Understanding lerp():</strong><br>
+            <code>lerp(start, stop, amount)</code> - Interpolates between two values<br>
+            • <code>start</code> - Current position<br>
+            • <code>stop</code> - Target position<br>
+            • <code>amount</code> - How much to move (0.1 = move 10% closer each frame)<br>
+            • Creates smooth, eased movement that slows down as it approaches the target
+        </div>
         </div>
     </div>
 

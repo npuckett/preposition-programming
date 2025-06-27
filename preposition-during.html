@@ -12,66 +12,79 @@
         </p>
         
         <h3>Try It</h3>
-        <p>Click to start the animation and see events that happen during it.</p>
-    </div>    <div class="container">
+        <p>Click to start the journey and watch particles emit during the traveler's movement from point A to point B.</p>
+    </div>
+
+    <div class="container">
         <div class="canvas-container">
             <div id="canvas"></div>
-        </div>
-    </div>
-                <button onclick="resetAnimation()">Reset</button>
-            </div>
-            <div id="status">Animation: Ready to start</div>
         </div>
     </div>
 
     <div class="description">
         <h3>Concept</h3>
-        <p>The preposition <strong>"during"</strong> indicates that something happens within the time span of another event or period. It describes concurrent or overlapping timeframes where one action occurs while another is taking place. In programming, this involves checking if the current time falls within a specific interval.</p>        <h3>Translation Strategy</h3>
-        <p>To create "during" relationships in time:</p>
+        <p>The preposition <strong>"during"</strong> indicates that something happens throughout the time span of another event or process. It describes continuous or ongoing activities that occur while something else is taking place. In this visualization, particles are emitted continuously during a traveler's journey from one point to another.</p>
+
+        <h3>Visual Translation Strategy</h3>
+        <p>To represent "during" relationships through movement:</p>
         <ul>
-            <li><strong>Time Periods:</strong> Define start and end times for intervals</li>
-            <li><strong>Range Checking:</strong> Use conditional logic to test if current time falls within period</li>
-            <li><strong>State Management:</strong> Activate/deactivate elements based on time intervals</li>
+            <li><strong>Continuous Process:</strong> Actions that happen throughout an entire period</li>
+            <li><strong>Journey-Based Events:</strong> Things that occur while traveling from A to B</li>
+            <li><strong>Progressive Activity:</strong> Ongoing emission/creation during movement</li>
+            <li><strong>Temporal Overlap:</strong> Secondary events happening within primary process</li>
         </ul>
 
         <h3>Key P5.js Methods</h3>
         <div class="code-section">
-            <strong>Time Management:</strong><br>
-            • <a href="https://p5js.org/reference/p5/millis" target="_blank">millis()</a> - tracks elapsed time for temporal calculations<br>
-            • Range checking: <code>time >= start && time <= end</code><br>
-            • <a href="https://p5js.org/reference/p5/frameCount" target="_blank">frameCount</a> - alternative timing method<br><br>
+            <strong>Movement and Timing:</strong><br>
+            • <a href="https://p5js.org/reference/p5/atan2" target="_blank">atan2()</a> - calculates movement direction<br>
+            • <a href="https://p5js.org/reference/p5/frameCount" target="_blank">frameCount</a> - controls emission timing during journey<br>
+            • <a href="https://p5js.org/reference/p5/cos" target="_blank">cos()</a> and <a href="https://p5js.org/reference/p5/sin" target="_blank">sin()</a> - for directional movement<br>
+            • <a href="https://p5js.org/reference/p5/random" target="_blank">random()</a> - varies particle properties during emission<br><br>
             
-            <strong>Visual Elements:</strong><br>
-            • <a href="https://p5js.org/reference/p5/map" target="_blank">map()</a> - converts time values to visual positions<br>
-            • <a href="https://p5js.org/reference/p5/sin" target="_blank">sin()</a> - creates wave animations for events<br>
-            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect()</a> - draws time periods and progress bars<br>
-            • <a href="https://p5js.org/reference/p5/text" target="_blank">text()</a> - displays timing and status information<br><br>
+            <strong>Particle System:</strong><br>
+            • <a href="https://p5js.org/reference/p5/push" target="_blank">push()</a> - adds new particles during movement<br>
+            • <a href="https://p5js.org/reference/p5/splice" target="_blank">splice()</a> - removes faded particles<br>
+            • <a href="https://p5js.org/reference/p5/beginShape" target="_blank">beginShape()</a> - creates particle trails<br>
+            • <a href="https://p5js.org/reference/p5/vertex" target="_blank">vertex()</a> - builds trail paths<br><br>
             
-            <strong>Animation:</strong><br>
-            • State-based animations during specific periods<br>
-            • Conditional particle systems<br>
-            • Timeline visualization with highlighted periods
+            <strong>Visual Feedback:</strong><br>
+            • Alpha transparency for fading effects<br>
+            • Progress tracking during journey<br>
+            • Real-time particle count display
         </div>
 
-        <h3>Code Structure</h3>        <div class="code-section">
-            <strong>Basic Pattern for "During":</strong><br><br>
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "During" Events:</strong><br><br>
             
-            1. <strong>Define time period:</strong> Set start and end times<br>
-            <code>let timeline = {</code><br>
-            <code>&nbsp;&nbsp;duringPeriod: {start: 2000, end: 6000}, // 2-6 seconds</code><br>
-            <code>&nbsp;&nbsp;activities: [...]</code><br>
+            1. <strong>Setup journey:</strong> Define start and end points<br>
+            <code>let traveler = {</code><br>
+            <code>&nbsp;&nbsp;x: 50, y: 150, targetX: 350, targetY: 150,</code><br>
+            <code>&nbsp;&nbsp;speed: 2, isMoving: false</code><br>
             <code>};</code><br><br>
             
-            2. <strong>Calculate current time:</strong> Track elapsed time<br>
-            <code>let elapsed = millis() - timeline.startTime;</code><br><br>
+            2. <strong>Move during journey:</strong> Update position while traveling<br>
+            <code>if (traveler.isMoving) {</code><br>
+            <code>&nbsp;&nbsp;let angle = atan2(dy, dx);</code><br>
+            <code>&nbsp;&nbsp;traveler.x += cos(angle) * traveler.speed;</code><br>
+            <code>&nbsp;&nbsp;traveler.y += sin(angle) * traveler.speed;</code><br>
+            <code>}</code><br><br>
             
-            3. <strong>Check if currently during period:</strong> Range checking<br>
-            <code>let duringActive = elapsed >= timeline.duringPeriod.start &&</code><br>
-            <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elapsed <= timeline.duringPeriod.end;</code><br><br>
+            3. <strong>Emit particles during movement:</strong> Continuous creation<br>
+            <code>if (frameCount % 8 === 0) { // Every 8 frames</code><br>
+            <code>&nbsp;&nbsp;let newParticle = {</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;x: traveler.x, y: traveler.y,</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;vx: random(-2, 2), vy: random(-2, 2)</code><br>
+            <code>&nbsp;&nbsp;};</code><br>
+            <code>&nbsp;&nbsp;particles.push(newParticle);</code><br>
+            <code>}</code><br><br>
             
-            4. <strong>Activate elements during period:</strong> State management<br>
-            <code>for (let activity of timeline.activities) {</code><br>
-            <code>&nbsp;&nbsp;activity.active = duringActive;</code><br>
+            4. <strong>Update particles:</strong> Animate emitted particles<br>
+            <code>for (let particle of particles) {</code><br>
+            <code>&nbsp;&nbsp;particle.x += particle.vx;</code><br>
+            <code>&nbsp;&nbsp;particle.y += particle.vy;</code><br>
+            <code>&nbsp;&nbsp;particle.life -= 0.01; // Fade over time</code><br>
             <code>}</code>
         </div>
     </div>

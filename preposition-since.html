@@ -12,8 +12,10 @@
         </p>
         
         <h3>Try It</h3>
-        <p>Click to start tracking time since a reference point.</p>
-    </div>    <div class="container">
+        <p>Click anywhere to start a trail that grows continuously since your click point.</p>
+    </div>
+
+    <div class="container">
         <div class="canvas-container">
             <div id="canvas"></div>
         </div>
@@ -21,55 +23,68 @@
 
     <div class="description">
         <h3>Concept</h3>
-        <p>The preposition <strong>"since"</strong> indicates the starting point of a time period that continues to the present moment. It establishes a reference point in the past from which something has been ongoing or true. In programming, this involves calculating elapsed time from a specific starting point to track duration and accumulation.</p>        <h3>Translation Strategy</h3>
-        <p>To create "since" relationships in time:</p>
+        <p>The preposition <strong>"since"</strong> indicates the starting point of a time period that continues to the present moment. It establishes a reference point from which something has been ongoing or accumulating. In this visualization, a spiral trail grows continuously since the moment you click, demonstrating how something can build up over time from a specific starting point.</p>
+
+        <h3>Visual Translation Strategy</h3>
+        <p>To represent "since" relationships through movement:</p>
         <ul>
-            <li><strong>Reference Points:</strong> Establish starting times for ongoing measurements</li>
-            <li><strong>Accumulation:</strong> Track changes and growth from the reference point</li>
-            <li><strong>Duration Tracking:</strong> Calculate elapsed time from specific moments</li>
+            <li><strong>Reference Points:</strong> Clear starting locations that mark the beginning</li>
+            <li><strong>Continuous Growth:</strong> Ongoing accumulation from the reference point</li>
+            <li><strong>Visual Accumulation:</strong> Trail length shows duration since start</li>
+            <li><strong>Spiral Pattern:</strong> Expanding outward represents time progression</li>
         </ul>
 
         <h3>Key P5.js Methods</h3>
         <div class="code-section">
-            <strong>Time Management:</strong><br>
-            • <a href="https://p5js.org/reference/p5/millis" target="_blank">millis()</a> - tracks elapsed time for "since" calculations<br>
-            • Duration calculations: <code>timeSince = millis() - eventTime</code><br>
-            • <a href="https://p5js.org/reference/p5/frameCount" target="_blank">frameCount</a> - alternative counting method<br><br>
+            <strong>Trail Generation:</strong><br>
+            • <a href="https://p5js.org/reference/p5/cos" target="_blank">cos()</a> and <a href="https://p5js.org/reference/p5/sin" target="_blank">sin()</a> - create spiral patterns<br>
+            • <a href="https://p5js.org/reference/p5/frameCount" target="_blank">frameCount</a> - controls timing for adding trail points<br>
+            • <a href="https://p5js.org/reference/p5/push" target="_blank">push()</a> - adds new points to trail since start<br>
+            • <a href="https://p5js.org/reference/p5/shift" target="_blank">shift()</a> - manages trail length over time<br><br>
             
             <strong>Visual Elements:</strong><br>
-            • <a href="https://p5js.org/reference/p5/random" target="_blank">random()</a> - generates ongoing events to count<br>
-            • <a href="https://p5js.org/reference/p5/map" target="_blank">map()</a> - visualizes accumulation over time<br>
-            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect()</a> - creates progress bars and counters<br>
-            • <a href="https://p5js.org/reference/p5/text" target="_blank">text()</a> - displays duration and count information<br><br>
+            • <a href="https://p5js.org/reference/p5/beginShape" target="_blank">beginShape()</a> - draws continuous trail path<br>
+            • <a href="https://p5js.org/reference/p5/vertex" target="_blank">vertex()</a> - connects trail points<br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse()</a> - marks start and current end points<br>
+            • <a href="https://p5js.org/reference/p5/strokeWeight" target="_blank">strokeWeight()</a> - emphasizes trail visibility<br><br>
             
-            <strong>Data Tracking:</strong><br>
-            • Counter variables for accumulation<br>
-            • State management for ongoing processes<br>
-            • Visual feedback for continuous activity
+            <strong>State Management:</strong><br>
+            • Boolean flags for growth state<br>
+            • Reference point tracking<br>
+            • Continuous accumulation patterns
         </div>
 
-        <h3>Code Structure</h3>        <div class="code-section">
-            <strong>Basic Pattern for "Since":</strong><br><br>
+        <h3>Code Structure</h3>
+        <div class="code-section">
+            <strong>Basic Pattern for "Since" Growth:</strong><br><br>
             
-            1. <strong>Setup tracking variables:</strong> Store reference time and counters<br>
-            <code>let tracking = {</code><br>
-            <code>&nbsp;&nbsp;eventTime: null,</code><br>
-            <code>&nbsp;&nbsp;counters: {steps: 0, notifications: 0}</code><br>
-            <code>};</code><br><br>
+            1. <strong>Setup reference point:</strong> Store starting location and state<br>
+            <code>let startPoint = { x: 0, y: 0 };</code><br>
+            <code>let trail = [];</code><br>
+            <code>let isGrowing = false;</code><br><br>
             
-            2. <strong>Calculate time since event:</strong> Duration from reference<br>
-            <code>function getTimeSince() {</code><br>
-            <code>&nbsp;&nbsp;if (!tracking.eventTime) return 0;</code><br>
-            <code>&nbsp;&nbsp;return millis() - tracking.eventTime;</code><br>
+            2. <strong>Start tracking from click:</strong> Establish reference point<br>
+            <code>function mousePressed() {</code><br>
+            <code>&nbsp;&nbsp;startPoint.x = mouseX;</code><br>
+            <code>&nbsp;&nbsp;startPoint.y = mouseY;</code><br>
+            <code>&nbsp;&nbsp;trail = []; // Reset trail</code><br>
+            <code>&nbsp;&nbsp;isGrowing = true;</code><br>
             <code>}</code><br><br>
             
-            3. <strong>Update counters since event:</strong> Accumulate values<br>
-            <code>if (tracking.eventTime && tracking.running) {</code><br>
-            <code>&nbsp;&nbsp;// Continuous accumulation since the event</code><br>
-            <code>&nbsp;&nbsp;if (frameCount % 60 === 0) {</code><br>
-            <code>&nbsp;&nbsp;&nbsp;&nbsp;tracking.counters.steps++;</code><br>
-            <code>&nbsp;&nbsp;}</code><br>
-            <code>}</code>
+            3. <strong>Add points since start:</strong> Continuous accumulation<br>
+            <code>if (isGrowing && frameCount % 3 === 0) {</code><br>
+            <code>&nbsp;&nbsp;let radius = trailLength * 2;</code><br>
+            <code>&nbsp;&nbsp;let x = startPoint.x + cos(angle) * radius;</code><br>
+            <code>&nbsp;&nbsp;let y = startPoint.y + sin(angle) * radius;</code><br>
+            <code>&nbsp;&nbsp;trail.push({ x: x, y: y });</code><br>
+            <code>}</code><br><br>
+            
+            4. <strong>Draw growing trail:</strong> Visualize accumulation since start<br>
+            <code>beginShape();</code><br>
+            <code>for (let i = 0; i < trail.length; i++) {</code><br>
+            <code>&nbsp;&nbsp;vertex(trail[i].x, trail[i].y);</code><br>
+            <code>}</code><br>
+            <code>endShape();</code>
         </div>
     </div>
 

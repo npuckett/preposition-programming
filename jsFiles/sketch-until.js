@@ -1,125 +1,158 @@
 /**
- * P5.js Sketch: UNTIL - Continuing Until a Condition is Met
+ * P5.js Sketch: UNTIL - Continuous Movement Until Stopped
  * 
- * CONCEPT: "Until" means an action continues up to a specific point,
- * then stops when that condition is reached. This shows the temporal
- * boundary where something ongoing comes to an end.
+ * CONCEPT: "Until" means continuing an action up to a specific point,
+ * then stopping when that condition is met. This shows an object
+ * moving continuously around the canvas until you click to stop it.
  * 
  * LEARNING OBJECTIVES:
  * • Understand conditional termination and stopping points
- * • Practice progress tracking toward a target
- * • Learn state transitions (running → stopped)
- * • Explore time-based or condition-based endings
+ * • Practice continuous processes with stopping conditions
+ * • Learn state transitions (moving → stopped)
+ * • Explore spatial representation of temporal limits
  * 
  * KEY VARIABLES & METHODS:
- * • progress - tracks how close we are to the "until" point
- * • isRunning - boolean state for the ongoing action
- * • targetValue - the condition that ends the process
- * • map() - convert progress to visual representation
+ * • mover - object that moves until clicked
+ * • Continuous wandering movement pattern
+ * • Click interaction to trigger stopping condition
  * 
  * EXTENSION IDEAS:
- * • Multiple different "until" conditions
- * • User-defined stopping points
- * • Visual countdown indicators
- * • Different types of progress (time, distance, count)
+ * • Different movement patterns until stopped
+ * • Multiple objects moving until different conditions
+ * • Obstacles that cause stopping until cleared
  */
 
-let progress = 0;
-let isRunning = false;
-let targetValue = 100; // Continue until we reach 100%
-let startTime = 0;
-let fillSpeed = 0.8; // How fast the progress increases
+// Moving object that wanders until stopped
+let mover = {
+  x: 200,
+  y: 150,
+  vx: 2,
+  vy: 1.5,
+  size: 12,
+  isMoving: true,
+  isStopped: false
+};
+
+// Movement trail
+let trail = [];
 
 function setup() {
   createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
-  background(240);
+  background(240, 248, 255);
   
-  // Update progress if running
-  if (isRunning && progress < targetValue) {
-    progress += fillSpeed;
-    
-    // Check if we've reached the "until" condition
-    if (progress >= targetValue) {
-      isRunning = false; // Stop when condition is met
-      progress = targetValue; // Cap at target
-    }
+  // Update movement until stopped
+  if (mover.isMoving && !mover.isStopped) {
+    updateMovement();
   }
   
-  // Draw the progress container
-  drawProgressBar();
+  // Draw trail
+  drawTrail();
   
-  // Draw status and instructions
-  drawInfo();
+  // Draw mover
+  drawMover();
+  
+  // Draw status
+  drawStatus();
 }
 
-function drawProgressBar() {
-  // Background container
-  fill(220);
-  stroke(150);
+function updateMovement() {
+  // Move the object
+  mover.x += mover.vx;
+  mover.y += mover.vy;
+  
+  // Bounce off edges
+  if (mover.x <= mover.size/2 || mover.x >= width - mover.size/2) {
+    mover.vx *= -1;
+  }
+  if (mover.y <= mover.size/2 || mover.y >= height - mover.size/2) {
+    mover.vy *= -1;
+  }
+  
+  // Keep within bounds
+  mover.x = constrain(mover.x, mover.size/2, width - mover.size/2);
+  mover.y = constrain(mover.y, mover.size/2, height - mover.size/2);
+  
+  // Add to trail
+  let trailPoint = { x: mover.x, y: mover.y };
+  trail.push(trailPoint);
+  
+  // Keep trail manageable
+  if (trail.length > 100) {
+    trail.shift();
+  }
+}
+
+function drawTrail() {
+  if (trail.length < 2) return;
+  
+  stroke(150, 150, 150, 150);
   strokeWeight(2);
-  rect(50, 150, 300, 40, 5);
+  noFill();
   
-  // Progress fill (grows until target is reached)
-  let fillWidth = map(progress, 0, targetValue, 0, 300);
-  
-  if (isRunning) {
-    fill(100, 150, 255); // Blue while running
-  } else if (progress >= targetValue) {
-    fill(100, 255, 100); // Green when complete
-  } else {
-    fill(200); // Gray when stopped
+  beginShape();
+  for (let i = 0; i < trail.length; i++) {
+    vertex(trail[i].x, trail[i].y);
   }
-  
-  noStroke();
-  rect(50, 150, fillWidth, 40, 5);
-  
-  // Progress percentage text
-  fill(50);
-  textAlign(CENTER, CENTER);
-  textSize(16);
-  text(`${progress.toFixed(1)}%`, 200, 170);
-  
-  // Target line
-  stroke(255, 100, 100);
-  strokeWeight(3);
-  line(350, 140, 350, 200);
-  
-  // Target label
-  fill(255, 100, 100);
-  noStroke();
-  textAlign(CENTER);
-  textSize(10);
-  text("UNTIL", 350, 130);
-  text("100%", 350, 210);
+  endShape();
 }
 
-function drawInfo() {
-  fill(50);
-  noStroke();
-  textAlign(CENTER);
-  textSize(16);
-  
-  if (progress >= targetValue) {
-    fill(0, 150, 0);
-    text("Process completed! It ran UNTIL 100%", width/2, 60);
-    text("Click to start again", width/2, 250);
-  } else if (isRunning) {
-    fill(0, 0, 150);
-    text("Process is running UNTIL it reaches 100%...", width/2, 60);
-    text("Watch it continue until the target", width/2, 250);
+function drawMover() {
+  // Moving object
+  if (mover.isStopped) {
+    fill(220, 50, 50); // Red when stopped
   } else {
-    text("Click to start a process that runs UNTIL 100%", width/2, 60);
-    text("It will continue until the red line", width/2, 250);
+    fill(70, 130, 180); // Blue when moving
   }
   
-  // Simple status
-  textAlign(LEFT);
-  textSize(12);
-  fill(100);
-  text(`Status: ${isRunning ? "Running" : progress >= targetValue ? "Complete" : "Stopped"}`, 20, 30);
+  noStroke();
+  ellipse(mover.x, mover.y, mover.size, mover.size);
+  
+  // Velocity indicator when moving
+  if (mover.isMoving && !mover.isStopped) {
+    stroke(70, 130, 180);
+    strokeWeight(2);
+    let arrowX = mover.x + mover.vx * 5;
+    let arrowY = mover.y + mover.vy * 5;
+    line(mover.x, mover.y, arrowX, arrowY);
+  }
+}
+
+function drawStatus() {
+  fill(60);
+  noStroke();
+  textAlign(CENTER);
+  textSize(14);
+  
+  if (!mover.isMoving) {
+    text("Click to start continuous movement", width/2, height - 20);
+  } else if (mover.isStopped) {
+    text("Movement stopped! Click to restart continuous movement", width/2, height - 20);
+  } else {
+    text("Moving continuously UNTIL you click to stop", width/2, height - 20);
+  }
+}
+
+function mousePressed() {
+  if (!mover.isMoving || mover.isStopped) {
+    // Start or restart movement
+    mover.x = 200;
+    mover.y = 150;
+    mover.vx = random(-3, 3);
+    mover.vy = random(-3, 3);
+    // Ensure minimum speed
+    if (abs(mover.vx) < 1) mover.vx = mover.vx > 0 ? 1 : -1;
+    if (abs(mover.vy) < 1) mover.vy = mover.vy > 0 ? 1 : -1;
+    
+    mover.isMoving = true;
+    mover.isStopped = false;
+    trail = [];
+  } else {
+    // Stop movement
+    mover.isStopped = true;
+  }
 }
 
 // Helper functions for cross-platform input handling
@@ -131,35 +164,8 @@ function getInputY() {
   return touches.length > 0 ? touches[0].y : mouseY;
 }
 
-// Handle input start (both mouse and touch)
-function handleInputStart() {
-  if (progress >= targetValue || !isRunning) {
-    // Reset and start the process
-    progress = 0;
-    isRunning = true;
-    startTime = millis();
-  }
-}
-
-function mousePressed() {
-  handleInputStart();
-}
-
 // Handle touch events for mobile
 function touchStarted() {
-  handleInputStart();
+  mousePressed();
   return false; // Prevent default touch behavior
-}
-
-function keyPressed() {
-  if (key === 'r' || key === 'R') {
-    // Reset
-    progress = 0;
-    isRunning = false;
-  } else if (key === ' ') {
-    // Start/stop toggle
-    if (progress < targetValue) {
-      isRunning = !isRunning;
-    }
-  }
 }
