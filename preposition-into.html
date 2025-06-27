@@ -6,13 +6,13 @@
 <body>    <div class="description">
         
         <p class="web-editor-link-container">
-            <a href="https://editor.p5js.org/npuckett/sketches/T6n1O_dKq" target="_blank" class="web-editor-link">
+            <a href="https://editor.p5js.org/npuckett/sketches/6EUFcUmF1" target="_blank" class="web-editor-link">
                 Open this sketch in P5 Web Editor →
             </a>
         </p>
         
         <h3>Try It</h3>
-        <p>Click to watch the circle move into the container.</p>
+        <p>Click to watch the circle move in an arc into the semi-transparent box. Notice how the circle appears behind the box as it enters.</p>
     </div>
 
     <div class="container">
@@ -23,63 +23,65 @@
 
     <div class="description">
         <h3>Concept</h3>
-        <p><strong>INTO</strong> means moving from outside to inside something, entering or penetrating a space, container, or boundary. This implies a transition from external to internal position.</p>
+        <p><strong>INTO</strong> means moving from outside to inside something, entering or penetrating a space, container, or boundary. This side-view demonstration shows a circle moving in an arc path into a semi-transparent box, emphasizing the transition from external to internal position.</p>
         
         <h3>Translation Strategy</h3>
         <p>To create "into" relationships on screen:</p>
         <ul>
-            <li><strong>Boundary Crossing:</strong> Move an object from outside a defined area to inside it</li>
-            <li><strong>Entry Points:</strong> Define specific entrance locations or general boundary crossing</li>
-            <li><strong>State Transition:</strong> Track the change from "outside" to "inside" state</li>
+            <li><strong>Arc Movement:</strong> Use curved paths to show natural entry motion</li>
+            <li><strong>Visual Depth:</strong> Draw moving objects behind containers to show entry</li>
+            <li><strong>Transparency Effects:</strong> Use semi-transparent containers so objects remain visible inside</li>
+            <li><strong>Path Visualization:</strong> Show dotted guides to indicate entry trajectory</li>
         </ul>
         
         <h3>Key P5.js Methods</h3>
         <div class="code-section">
+            <strong>Arc Movement:</strong><br>
+            • <a href="https://p5js.org/reference/p5/sin" target="_blank">sin()</a> - Create smooth arc motion<br>
+            • <a href="https://p5js.org/reference/p5/lerp" target="_blank">lerp(start, stop, amount)</a> - Smooth horizontal interpolation<br>
+            • Combined sine and linear movement for arc paths<br><br>
+            
             <strong>Boundary Detection:</strong><br>
-            • <a href="https://p5js.org/reference/p5/dist" target="_blank">dist(x1, y1, x2, y2)</a> - Calculate distance from boundary center<br>
-            • For circular boundaries: <code>distance < radius</code> means inside<br>
-            • For rectangular boundaries: check X and Y ranges<br><br>
+            • Simple rectangle bounds checking: <code>x > boxX && x < boxX + boxWidth</code><br>
+            • <a href="https://p5js.org/reference/p5/fill" target="_blank">fill()</a> with alpha transparency for containers<br><br>
             
-            <strong>Movement Control:</strong><br>
-            • <a href="https://p5js.org/reference/p5/lerp" target="_blank">lerp(start, stop, amount)</a> - Smooth movement toward interior<br>
-            • Vector calculation for entry direction<br><br>
+            <strong>Drawing Order:</strong><br>
+            • Draw moving objects BEFORE containers for visual depth<br>
+            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect()</a> with transparency for see-through containers<br>
+            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse()</a> for moving objects and path guides<br><br>
             
-            <strong>Drawing Elements:</strong><br>
-            • <a href="https://p5js.org/reference/p5/ellipse" target="_blank">ellipse(x, y, width, height)</a> - Draw containers and moving objects<br>
-            • <a href="https://p5js.org/reference/p5/rect" target="_blank">rect(x, y, width, height)</a> - Draw rectangular containers<br>
-            • <a href="https://p5js.org/reference/p5/fill" target="_blank">fill()</a> with transparency to show containment<br><br>
-            
-            <strong>State Management:</strong><br>
-            • Boolean flags to track inside/outside status<br>
-            • Entry detection and completion tracking<br><br>
+            <strong>Animation Control:</strong><br>
+            • Progress tracking from 0 to 1 for smooth animation<br>
+            • Speed control with incremental progress updates<br><br>
             
             <strong>Mouse Interaction:</strong><br>
-            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Trigger entry animation<br>
-            • Button controls for animation
+            • <a href="https://p5js.org/reference/p5/mousePressed" target="_blank">mousePressed()</a> - Start or restart entry animation<br>
+            • Touch support for mobile devices
         </div>
         
         <h3>Code Structure</h3>
         <div class="code-section">
-            <strong>Basic Pattern for "Into":</strong><br><br>
+            <strong>Basic Pattern for "Into" with Arc Movement:</strong><br><br>
             
-            1. <strong>Define container and entry point:</strong> Set up boundary and starting position<br>
-            <code>let container = {x: 200, y: 150, radius: 80};</code><br>
-            <code>let startPoint = {x: 50, y: 150};</code><br>
-            <code>let endPoint = {x: 200, y: 150}; // Inside container</code><br><br>
+            1. <strong>Define container and positions:</strong> Set up box and start/end points<br>
+            <code>let boxX = 280, boxY = 150, boxWidth = 100, boxHeight = 80;</code><br>
+            <code>let startX = 80, startY = 200; // Outside the box</code><br>
+            <code>let targetX = 320, targetY = 190; // Inside the box</code><br><br>
             
-            2. <strong>Check containment:</strong> Detect inside/outside status<br>
-            <code>let distance = dist(object.x, object.y, container.x, container.y);</code><br>
-            <code>let isInside = distance < container.radius;</code><br><br>
+            2. <strong>Create arc movement:</strong> Combine linear and sine motion<br>
+            <code>circleX = lerp(startX, targetX, progress);</code><br>
+            <code>let straightY = lerp(startY, targetY, progress);</code><br>
+            <code>let arcOffset = sin(progress * PI) * arcHeight;</code><br>
+            <code>circleY = straightY - arcOffset;</code><br><br>
             
-            3. <strong>Animate entry:</strong> Move from outside to inside<br>
-            <code>if (isMoving && progress < 1) {</code><br>
-            <code>&nbsp;&nbsp;progress += speed;</code><br>
-            <code>&nbsp;&nbsp;object.x = lerp(startPoint.x, endPoint.x, progress);</code><br>
-            <code>&nbsp;&nbsp;object.y = lerp(startPoint.y, endPoint.y, progress);</code><br>
-            <code>}</code><br><br>
+            3. <strong>Check containment:</strong> Simple rectangle bounds<br>
+            <code>let isInside = circleX > boxX && circleX < boxX + boxWidth &&</code><br>
+            <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;circleY > boxY && circleY < boxY + boxHeight;</code><br><br>
             
-            4. <strong>Track entry completion:</strong> Detect when fully inside<br>
-            <code>if (isInside && wasOutside) { hasEnteredContainer = true; }</code>
+            4. <strong>Draw with proper layering:</strong> Circle first, then transparent box<br>
+            <code>ellipse(circleX, circleY, circleSize, circleSize); // Circle behind</code><br>
+            <code>fill(200, 200, 200, 150); // Semi-transparent box</code><br>
+            <code>rect(boxX, boxY, boxWidth, boxHeight); // Box in front</code>
         </div>
     </div>
 

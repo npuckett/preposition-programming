@@ -1,218 +1,162 @@
 /**
- * P5.js Sketch: INTO - Entry and Containment
+ * P5.js Sketch: INTO - Entry and Containment (Side View)
  * 
  * CONCEPT: "Into" represents movement from outside to inside something,
- * entering or penetrating a space, container, or boundary. This implies
- * a transition from external to internal position.
+ * entering or penetrating a space, container, or boundary. This shows
+ * a side view of a circle moving in an arc into a semi-transparent box.
  * 
  * LEARNING OBJECTIVES:
  * • Understand boundary detection and containment
- * • Practice distance calculations for circular boundaries
- * • Learn state transitions (outside → inside)
- * • Explore smooth movement with lerp()
+ * • Practice arc movement with sine functions
+ * • Learn drawing order for visual depth
+ * • Explore transparency and visual effects
  * 
  * KEY VARIABLES & METHODS:
- * • dist(x1, y1, x2, y2) - Calculate distance between points
- * • lerp(start, stop, amount) - Smooth interpolation
- * • isInside boolean - Track containment state
- * • progress - Animation progression (0 to 1)
+ * • sin() - Creates smooth arc movement
+ * • lerp() - Smooth interpolation between points
+ * • Drawing order: circle first, then container (for depth)
+ * • Alpha transparency for see-through effects
  * 
  * EXTENSION IDEAS:
- * • Multiple entry points or paths
- * • Different container shapes (rectangles, polygons)
- * • Particle system entering container
- * • Interactive dragging to move objects into containers
- * • Sound or visual effects when entry is complete
+ * • Multiple objects entering the box
+ * • Different entry angles or speeds
+ * • Sound effects when entering
+ * • Interactive dragging to control path
  */
 
-let container = { x: 280, y: 150, radius: 70 };
-let movingCircle = { x: 80, y: 150, radius: 15 };
-let startPoint = { x: 80, y: 150 };
-let targetPoint = { x: 280, y: 150 };
+// Container (the box the circle moves into)
+let boxX = 280;
+let boxY = 150;
+let boxWidth = 100;
+let boxHeight = 80;
+
+// Moving circle
+let circleX = 80;
+let circleY = 200;
+let circleSize = 20;
+
+// Animation
+let startX = 80;
+let startY = 200;
+let targetX = 330; // Inside the box
+let targetY = 170; // Near the top inside the box
 let progress = 0;
 let isMoving = false;
-let hasEntered = false;
-let wasOutside = true;
-let trail = [];
 
 function setup() {
-    createCanvas(400, 300).parent('canvas');;
+    createCanvas(400, 300).parent('canvas');
 }
 
 function draw() {
-    background(240);
+    background(240, 248, 255);
     
-    // Update movement
+    // Update movement when animation is active
     if (isMoving && progress < 1) {
-        progress += 0.015; // Speed of entry
-        movingCircle.x = lerp(startPoint.x, targetPoint.x, progress);
-        movingCircle.y = lerp(startPoint.y, targetPoint.y, progress);
+        progress += 0.015; // Animation speed
         
-        // Add to trail
-        trail.push({x: movingCircle.x, y: movingCircle.y});
+        // Horizontal movement (linear)
+        circleX = lerp(startX, targetX, progress);
         
-        // Limit trail length
-        if (trail.length > 40) {
-            trail.shift();
-        }
+        // Vertical movement with arc (using sine for smooth curve)
+        let straightY = lerp(startY, targetY, progress);
+        let arcHeight = 80; // Height of the arc
+        let arcOffset = sin(progress * PI) * arcHeight;
+        circleY = straightY - arcOffset;
         
-        // Check if animation is complete
+        // Stop when animation completes
         if (progress >= 1) {
             isMoving = false;
-            hasEntered = true;
         }
     }
     
-    // Check if circle is inside container
-    let distance = dist(movingCircle.x, movingCircle.y, container.x, container.y);
-    let isInside = distance <= container.radius - movingCircle.radius;
+    // Check if circle is inside the box
+    let isInside = circleX > boxX && circleX < boxX + boxWidth &&
+                   circleY > boxY && circleY < boxY + boxHeight;
     
-    // Track entry event
-    if (isInside && wasOutside && !isMoving) {
-        hasEntered = true;
+    // Draw arc path guide (shows where circle will move)
+    if (!isMoving || progress < 1) {
+        drawArcPath();
     }
-    wasOutside = !isInside;
     
-    // Draw container with visual feedback
+    // Draw the moving circle FIRST (so it appears behind the box)
     if (isInside) {
-        fill(100, 200, 100, 100); // Green when object is inside
-        stroke(50, 150, 50);
+        fill(255, 100, 100); // Red when inside
     } else {
-        fill(70, 130, 180, 100); // Blue when empty
-        stroke(50, 100, 150);
+        fill(70, 130, 180); // Blue when outside
+    }
+    stroke(50);
+    strokeWeight(2);
+    ellipse(circleX, circleY, circleSize, circleSize);
+    
+    // Draw the box LAST (so it appears in front with transparency)
+    if (isInside) {
+        fill(100, 200, 100, 150); // Semi-transparent green when occupied
+        stroke(80, 150, 80);
+    } else {
+        fill(200, 200, 200, 150); // Semi-transparent gray when empty
+        stroke(120, 120, 120);
     }
     strokeWeight(3);
-    ellipse(container.x, container.y, container.radius * 2, container.radius * 2);
+    rect(boxX, boxY, boxWidth, boxHeight);
     
-    // Draw entry path guide
-    if (!hasEntered) {
-        stroke(150, 150, 150, 100);
-        strokeWeight(2);
-        setLineDash([5, 5]);
-        line(startPoint.x, startPoint.y, targetPoint.x, targetPoint.y);
-        setLineDash([]);
-    }
+    // Add opening indicator at top of box
+    stroke(80, 80, 80);
+    strokeWeight(4);
+    line(boxX, boxY, boxX + boxWidth, boxY);
     
-    // Draw trail
-    if (trail.length > 1) {
-        stroke(255, 200, 0, 150);
-        strokeWeight(3);
-        noFill();
-        for (let i = 1; i < trail.length; i++) {
-            let alpha = map(i, 0, trail.length - 1, 50, 255);
-            stroke(255, 200, 0, alpha);
-            line(trail[i-1].x, trail[i-1].y, trail[i].x, trail[i].y);
-        }
-    }
-    
-    // Draw moving circle
-    fill(255, 215, 0);
-    stroke(200, 165, 0);
-    strokeWeight(2);
-    ellipse(movingCircle.x, movingCircle.y, movingCircle.radius * 2, movingCircle.radius * 2);
-    
-    // Draw direction arrow when moving
-    if (isMoving) {
-        let dirX = targetPoint.x - startPoint.x;
-        let dirY = targetPoint.y - startPoint.y;
-        let dirLength = dist(0, 0, dirX, dirY);
-        dirX = (dirX / dirLength) * 25;
-        dirY = (dirY / dirLength) * 25;
-        
-        stroke(255, 100, 100);
-        strokeWeight(3);
-        line(movingCircle.x, movingCircle.y, 
-             movingCircle.x + dirX, movingCircle.y + dirY);
-          // Arrow head
-        push();
-        translate(movingCircle.x + dirX, movingCircle.y + dirY);
-        rotate(atan2(dirY, dirX));
-        fill(255, 100, 100);
-        noStroke();
-        triangle(0, 0, -8, -4, -8, 4);
-        pop();
-    }
-    
-    // Simple status text
-    fill(0);
+    // Instructions and status
+    fill(60);
     noStroke();
     textAlign(CENTER);
-    textSize(14);
+    textSize(16);
     
-    let statusText = "";
-    if (hasEntered) {
-        statusText = "Circle has moved INTO the container";
+    if (progress >= 1) {
+        text("Circle moved INTO the box!", width/2, height - 40);
+        textSize(12);
+        text("Click to animate again", width/2, height - 20);
     } else if (isMoving) {
-        statusText = "Circle is moving INTO the container";
+        text("Moving INTO the box...", width/2, height - 40);
     } else {
-        statusText = "Click to move circle INTO the container";
+        text("Click to move circle INTO the box", width/2, height - 40);
+        textSize(12);
+        text("Watch the arc path and transparency effect", width/2, height - 20);
     }
+}
+
+function drawArcPath() {
+    // Draw dotted line showing the arc path
+    stroke(150, 150, 150, 120);
+    strokeWeight(2);
+    noFill();
     
-    text(statusText, width/2, height - 20);
-}
-
-// Helper functions for cross-platform input handling
-function getInputX() {
-    return touches.length > 0 ? touches[0].x : mouseX;
-}
-
-function getInputY() {
-    return touches.length > 0 ? touches[0].y : mouseY;
-}
-
-// Handle input start (both mouse and touch)
-function handleInputStart() {
-    if (hasEntered || !isMoving) {
-        // Reset animation
-        progress = 0;
-        isMoving = true;
-        hasEntered = false;
-        wasOutside = true;
-        trail = [];
-        movingCircle.x = startPoint.x;
-        movingCircle.y = startPoint.y;
+    // Draw path in small segments for dotted effect
+    for (let i = 0; i <= 20; i++) {
+        let t = i / 20;
+        let x = lerp(startX, targetX, t);
+        let straightY = lerp(startY, targetY, t);
+        let arcOffset = sin(t * PI) * 80;
+        let y = straightY - arcOffset;
+        
+        // Draw dots every few segments
+        if (i % 3 === 0) {
+            ellipse(x, y, 3, 3);
+        }
     }
 }
 
 function mousePressed() {
-    handleInputStart();
+    // Start or restart the animation
+    progress = 0;
+    isMoving = true;
+    circleX = startX;
+    circleY = startY;
 }
 
-// Handle touch events for mobile
+// Touch support for mobile devices
 function touchStarted() {
-    handleInputStart();
+    progress = 0;
+    isMoving = true;
+    circleX = startX;
+    circleY = startY;
     return false; // Prevent default touch behavior
-}
-
-function keyPressed() {
-    // Change entry direction
-    if (key === '1') {
-        startPoint = { x: 80, y: 150 };   // From left
-        targetPoint = { x: 280, y: 150 };
-    } else if (key === '2') {
-        startPoint = { x: 280, y: 80 };   // From top
-        targetPoint = { x: 280, y: 150 };
-    } else if (key === '3') {
-        startPoint = { x: 380, y: 150 };  // From right
-        targetPoint = { x: 280, y: 150 };
-    } else if (key === '4') {
-        startPoint = { x: 280, y: 220 };  // From bottom
-        targetPoint = { x: 280, y: 150 };
-    }
-    
-    // Reset if direction changed
-    if (key >= '1' && key <= '4') {
-        progress = 0;
-        isMoving = false;
-        hasEntered = false;
-        trail = [];
-        movingCircle.x = startPoint.x;
-        movingCircle.y = startPoint.y;
-    }
-}
-
-// Helper function for dashed lines (P5.js doesn't have native support)
-function setLineDash(segments) {
-    // This is a placeholder - actual implementation would require custom line drawing
-    // For web editor, you might need to use native canvas methods or draw manual dashes
 }
