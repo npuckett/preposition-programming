@@ -14,24 +14,16 @@
  * KEY VARIABLES & METHODS:
  * • Distance calculations for proximity detection
  * • Alignment checking (same Y level, adjacent X positions)
- * • Snapping mechanisms for precise positioning
+ * • Zone-based positioning
  * • Visual indicators for "beside" relationships
- * 
- * EXTENSION IDEAS:
- * • Multiple objects that can be placed beside each other
- * • Snap-to-grid functionality for precise alignment
- * • Different "beside" variations (left, right, both sides)
- * • Interactive arrangement of objects in rows
- * • Magnetic attraction when objects get close
  */
 
-let blueSquare = { x: 200, y: 150, size: 60 };
-let movingCircle = { x: 100, y: 100, radius: 20 };
-let isDragging = false;
-let isBeside = false;
-let besideDirection = ""; // "left", "right", or ""
-let snapDistance = 80; // Distance for "beside" detection
-let alignmentTolerance = 30; // Y-axis alignment tolerance
+let blueRect = { x: 200, y: 150, width: 80, height: 140 };
+let movingCircle = { x: 80, y: 150, radius: 20, dragging: false };
+
+// Zone dimensions
+let besideZoneWidth = 60;
+let besideZoneHeight = 140; // Same height as the rectangle
 
 function setup() {
     createCanvas(400, 300);
@@ -40,172 +32,180 @@ function setup() {
 function draw() {
     background(240);
     
-    // Check if circle is beside the square
-    checkBesideRelationship();
-    
-    // Draw alignment guides
-    drawAlignmentGuides();
-    
-    // Draw blue square
-    if (isBeside) {
-        fill(100, 200, 255); // Lighter blue when circle is beside it
-        stroke(50, 150, 200);
-    } else {
-        fill(70, 130, 180);
-        stroke(50, 100, 150);
-    }
+    // Draw blue rectangle (main object)
+    fill(100, 150, 255);
+    stroke(70, 120, 220);
     strokeWeight(3);
     rectMode(CENTER);
-    rect(blueSquare.x, blueSquare.y, blueSquare.size, blueSquare.size);
+    rect(blueRect.x, blueRect.y, blueRect.width, blueRect.height);
     
-    // Draw "beside" zones (visual indicators)
-    if (!isBeside) {
-        // Left beside zone
-        fill(100, 255, 100, 50);
-        stroke(50, 200, 50, 100);
-        strokeWeight(2);
-        rect(blueSquare.x - blueSquare.size/2 - snapDistance/2, blueSquare.y, 
-             snapDistance, blueSquare.size + alignmentTolerance * 2);
+    // Draw beside zones (left and right)
+    drawBesideZones();
+    
+    // Draw the moving circle
+    drawMovingCircle();
+    
+    // Draw status text
+    drawSimpleStatus();
+}
+
+function drawBesideZones() {
+    // Left beside zone
+    let leftZoneX = blueRect.x - blueRect.width/2 - besideZoneWidth/2;
+    let rightZoneX = blueRect.x + blueRect.width/2 + besideZoneWidth/2;
+    let zoneY = blueRect.y;
+    
+    // Draw zones with subtle background
+    fill(100, 150, 255, 50);
+    stroke(100, 150, 255, 120);
+    strokeWeight(2);
+    
+    // Left zone
+    rect(leftZoneX, zoneY, besideZoneWidth, besideZoneHeight);
+    
+    // Right zone  
+    rect(rightZoneX, zoneY, besideZoneWidth, besideZoneHeight);
+    
+    // Draw arrows pointing left and right from rectangle
+    stroke(70, 120, 220);
+    strokeWeight(2);
+    let arrowLength = 20;
+    let arrowSpacing = 35;
+    
+    // Calculate centered arrow positions
+    let numArrows = 3;
+    let totalArrowSpan = (numArrows - 1) * arrowSpacing;
+    let startY = blueRect.y - totalArrowSpan/2;
+    
+    // Left arrows
+    let leftRectEdge = blueRect.x - blueRect.width/2;
+    for (let i = 0; i < numArrows; i++) {
+        let y = startY + i * arrowSpacing;
         
-        // Right beside zone  
-        rect(blueSquare.x + blueSquare.size/2 + snapDistance/2, blueSquare.y, 
-             snapDistance, blueSquare.size + alignmentTolerance * 2);
+        // Arrow line pointing left
+        line(leftRectEdge, y, leftRectEdge - arrowLength, y);
         
-        // Zone labels
-        fill(50, 150, 50);
-        noStroke();
-        textAlign(CENTER, CENTER);
-        textSize(10);
-        text("BESIDE\n(left)", blueSquare.x - blueSquare.size/2 - snapDistance/2, blueSquare.y);
-        text("BESIDE\n(right)", blueSquare.x + blueSquare.size/2 + snapDistance/2, blueSquare.y);
+        // Arrow head pointing left
+        let arrowSize = 5;
+        let arrowX = leftRectEdge - arrowLength;
+        line(arrowX, y, arrowX + arrowSize, y - arrowSize);
+        line(arrowX, y, arrowX + arrowSize, y + arrowSize);
     }
     
-    // Draw moving circle
-    if (isBeside) {
+    // Right arrows
+    let rightRectEdge = blueRect.x + blueRect.width/2;
+    for (let i = 0; i < numArrows; i++) {
+        let y = startY + i * arrowSpacing;
+        
+        // Arrow line pointing right
+        line(rightRectEdge, y, rightRectEdge + arrowLength, y);
+        
+        // Arrow head pointing right
+        let arrowSize = 5;
+        let arrowX = rightRectEdge + arrowLength;
+        line(arrowX, y, arrowX - arrowSize, y - arrowSize);
+        line(arrowX, y, arrowX - arrowSize, y + arrowSize);
+    }
+    
+    // Zone labels
+    fill(70, 120, 220);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(10);
+    text("BESIDE", leftZoneX, zoneY + besideZoneHeight/2 + 15);
+    text("BESIDE", rightZoneX, zoneY + besideZoneHeight/2 + 15);
+}
+
+function drawMovingCircle() {
+    // Check if circle center point is in either beside zone
+    let inLeftZone = isInLeftBesideZone(movingCircle.x, movingCircle.y);
+    let inRightZone = isInRightBesideZone(movingCircle.x, movingCircle.y);
+    let inBesideZone = inLeftZone || inRightZone;
+    
+    // Set circle color based on zone
+    if (inBesideZone) {
         fill(100, 255, 100); // Green when beside
         stroke(50, 200, 50);
     } else {
-        fill(255, 215, 0); // Yellow when not beside
-        stroke(200, 165, 0);
+        fill(255, 150, 100); // Orange when not beside
+        stroke(200, 100, 50);
     }
-    strokeWeight(3);
+    
+    strokeWeight(2);
     ellipse(movingCircle.x, movingCircle.y, movingCircle.radius * 2, movingCircle.radius * 2);
+}
+
+function drawSimpleStatus() {
+    // Check current status
+    let inLeftZone = isInLeftBesideZone(movingCircle.x, movingCircle.y);
+    let inRightZone = isInRightBesideZone(movingCircle.x, movingCircle.y);
     
-    // Draw connection line when beside
-    if (isBeside) {
-        stroke(100, 255, 100, 150);
-        strokeWeight(2);
-        line(movingCircle.x, movingCircle.y, blueSquare.x, blueSquare.y);
-        
-        // Distance indicator
-        let distance = dist(movingCircle.x, movingCircle.y, blueSquare.x, blueSquare.y);
-        fill(50);
-        noStroke();
-        textAlign(CENTER, CENTER);
-        textSize(8);
-        text(`${distance.toFixed(0)}px`, 
-             (movingCircle.x + blueSquare.x) / 2, 
-             (movingCircle.y + blueSquare.y) / 2 - 10);
-    }
-    
-    // Draw positioning information
-    drawPositionInfo();
-    
-    // Instructions
-    fill(50);
+    fill(0);
     noStroke();
-    textAlign(CENTER, CENTER);
-    textSize(12);
+    textAlign(CENTER);
+    textSize(14);
     
-    if (isBeside) {
-        text(`Circle is BESIDE the square (${besideDirection} side)!`, width/2, 30);
-        text("Green connection shows the beside relationship", width/2, 45);
+    if (inLeftZone) {
+        text("Circle is BESIDE the rectangle (left)", width/2, height - 20);
+    } else if (inRightZone) {
+        text("Circle is BESIDE the rectangle (right)", width/2, height - 20);
     } else {
-        text("Drag the yellow circle to place it BESIDE the blue square", width/2, 30);
-        text("Green zones show where 'beside' positioning workst", width/2, 45);
-    }
-    
-
-}
-
-function checkBesideRelationship() {
-    let horizontalDistance = abs(movingCircle.x - blueSquare.x);
-    let verticalAlignment = abs(movingCircle.y - blueSquare.y);
-    
-    // Check if vertically aligned (same level)
-    let isAligned = verticalAlignment <= alignmentTolerance;
-    
-    // Check if horizontally beside (appropriate distance)
-    let minBesideDistance = blueSquare.size/2 + movingCircle.radius + 10;
-    let maxBesideDistance = snapDistance;
-    let isBesideDistance = horizontalDistance >= minBesideDistance && 
-                          horizontalDistance <= maxBesideDistance;
-    
-    isBeside = isAligned && isBesideDistance;
-    
-    if (isBeside) {
-        if (movingCircle.x < blueSquare.x) {
-            besideDirection = "left";
-        } else {
-            besideDirection = "right";
-        }
-    } else {
-        besideDirection = "";
+        text("Circle is NOT beside the rectangle", width/2, height - 20);
     }
 }
 
-function drawAlignmentGuides() {
-    // Horizontal alignment guide
-    stroke(200, 100, 100, 100);
-    strokeWeight(1);
-    setLineDash([5, 5]);
-    line(0, blueSquare.y, width, blueSquare.y);
-    setLineDash([]);
+function isInLeftBesideZone(x, y) {
+    let leftZoneX = blueRect.x - blueRect.width/2 - besideZoneWidth/2;
+    let leftZoneLeft = leftZoneX - besideZoneWidth/2;
+    let leftZoneRight = leftZoneX + besideZoneWidth/2;
+    let zoneTop = blueRect.y - besideZoneHeight/2;
+    let zoneBottom = blueRect.y + besideZoneHeight/2;
     
-    // Vertical alignment indicators
-    let minY = blueSquare.y - alignmentTolerance;
-    let maxY = blueSquare.y + alignmentTolerance;
-    
-    if (movingCircle.y >= minY && movingCircle.y <= maxY) {
-        // Show alignment zone
-        fill(255, 100, 100, 50);
-        noStroke();
-        rect(0, minY, width, alignmentTolerance * 2);
-        
-        // Alignment status
-        fill(255, 100, 100);
-        noStroke();
-        textAlign(LEFT, CENTER);
-        textSize(10);
-        text("ALIGNED", 10, blueSquare.y);
+    // Check X coordinate first
+    if (x < leftZoneLeft) {
+        return false;
     }
+    if (x > leftZoneRight) {
+        return false;
+    }
+    
+    // Check Y coordinate
+    if (y < zoneTop) {
+        return false;
+    }
+    if (y > zoneBottom) {
+        return false;
+    }
+    
+    // If we get here, the point is inside the zone
+    return true;
 }
 
-function drawPositionInfo() {
-    // Info panel
+function isInRightBesideZone(x, y) {
+    let rightZoneX = blueRect.x + blueRect.width/2 + besideZoneWidth/2;
+    let rightZoneLeft = rightZoneX - besideZoneWidth/2;
+    let rightZoneRight = rightZoneX + besideZoneWidth/2;
+    let zoneTop = blueRect.y - besideZoneHeight/2;
+    let zoneBottom = blueRect.y + besideZoneHeight/2;
     
+    // Check X coordinate first
+    if (x < rightZoneLeft) {
+        return false;
+    }
+    if (x > rightZoneRight) {
+        return false;
+    }
     
-    fill(50);
-    noStroke();
-    textAlign(LEFT, TOP);
-    textSize(10);
-    text("Position Information:", 15, 220);
+    // Check Y coordinate
+    if (y < zoneTop) {
+        return false;
+    }
+    if (y > zoneBottom) {
+        return false;
+    }
     
-    text(`Circle: (${movingCircle.x.toFixed(0)}, ${movingCircle.y.toFixed(0)})`, 15, 235);
-    text(`Square: (${blueSquare.x}, ${blueSquare.y})`, 15, 250);
-    
-    let hDist = abs(movingCircle.x - blueSquare.x);
-    let vDist = abs(movingCircle.y - blueSquare.y);
-    text(`H-Distance: ${hDist.toFixed(0)}px`, 15, 265);
-    text(`V-Distance: ${vDist.toFixed(0)}px`, 15, 280);
-    
-    // Status indicator
-    if (isBeside) {
-        fill(100, 255, 100);
-        text("STATUS: BESIDE (" + besideDirection + ")", 15, 5);
-    } else {
-        fill(255, 100, 100);
-        text("STATUS: NOT BESIDE", 15, 5);    }
+    // If we get here, the point is inside the zone
+    return true;
 }
 
 // Helper functions for cross-platform input handling
@@ -225,13 +225,13 @@ function handleInputStart() {
     // Check if input is over the circle
     let distance = dist(inputX, inputY, movingCircle.x, movingCircle.y);
     if (distance < movingCircle.radius) {
-        isDragging = true;
+        movingCircle.dragging = true;
     }
 }
 
 // Handle input drag (both mouse and touch)
 function handleInputDrag() {
-    if (isDragging) {
+    if (movingCircle.dragging) {
         let inputX = getInputX();
         let inputY = getInputY();
         
@@ -248,29 +248,7 @@ function handleInputDrag() {
 
 // Handle input end (both mouse and touch)
 function handleInputEnd() {
-    if (isDragging) {
-        // Snap to beside position if close enough
-        let horizontalDistance = abs(movingCircle.x - blueSquare.x);
-        let verticalAlignment = abs(movingCircle.y - blueSquare.y);
-        
-        if (verticalAlignment <= alignmentTolerance * 1.5) {
-            // Snap to horizontal alignment
-            movingCircle.y = blueSquare.y;
-            
-            // Snap to beside position if close
-            let snapToBeside = blueSquare.size/2 + movingCircle.radius + 20;
-            
-            if (movingCircle.x < blueSquare.x && horizontalDistance < snapDistance) {
-                // Snap to left beside
-                movingCircle.x = blueSquare.x - snapToBeside;
-            } else if (movingCircle.x > blueSquare.x && horizontalDistance < snapDistance) {
-                // Snap to right beside
-                movingCircle.x = blueSquare.x + snapToBeside;
-            }
-        }
-    }
-    
-    isDragging = false;
+    movingCircle.dragging = false;
 }
 
 function mousePressed() {
@@ -299,30 +277,4 @@ function touchMoved() {
 function touchEnded() {
     handleInputEnd();
     return false;
-}
-
-function keyPressed() {
-    if (key === '1') {
-        // Position circle beside left
-        movingCircle.x = blueSquare.x - blueSquare.size/2 - movingCircle.radius - 20;
-        movingCircle.y = blueSquare.y;
-    } else if (key === '2') {
-        // Position circle beside right
-        movingCircle.x = blueSquare.x + blueSquare.size/2 + movingCircle.radius + 20;
-        movingCircle.y = blueSquare.y;
-    } else if (key === '3') {
-        // Position circle not beside (above)
-        movingCircle.x = blueSquare.x;
-        movingCircle.y = blueSquare.y - 80;
-    } else if (key === 'r' || key === 'R') {
-        // Reset to starting position
-        movingCircle.x = 100;
-        movingCircle.y = 100;
-    }
-}
-
-// Helper function for dashed lines
-function setLineDash(segments) {
-    // Placeholder for dashed line functionality
-    // In actual P5.js, you might need to implement this manually
 }

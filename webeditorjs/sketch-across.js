@@ -1,28 +1,28 @@
 // P5.js Sketch: Preposition "Across"
-// This sketch demonstrates the concept of "across" through crossing movement
-// The circle moves across a barrier from one side to the other
+// This sketch demonstrates "across" as moving from one side of a space to the other
+// Like walking across a room from one wall to the opposite wall
 
-// Barrier that will be crossed
-let barrier = {
-  x: 180,        // X position of barrier
-  y: 50,         // Y position of barrier
-  width: 40,     // Width of barrier
-  height: 200    // Height of barrier
+// Room boundaries
+let room = {
+  x: 50,         // Left wall
+  y: 80,         // Top wall
+  width: 300,    // Room width
+  height: 140    // Room height
 };
 
-// Start and end points for crossing
-let startPoint = { x: 50, y: 150 };
-let endPoint = { x: 350, y: 150 };
+// Start and end points for crossing the room
+let startPoint = { x: 70, y: 150 };
+let endPoint = { x: 330, y: 150 };
 
-// Moving circle that crosses the barrier
+// Moving circle that crosses from one side of the room to the other
 let movingCircle = {
-  x: 50,         // Current x position
+  x: 70,         // Current x position  
   y: 150,        // Current y position
   radius: 15     // Radius of circle
 };
 
 // Animation control variables
-let progress = 0;           // How far across (0 to 1)
+let progress = 0;           // How far across the room (0 to 1)
 let isMoving = false;       // Whether currently moving
 let hasCrossed = false;     // Whether crossing is complete
 let crossingPath = [];      // Trail of movement
@@ -40,7 +40,7 @@ function draw() {
   
   // Update position based on progress
   if (isMoving && progress < 1) {
-    progress += 0.015; // Speed of crossing
+    progress += 0.02; // Speed of crossing the room
     
     // Use lerp to interpolate between start and end points
     movingCircle.x = lerp(startPoint.x, endPoint.x, progress);
@@ -50,7 +50,7 @@ function draw() {
     crossingPath.push({x: movingCircle.x, y: movingCircle.y});
     
     // Limit trail length for performance
-    if (crossingPath.length > 100) {
+    if (crossingPath.length > 80) {
       crossingPath.shift(); // Remove oldest point
     }
   } else if (progress >= 1 && isMoving) {
@@ -61,7 +61,7 @@ function draw() {
   
   // Draw crossing path trail
   if (crossingPath.length > 1) {
-    stroke(255, 200, 0, 150); // Semi-transparent yellow
+    stroke(255, 200, 0, 150); // Semi-transparent yellow trail
     strokeWeight(3);
     noFill();
     beginShape();
@@ -71,20 +71,18 @@ function draw() {
     endShape();
   }
   
-  // Draw full crossing line (start to end)
-  stroke(200, 200, 200, 100);
-  strokeWeight(2);
-  line(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
-  
-  // Draw the barrier being crossed
-  fill(100, 150, 255, 100); // Semi-transparent blue
-  stroke(100, 150, 255);
+  // Draw the room
+  fill(240, 240, 255); // Light blue room interior
+  stroke(100, 100, 150);
   strokeWeight(3);
-  rect(barrier.x, barrier.y, barrier.width, barrier.height);
+  rect(room.x, room.y, room.width, room.height);
   
-  // Check if circle is currently crossing the barrier
-  let isCrossingBarrier = (movingCircle.x > barrier.x && 
-                          movingCircle.x < barrier.x + barrier.width);
+  // Draw room labels
+  fill(100, 100, 150);
+  noStroke();
+  textAlign(CENTER);
+  textSize(12);
+  text("Room", room.x + room.width/2, room.y - 10);
   
   // Draw start and end markers
   fill(100, 255, 100); // Green start
@@ -94,68 +92,43 @@ function draw() {
   fill(255, 100, 100); // Red end
   ellipse(endPoint.x, endPoint.y, 12, 12);
   
-  // Draw the moving circle with different colors based on state
-  if (isCrossingBarrier) {
-    fill(255, 150, 255); // Magenta when crossing barrier
-    stroke(200, 100, 200);
-  } else if (hasCrossed) {
-    fill(100, 255, 100); // Green when crossed
+  // Draw the moving circle with different colors based on progress
+  if (hasCrossed) {
+    fill(100, 255, 100); // Green when successfully crossed room
     stroke(50, 200, 50);
+  } else if (isMoving) {
+    fill(255, 255, 100); // Yellow when moving across
+    stroke(200, 200, 0);
   } else {
-    fill(255, 200, 100); // Yellow default
-    stroke(255, 150, 0);
+    fill(255, 150, 100); // Orange when at start
+    stroke(200, 100, 50);
   }
   
   strokeWeight(2);
   ellipse(movingCircle.x, movingCircle.y, movingCircle.radius * 2, movingCircle.radius * 2);
   
-  // Draw labels
+  // Draw simple labels
   fill(0);
   noStroke();
   textAlign(CENTER);
   textSize(12);
-  text("Start", startPoint.x, startPoint.y - 15);
-  text("End", endPoint.x, endPoint.y - 15);
-  text("Barrier", barrier.x + barrier.width/2, barrier.y - 10);
-  text("Moving Circle", movingCircle.x, movingCircle.y - 25);
+  text("Start", startPoint.x, startPoint.y + 25);
+  text("End", endPoint.x, endPoint.y + 25);
   
-  // Determine relationship status
-  let relationship = "";
-  if (isMoving && isCrossingBarrier) {
-    relationship = "Circle is moving ACROSS the barrier";
-  } else if (isMoving && !isCrossingBarrier) {
-    relationship = "Circle is approaching/leaving the barrier";
-  } else if (hasCrossed) {
-    relationship = "Circle has moved ACROSS to the other side";
+  // Simple status text at bottom
+  textAlign(CENTER);
+  textSize(14);
+  
+  let statusText = "";
+  if (hasCrossed) {
+    statusText = "Circle moved ACROSS the room";
+  } else if (isMoving) {
+    statusText = "Circle is moving ACROSS the room";
   } else {
-    relationship = "Click to move circle ACROSS the barrier";
+    statusText = "Click to move circle ACROSS the room";
   }
   
-  // Draw measurement information
-  textAlign(LEFT);
-  textSize(10);
-  fill(0);
-  text("Progress: " + Math.round(progress * 100) + "%", 10, 20);
-  text("Position: (" + Math.round(movingCircle.x) + ", " + Math.round(movingCircle.y) + ")", 10, 35);
-  text("Crossing barrier: " + isCrossingBarrier, 10, 50);
-  text("Has crossed: " + hasCrossed, 10, 65);
-  
-  // Draw reset button
-  fill(200);
-  stroke(100);
-  strokeWeight(1);
-  rect(10, 75, 60, 25);
-  fill(0);
-  noStroke();
-  textAlign(CENTER);
-  text("Reset", 40, 92);
-  
-  // Draw relationship status
-  textAlign(CENTER);
-  textSize(16);
-  fill(0);
-  text(relationship, width/2, height - 30);
-  text("Click anywhere to start crossing", width/2, height - 15);
+  text(statusText, width/2, height - 20);
 }
 
 // Helper functions for cross-platform input handling
@@ -172,24 +145,9 @@ function handleInputStart() {
   let inputX = getInputX();
   let inputY = getInputY();
   
-  // Check if reset button was clicked/touched
-  if (inputX > 10 && inputX < 70 && inputY > 75 && inputY < 100) {
-    // Reset to initial state
-    progress = 0;
-    isMoving = false;
-    hasCrossed = false;
-    movingCircle.x = startPoint.x;
-    movingCircle.y = startPoint.y;
-    crossingPath = [];
-    return;
-  }
-  
-  // Start the crossing animation
-  if (!isMoving && !hasCrossed) {
-    isMoving = true;
-    crossingPath = []; // Clear previous trail
-  } else if (hasCrossed) {
-    // Reset and start again
+  // Start the crossing animation or reset if already completed
+  if (!isMoving) {
+    // Reset to initial state and start
     progress = 0;
     isMoving = true;
     hasCrossed = false;

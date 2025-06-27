@@ -161,11 +161,7 @@ function draw() {
     textSize(14);
     text("Green = among the group, Yellow = separate from group", width/2, height - 20);
     
-    // Status information
-    textAlign(LEFT, TOP);
-    textSize(10);
-    text(`Status: ${movingCircle.isAmong ? "AMONG" : "SEPARATE"}`, 10, 10);
-    text(`Nearby circles: ${nearbyCount}`, 10, 25);    text(`Min distance: ${minDistanceToGroup.toFixed(1)}px`, 10, 40);
+   
 }
 
 // Helper functions for cross-platform input handling

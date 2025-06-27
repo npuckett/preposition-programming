@@ -175,55 +175,28 @@ function drawDirectionLine() {
 }
 
 function drawInformation() {
-  // Calculate and display distance and direction
+  // Calculate distance for display
   let distance = dist(movingDot.x, movingDot.y, movingDot.targetX, movingDot.targetY);
-  let angle = atan2(movingDot.targetY - movingDot.y, movingDot.targetX - movingDot.x);
-  let angleDegrees = degrees(angle);
   
-  // Information panel
-  fill(255, 255, 255, 200);
-  stroke(100);
-  strokeWeight(1);
-  rect(10, 10, 200, 80);
-  
+  // Simple status text at bottom
   fill(0);
   noStroke();
-  textAlign(LEFT);
-  textSize(11);
-  text("Distance to target: " + distance.toFixed(1), 15, 25);
-  text("Direction: " + angleDegrees.toFixed(1) + "°", 15, 40);
-  text("Status: " + (isMoving ? "Moving TOWARD target" : "Reached target"), 15, 55);
-  text("Speed: " + (movingDot.speed * 100).toFixed(1) + "%", 15, 70);
-  text("Click anywhere to set new target", 15, 85);
+  textAlign(CENTER);
+  textSize(14);
+  
+  let statusText = "";
+  if (isMoving) {
+    statusText = "Green dot is moving TOWARD the target";
+  } else {
+    statusText = "Click anywhere to set target - dot will move toward it";
+  }
+  
+  text(statusText, width/2, height - 20);
 }
 
 function drawControls() {
-  // Start/Stop button
-  let buttonColor = isMoving ? color(255, 100, 100) : color(100, 200, 100);
-  let buttonText = isMoving ? "Stop" : "Start";
-  
-  fill(buttonColor);
-  stroke(100);
-  strokeWeight(1);
-  rect(250, 20, 60, 25);
-  
-  fill(255);
-  noStroke();
-  textAlign(CENTER);
-  textSize(12);
-  text(buttonText, 280, 37);
-  
-  // Reset button
-  fill(200);
-  stroke(100);
-  rect(320, 20, 60, 25);
-  fill(0);
-  text("Reset", 350, 37);
-  
-  // Speed control label
-  fill(0);
-  textAlign(LEFT);
-  textSize(10);  text("Speed: Use +/- keys", 250, 60);
+  // Remove all control buttons and complex UI elements
+  // Keep the interaction simple - just click to set target
 }
 
 // Helper functions for cross-platform input handling
@@ -240,30 +213,11 @@ function handleInputStart() {
   let inputX = getInputX();
   let inputY = getInputY();
   
-  // Check button clicks
-  if (inputX > 250 && inputX < 310 && inputY > 20 && inputY < 45) {
-    // Start/Stop button
-    isMoving = !isMoving;
-    if (isMoving) {
-      movingDot.trail = [];  // Clear trail when starting
-    }
-  } else if (inputX > 320 && inputX < 380 && inputY > 20 && inputY < 45) {
-    // Reset button
-    movingDot.x = width / 2;
-    movingDot.y = height / 2;
-    movingDot.targetX = width / 2;
-    movingDot.targetY = height / 2;
-    movingDot.trail = [];
-    isMoving = false;
-  } else {
-    // Set new target
-    movingDot.targetX = inputX;
-    movingDot.targetY = inputY;
-    if (!isMoving) {
-      isMoving = true;
-      movingDot.trail = [];
-    }
-  }
+  // Set new target and start moving
+  movingDot.targetX = inputX;
+  movingDot.targetY = inputY;
+  isMoving = true;
+  movingDot.trail = []; // Clear trail for new movement
 }
 
 function mousePressed() {
@@ -277,10 +231,5 @@ function touchStarted() {
 }
 
 function keyPressed() {
-  // Speed controls
-  if (key === '+' || key === '=') {
-    movingDot.speed = min(movingDot.speed + 0.01, 0.2);  // Increase speed
-  } else if (key === '-') {
-    movingDot.speed = max(movingDot.speed - 0.01, 0.01); // Decrease speed
-  }
+  // Remove speed controls for simplicity
 }

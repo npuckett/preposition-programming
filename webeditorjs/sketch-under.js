@@ -71,20 +71,42 @@ function draw() {
     textAlign(CENTER, CENTER);
     textSize(10);
     text("Ground Level", width/2, 235);
-    
-    // Draw obstacle (what we're going under) - positioned higher than in "over"
+      // Draw obstacle (what we're going under) - positioned higher than in "over"
     fill(120, 80, 60);
     stroke(90, 60, 40);
     strokeWeight(2);
     rect(obstacle.x - obstacle.width/2, obstacle.y - obstacle.height/2, 
          obstacle.width, obstacle.height);
     
+    // Draw dotted lines showing the "under" trigger zone
+    stroke(100, 100, 100, 150);
+    strokeWeight(1);
+    drawingContext.setLineDash([5, 5]); // Create dotted line pattern
+    
+    // Left boundary line (extending downward)
+    line(obstacle.x - obstacle.width/2, obstacle.y + obstacle.height/2, 
+         obstacle.x - obstacle.width/2, 280);
+    
+    // Right boundary line (extending downward)
+    line(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2, 
+         obstacle.x + obstacle.width/2, 280);
+    
+    // Reset line dash for other drawings
+    drawingContext.setLineDash([]);
+    
+    // Zone label
+    fill(100, 100, 100, 150);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(8);
+    text("Under Zone", obstacle.x, 270);
+    
     // Obstacle label
     fill(255);
     noStroke();
     textAlign(CENTER, CENTER);
     textSize(10);
-    text("Bridge/Barrier", obstacle.x, obstacle.y);
+    text("Obstacle", obstacle.x, obstacle.y);
     
     // Draw the arc path (showing the "under" trajectory)
     if (showPath) {

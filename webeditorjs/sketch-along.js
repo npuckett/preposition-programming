@@ -171,32 +171,21 @@ function draw() {
     relationship = "Click to move circle ALONG the path";
   }
   
-  // Draw measurement information
-  textAlign(LEFT);
-  textSize(10);
-  fill(0);
-  let progressPercent = Math.round((pathProgress / (pathPoints.length - 1)) * 100);
-  text("Progress along path: " + progressPercent + "%", 10, 20);
-  text("Path points: " + pathPoints.length, 10, 35);
-  text("Current position: (" + Math.round(movingCircle.x) + ", " + Math.round(movingCircle.y) + ")", 10, 50);
-  text("Moving: " + isMoving, 10, 65);
-  
-  // Draw reset button
-  fill(200);
-  stroke(100);
-  strokeWeight(1);
-  rect(10, 75, 60, 25);
-  fill(0);
-  noStroke();
-  textAlign(CENTER);
-  text("Reset", 40, 92);
+  // Remove measurement information and reset button for cleaner design
   
   // Draw relationship status
   textAlign(CENTER);
-  textSize(16);
+  textSize(14);
   fill(0);
-  text(relationship, width/2, height - 40);
-  text("Click anywhere to start movement along path", width/2, height - 15);
+  
+  let statusText = "";
+  if (movingCircle.isMoving) {
+    statusText = "Circle is moving ALONG the path";
+  } else {
+    statusText = "Click anywhere to start movement along path";
+  }
+  
+  text(statusText, width/2, height - 20);
 }
 
 // Function to draw direction arrow

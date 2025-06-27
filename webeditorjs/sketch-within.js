@@ -15,7 +15,7 @@
  * • container: object storing position, size, and color of the boundary
  * • movingObject: object that can be moved within the container
  * • outsideObject: object for comparison, outside the container
- * • showBoundaries, showDistances: visual feedback toggles
+ * • checkWithinContainer(): function to test if object is within bounds
  * • dist(), rect(), ellipse(): P5.js drawing and math functions
  *
  * EXTENSION IDEAS:
@@ -24,8 +24,8 @@
  * • Obstacles or zones within the container
  *
  * INTERACTION:
- * • Drag the object to move it within or outside the container
- * • Toggle visual feedback for boundaries and distances
+ * • Drag the circles to move them within or outside the container
+ * • Visual feedback shows containment status with colors
  */
 
 // P5.js Sketch: Preposition "Within"
@@ -60,40 +60,24 @@ let outsideObject = {
   dragging: false
 };
 
-// Visual controls
-let showBoundaries = true;
-let showDistances = false;
-let dragOffset = { x: 0, y: 0 };
+// Visual controls - removed for simplicity
 
 function setup() {
   createCanvas(400, 300);
 }
 
 function draw() {
-  background(240, 248, 255);
+  background(240);
   
   // Draw the container
   drawContainer();
-  
-  // Draw boundary indicators if enabled
-  if (showBoundaries) {
-    drawBoundaryIndicators();
-  }
   
   // Draw objects
   drawMovingObject();
   drawOutsideObject();
   
-  // Draw distance measurements if enabled
-  if (showDistances) {
-    drawDistanceMeasurements();
-  }
-  
-  // Draw relationship information
-  drawRelationshipInfo();
-  
-  // Draw controls
-  drawControls();
+  // Draw simple status text
+  drawSimpleStatus();
 }
 
 function drawContainer() {
@@ -103,60 +87,21 @@ function drawContainer() {
   strokeWeight(3);
   rect(container.x, container.y, container.width, container.height, 10);
   
-  // Draw container label
-  fill(0);
+  // Count and display number of objects within container
+  let objectsWithin = 0;
+  if (checkWithinContainer(movingObject)) objectsWithin++;
+  if (checkWithinContainer(outsideObject)) objectsWithin++;
+  
+  // Draw count in center of container
+  fill(50, 50, 50, 180);
   noStroke();
-  textAlign(CENTER);
-  textSize(14);
-  text("Container", container.x + container.width/2, container.y - 10);
+  textAlign(CENTER, CENTER);
+  textSize(36);
+  let centerX = container.x + container.width / 2;
+  let centerY = container.y + container.height / 2;
+  text(objectsWithin, centerX, centerY);
   
-  // Draw corner coordinates
-  textSize(10);
-  fill(100);
-  textAlign(LEFT);
-  text("(" + container.x + "," + container.y + ")", 
-       container.x + 5, container.y + 15);
-  textAlign(RIGHT);
-  text("(" + (container.x + container.width) + "," + (container.y + container.height) + ")", 
-       container.x + container.width - 5, container.y + container.height - 5);
-}
-
-function drawBoundaryIndicators() {
-  // Draw dashed boundary lines
-  stroke(150, 150, 150);
-  strokeWeight(1);
-  drawDashedRect(container.x, container.y, container.width, container.height);
-  
-  // Draw margin indicators
-  stroke(200, 100, 100, 100);
-  strokeWeight(1);
-  let margin = 10;
-  drawDashedRect(container.x + margin, container.y + margin, 
-                container.width - margin * 2, container.height - margin * 2);
-}
-
-function drawDashedRect(x, y, w, h) {
-  let dashLength = 5;
-  
-  // Top edge
-  for (let i = x; i < x + w; i += dashLength * 2) {
-    line(i, y, Math.min(i + dashLength, x + w), y);
-  }
-  
-  // Bottom edge
-  for (let i = x; i < x + w; i += dashLength * 2) {
-    line(i, y + h, Math.min(i + dashLength, x + w), y + h);
-  }
-  
-  // Left edge
-  for (let i = y; i < y + h; i += dashLength * 2) {
-    line(x, i, x, Math.min(i + dashLength, y + h));
-  }
-  
-  // Right edge
-  for (let i = y; i < y + h; i += dashLength * 2) {
-    line(x + w, i, x + w, Math.min(i + dashLength, y + h));
-  }
+ 
 }
 
 function drawMovingObject() {
@@ -175,23 +120,6 @@ function drawMovingObject() {
   }
   
   ellipse(movingObject.x, movingObject.y, movingObject.radius * 2, movingObject.radius * 2);
-  
-  // Draw object label
-  fill(0);
-  noStroke();
-  textAlign(CENTER);
-  textSize(10);
-  text("Moving Object", movingObject.x, movingObject.y - 25);
-  text("(" + Math.round(movingObject.x) + "," + Math.round(movingObject.y) + ")", 
-       movingObject.x, movingObject.y + 30);
-  
-  // Draw selection indicator if dragging
-  if (movingObject.dragging) {
-    stroke(255, 255, 0);
-    strokeWeight(2);
-    noFill();
-    ellipse(movingObject.x, movingObject.y, movingObject.radius * 2 + 10, movingObject.radius * 2 + 10);
-  }
 }
 
 function drawOutsideObject() {
@@ -200,121 +128,34 @@ function drawOutsideObject() {
   stroke(100, 100, 100);
   strokeWeight(2);
   ellipse(outsideObject.x, outsideObject.y, outsideObject.radius * 2, outsideObject.radius * 2);
+}
+
+function drawSimpleStatus() {
+  // Simple status text at the bottom
+  let movingWithin = checkWithinContainer(movingObject);
+  let outsideWithin = checkWithinContainer(outsideObject);
   
-  // Draw object label
   fill(0);
   noStroke();
   textAlign(CENTER);
-  textSize(10);
-  text("Outside Object", outsideObject.x, outsideObject.y - 20);
+  textSize(14);
   
-  // Draw selection indicator if dragging
-  if (outsideObject.dragging) {
-    stroke(255, 255, 0);
-    strokeWeight(2);
-    noFill();
-    ellipse(outsideObject.x, outsideObject.y, outsideObject.radius * 2 + 8, outsideObject.radius * 2 + 8);
-  }
-}
-
-function drawDistanceMeasurements() {
-  // Calculate distances to container edges
-  let leftDist = movingObject.x - container.x;
-  let rightDist = (container.x + container.width) - movingObject.x;
-  let topDist = movingObject.y - container.y;
-  let bottomDist = (container.y + container.height) - movingObject.y;
-  
-  // Draw distance lines
-  stroke(100, 100, 100, 150);
-  strokeWeight(1);
-  
-  // Left distance
-  if (leftDist > 0) {
-    line(container.x, movingObject.y, movingObject.x - movingObject.radius, movingObject.y);
-    text(Math.round(leftDist), container.x + leftDist/2, movingObject.y - 5);
-  }
-  
-  // Top distance
-  if (topDist > 0) {
-    line(movingObject.x, container.y, movingObject.x, movingObject.y - movingObject.radius);
-    text(Math.round(topDist), movingObject.x + 10, container.y + topDist/2);
-  }
-}
-
-function drawRelationshipInfo() {
-  // Determine containment status
-  let isWithin = checkWithinContainer(movingObject);
-  let isOutsideWithin = checkWithinContainer(outsideObject);
-  
-  let relationship = "";
-  if (isWithin) {
-    relationship = "Orange circle is WITHIN the container";
+  let statusText = "";
+  if (movingWithin) {
+    statusText += "Orange circle: within";
   } else {
-    relationship = "Orange circle is OUTSIDE the container";
+    statusText += "Orange circle: not within";
   }
   
-  // Draw relationship status
-  fill(0);
-  noStroke();
-  textAlign(CENTER);
-  textSize(16);
+  statusText += " | ";
   
-  if (isWithin) {
-    fill(0, 150, 0); // Green for within
+  if (outsideWithin) {
+    statusText += "Green circle: within";
   } else {
-    fill(150, 0, 0); // Red for outside
+    statusText += "Green circle: not within";
   }
-  text(relationship, width/2, height - 60);
   
-  // Additional information
-  
-  text("Green circle is " + (isOutsideWithin ? "WITHIN" : "OUTSIDE") + " container", 
-       width/2, height - 40);
-  
-  // Containment rules
-  textSize(10);
-  text("Objects are WITHIN when completely inside boundaries", width/2, height - 20);
-}
-
-function drawControls() {
-  // Instructions
-  fill(0);
-  noStroke();
-  textAlign(LEFT);
-  textSize(10);
-  text("Drag circles to explore containment", 10, 20);
-  text("Objects are 'within' when inside boundaries", 10, 35);
-  
-  // Control buttons
-  fill(200);
-  stroke(100);
-  strokeWeight(1);
-  
-  // Boundaries toggle
-  rect(250, 10, 90, 20);
-  fill(0);
-  noStroke();
-  textAlign(CENTER);
-  textSize(9);
-  text(showBoundaries ? "Hide Boundaries" : "Show Boundaries", 295, 23);
-  
-  // Distances toggle
-  fill(200);
-  stroke(100);
-  strokeWeight(1);
-  rect(250, 35, 90, 20);
-  fill(0);
-  noStroke();
-  text(showDistances ? "Hide Distances" : "Show Distances", 295, 48);
-  
-  // Reset button
-  fill(200);
-  stroke(100);
-  strokeWeight(1);
-  rect(350, 10, 40, 20);
-  fill(0);
-  noStroke();
-  text("Reset", 370, 23);
+  text(statusText, width/2, height - 20);
 }
 
 function checkWithinContainer(obj) {
@@ -324,13 +165,6 @@ function checkWithinContainer(obj) {
           obj.x <= container.x + container.width &&
           obj.y >= container.y && 
           obj.y <= container.y + container.height);
-}
-
-function checkCompletelyWithinContainer(obj) {
-  // Check if entire object including radius is within container
-  return (obj.x - obj.radius >= container.x && 
-          obj.x + obj.radius <= container.x + container.width &&
-          obj.y - obj.radius >= container.y &&          obj.y + obj.radius <= container.y + container.height);
 }
 
 // Helper functions for cross-platform input handling
@@ -347,35 +181,14 @@ function handleInputStart() {
   let inputX = getInputX();
   let inputY = getInputY();
   
-  // Check control buttons
-  if (inputY >= 10 && inputY <= 30) {
-    if (inputX >= 250 && inputX <= 340) {
-      showBoundaries = !showBoundaries;
-      return;
-    }
-    if (inputX >= 350 && inputX <= 390) {
-      resetObjects();
-      return;
-    }
-  }
-  
-  if (inputY >= 35 && inputY <= 55 && inputX >= 250 && inputX <= 340) {
-    showDistances = !showDistances;
-    return;
-  }
-  
   // Check object selection
   let distToMoving = dist(inputX, inputY, movingObject.x, movingObject.y);
   let distToOutside = dist(inputX, inputY, outsideObject.x, outsideObject.y);
   
   if (distToMoving <= movingObject.radius) {
     movingObject.dragging = true;
-    dragOffset.x = inputX - movingObject.x;
-    dragOffset.y = inputY - movingObject.y;
   } else if (distToOutside <= outsideObject.radius) {
     outsideObject.dragging = true;
-    dragOffset.x = inputX - outsideObject.x;
-    dragOffset.y = inputY - outsideObject.y;
   }
 }
 
@@ -385,8 +198,8 @@ function handleInputDrag() {
   let inputY = getInputY();
   
   if (movingObject.dragging) {
-    movingObject.x = inputX - dragOffset.x;
-    movingObject.y = inputY - dragOffset.y;
+    movingObject.x = inputX;
+    movingObject.y = inputY;
     
     // Keep within canvas bounds
     movingObject.x = constrain(movingObject.x, movingObject.radius, width - movingObject.radius);
@@ -394,8 +207,8 @@ function handleInputDrag() {
   }
   
   if (outsideObject.dragging) {
-    outsideObject.x = inputX - dragOffset.x;
-    outsideObject.y = inputY - dragOffset.y;
+    outsideObject.x = inputX;
+    outsideObject.y = inputY;
     
     // Keep within canvas bounds
     outsideObject.x = constrain(outsideObject.x, outsideObject.radius, width - outsideObject.radius);
@@ -435,16 +248,6 @@ function touchMoved() {
 function touchEnded() {
   handleInputEnd();
   return false;
-}
-
-function resetObjects() {
-  movingObject.x = 150;
-  movingObject.y = 120;
-  movingObject.dragging = false;
-  
-  outsideObject.x = 50;
-  outsideObject.y = 50;
-  outsideObject.dragging = false;
 }
 
 /*

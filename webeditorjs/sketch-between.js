@@ -14,15 +14,15 @@
  * - Use conditional logic for position analysis
  * 
  * KEY VARIABLES:
- * - leftCircle, rightCircle: boundary objects
- * - middleCircle: object that can be "between" the others
- * - dragging: interaction state tracking
+ * - blueCircle, redCircle: boundary objects that define the "between" zone
+ * - greenCircle: object that can be positioned "between" the others
+ * - dragging: interaction state tracking for mouse/touch input
  * 
  * KEY METHODS:
- * - min()/max(): find boundary values
- * - constrain(): limit values within bounds
- * - dist(): calculate distances between objects
- * - Mouse interaction functions
+ * - if/else statements: determine left and right boundary positions
+ * - && operator: compound conditional logic for "between" checking
+ * - dist(): calculate distances between objects for interaction
+ * - Mouse/touch interaction functions
  * 
  * HOW TO EXTEND:
  * 1. Add vertical "between" checking (Y coordinates)
@@ -66,8 +66,7 @@ function draw() {
   // Calculate the "between" relationship
   let isBetween = checkBetweenRelationship();
   
-  // Draw connection lines between boundary circles
-  drawConnectionLines(isBetween);
+
   
   // Draw all three circles
   drawCircle(blueCircle, color(100, 150, 255), "Blue");
@@ -78,41 +77,40 @@ function draw() {
   drawBetweenZone(isBetween);
   
   // Display relationship information
-  displayRelationshipInfo(isBetween);
+  displayRelationshipInfo();
   
-  // Show coordinate information
-  displayCoordinateInfo();
+  // Show boundary values under the lines
+  displayBoundaryValues();
 }
 
 function checkBetweenRelationship() {
-  // Find the leftmost and rightmost X coordinates of the boundary circles
-  let leftBoundary = min(blueCircle.x, redCircle.x);
-  let rightBoundary = max(blueCircle.x, redCircle.x);
-  
-  // Check if green circle is between the blue and red circles
+  // Check if green circle is between the blue and red circles using compound && statement
   // (considering circle radius for more accurate detection)
   let greenLeft = greenCircle.x - greenCircle.radius;
   let greenRight = greenCircle.x + greenCircle.radius;
-  let boundaryLeft = leftBoundary + (blueCircle.x < redCircle.x ? blueCircle.radius : redCircle.radius);
-  let boundaryRight = rightBoundary - (blueCircle.x < redCircle.x ? redCircle.radius : blueCircle.radius);
   
+  // Calculate boundary positions for both possible arrangements
+  let leftBoundary, rightBoundary, boundaryLeft, boundaryRight;
+  
+  if (blueCircle.x < redCircle.x) {
+    // Blue is on the left, red is on the right
+    leftBoundary = blueCircle.x;
+    rightBoundary = redCircle.x;
+    boundaryLeft = leftBoundary + blueCircle.radius;
+    boundaryRight = rightBoundary - redCircle.radius;
+  } else {
+    // Red is on the left, blue is on the right
+    leftBoundary = redCircle.x;
+    rightBoundary = blueCircle.x;
+    boundaryLeft = leftBoundary + redCircle.radius;
+    boundaryRight = rightBoundary - blueCircle.radius;
+  }
+  
+  // Use compound && statement to check if green is between blue and red
   return (greenLeft >= boundaryLeft && greenRight <= boundaryRight);
 }
 
-function drawConnectionLines(isBetween) {
-  // Draw line connecting the two boundary circles
-  stroke(150);
-  strokeWeight(2);
-  line(blueCircle.x, blueCircle.y, redCircle.x, redCircle.y);
-  
-  // If green is between, draw connecting lines to it
-  if (isBetween) {
-    stroke(100, 255, 100, 150);
-    strokeWeight(1);
-    line(blueCircle.x, blueCircle.y, greenCircle.x, greenCircle.y);
-    line(redCircle.x, redCircle.y, greenCircle.x, greenCircle.y);
-  }
-}
+
 
 function drawCircle(circle, circleColor, label) {
   // Main circle
@@ -129,7 +127,7 @@ function drawCircle(circle, circleColor, label) {
   text(label, circle.x, circle.y - circle.radius - 8);
   
   // Show coordinates
-  textSize(9);
+  textSize(10);
   fill(100);
   text("(" + Math.round(circle.x) + "," + Math.round(circle.y) + ")", 
        circle.x, circle.y + circle.radius + 15);
@@ -137,12 +135,21 @@ function drawCircle(circle, circleColor, label) {
 
 function drawBetweenZone(isBetween) {
   // Calculate and visualize the "between" zone
-  let leftBoundary = min(blueCircle.x, redCircle.x);
-  let rightBoundary = max(blueCircle.x, redCircle.x);
+  let leftBoundary, rightBoundary, boundaryLeft, boundaryRight;
   
-  // Add circle radius offsets for accurate zone
-  let boundaryLeft = leftBoundary + (blueCircle.x < redCircle.x ? blueCircle.radius : redCircle.radius);
-  let boundaryRight = rightBoundary - (blueCircle.x < redCircle.x ? redCircle.radius : blueCircle.radius);
+  if (blueCircle.x < redCircle.x) {
+    // Blue is on the left, red is on the right
+    leftBoundary = blueCircle.x;
+    rightBoundary = redCircle.x;
+    boundaryLeft = leftBoundary + blueCircle.radius;
+    boundaryRight = rightBoundary - redCircle.radius;
+  } else {
+    // Red is on the left, blue is on the right
+    leftBoundary = redCircle.x;
+    rightBoundary = blueCircle.x;
+    boundaryLeft = leftBoundary + redCircle.radius;
+    boundaryRight = rightBoundary - blueCircle.radius;
+  }
   
   // Draw "between" zone as a highlighted rectangle
   if (isBetween) {
@@ -177,8 +184,15 @@ function displayRelationshipInfo() {
     relationship = "Green is BETWEEN blue and red";
   } else {
     // Determine which side green is on
-    let leftBoundary = min(blueCircle.x, redCircle.x);
-    let rightBoundary = max(blueCircle.x, redCircle.x);
+    let leftBoundary, rightBoundary;
+    
+    if (blueCircle.x < redCircle.x) {
+      leftBoundary = blueCircle.x;
+      rightBoundary = redCircle.x;
+    } else {
+      leftBoundary = redCircle.x;
+      rightBoundary = blueCircle.x;
+    }
     
     if (greenCircle.x < leftBoundary) {
       relationship = "Green is to the LEFT of both circles";
@@ -193,33 +207,48 @@ function displayRelationshipInfo() {
   fill(0);
   noStroke();
   textAlign(CENTER);
-  textSize(16);
+  textSize(14);
   text(relationship, width/2, 25);
   
   // Instructions
-  textSize(12);
-  text("Drag any circle to change the relationship", width/2, height - 15);
+  textSize(14);
+  text("Drag any circle to change the relationship", width/2, height - 20);
 }
 
-function displayCoordinateInfo() {
-  // Information panel showing coordinates and measurements
-  fill(255, 255, 255, 200);
-  stroke(100);
-  strokeWeight(1);
-  rect(10, 210, 100, 35);
+function displayBoundaryValues() {
+  // Calculate boundary positions
+  let leftBoundary, rightBoundary, boundaryLeft, boundaryRight;
   
+  if (blueCircle.x < redCircle.x) {
+    // Blue is on the left, red is on the right
+    leftBoundary = blueCircle.x;
+    rightBoundary = redCircle.x;
+    boundaryLeft = leftBoundary + blueCircle.radius;
+    boundaryRight = rightBoundary - redCircle.radius;
+  } else {
+    // Red is on the left, blue is on the right
+    leftBoundary = redCircle.x;
+    rightBoundary = blueCircle.x;
+    boundaryLeft = leftBoundary + redCircle.radius;
+    boundaryRight = rightBoundary - blueCircle.radius;
+  }
+  
+  // Display boundary values under the vertical lines
   fill(0);
   noStroke();
-  textAlign(LEFT);
-  textSize(9);
+  textAlign(CENTER);
+  textSize(12);
   
-  let leftBoundary = min(blueCircle.x, redCircle.x);
-  let rightBoundary = max(blueCircle.x, redCircle.x);
-  let distance = rightBoundary - leftBoundary;
+  // Left boundary value
+  text(Math.round(boundaryLeft), boundaryLeft, 265);
   
-  text("Left boundary: " + Math.round(leftBoundary), 12, 222);
-  text("Right boundary: " + Math.round(rightBoundary), 12, 232);
-  text("Distance between: " + Math.round(distance), 12, 242);
+  // Right boundary value
+  text(Math.round(boundaryRight), boundaryRight, 265);
+  
+  // Distance value centered between the boundaries
+  let distance = boundaryRight - boundaryLeft;
+  let centerX = (boundaryLeft + boundaryRight) / 2;
+  text(Math.round(distance), centerX, 265);
 }
 
 // Helper functions for cross-platform input handling
@@ -301,3 +330,4 @@ function touchEnded() {
   handleInputEnd();
   return false;
 }
+

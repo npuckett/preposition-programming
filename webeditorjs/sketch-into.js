@@ -133,28 +133,22 @@ function draw() {
         pop();
     }
     
-    // Labels and status
-    fill(50);
+    // Simple status text
+    fill(0);
     noStroke();
-    textAlign(CENTER, CENTER);
-    textSize(12);
+    textAlign(CENTER);
+    textSize(14);
     
+    let statusText = "";
     if (hasEntered) {
-        text("Object has entered the container!", width/2, 30);
-        text("Click to reset and try again", width/2, height - 30);
+        statusText = "Circle has moved INTO the container";
     } else if (isMoving) {
-        text("Moving INTO the container...", width/2, 30);
-        text(`Progress: ${(progress * 100).toFixed(1)}%`, width/2, height - 30);
+        statusText = "Circle is moving INTO the container";
     } else {
-        text("Click to move the yellow circle INTO the blue container", width/2, 30);
-        text("Yellow circle moves from outside to inside", width/2, height - 30);
+        statusText = "Click to move circle INTO the container";
     }
     
-    // Status indicator
-    textAlign(LEFT, TOP);
-    textSize(10);
-    text(`Status: ${isInside ? "INSIDE" : "OUTSIDE"}`, 10, 40);
-    text(`Distance from center: ${distance.toFixed(1)}px`, 10, 65);    text(`Container radius: ${container.radius}px`, 10, 80);
+    text(statusText, width/2, height - 20);
 }
 
 // Helper functions for cross-platform input handling

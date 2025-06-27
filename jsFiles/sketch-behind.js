@@ -94,23 +94,7 @@ function draw() {
   text("Back", blueCircle.x, blueCircle.y - blueCircle.radius - 15);
   text("Front", redCircle.x, redCircle.y - redCircle.radius - 15);
   
-  // Determine relationship
-  let relationship = "";
-  if (isOverlapping) {
-    relationship = `Blue is ${Math.round(percentOverlap)}% BEHIND Red`;
-  } else {
-    relationship = "No overlap - no behind relationship";
-  }
-  
-  // Draw relationship text
-  textAlign(CENTER);
-  textSize(14);
-  if (isOverlapping) {
-    fill(200, 50, 50); // Red when overlapping
-  } else {
-    fill(100, 100, 100); // Gray when not overlapping
-  }
-  text(relationship, width/2, height - 30);
+
   
   fill(0);
   textSize(14);

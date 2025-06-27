@@ -1,363 +1,254 @@
-// P5.js Sketch: Preposition "After"
-// This sketch demonstrates the concept of "after" through sequential timing
-// Events happen after a main event occurs, showing temporal sequence
+/**
+ * P5.js Sketch: AFTER - Movement Consequences
+ * 
+ * CONCEPT: "After" means occurring following a main event.
+ * This shows objects scattering in different directions after
+ * a collision point, demonstrating the consequences that follow.
+ * 
+ * LEARNING OBJECTIVES:
+ * • Understand temporal sequence and consequences
+ * • Practice state transitions and event results
+ * • Learn simple physics and spreading effects
+ * • Explore spatial representation of "after" relationships
+ * 
+ * KEY VARIABLES & METHODS:
+ * • impact - central point where collision happens
+ * • particles - objects that scatter after impact
+ * • Simple radial movement from collision point
+ * 
+ * EXTENSION IDEAS:
+ * • Different types of "after" effects
+ * • Varying particle behaviors after collision
+ * • Multiple collision points with different results
+ */
 
-// Timeline configuration
-let timeline = {
-  startTime: null,           // When timeline started
-  running: false,            // Whether timeline is active
-  mainEventTime: 3000,       // Main event happens at 3 seconds
-  mainEventTriggered: false, // Whether main event has occurred
-  afterEvents: [             // Events that happen after main event
-    {delay: 1000, triggered: false, name: "First after event", color: [100, 255, 100]},
-    {delay: 2500, triggered: false, name: "Second after event", color: [255, 150, 100]},
-    {delay: 4000, triggered: false, name: "Final after event", color: [255, 100, 255]}
-  ]
+// Central impact point
+let impact = {
+  x: 200,
+  y: 150,
+  size: 20,
+  hasHappened: false
 };
 
-// Visual elements
+// Moving object that causes impact
+let projectile = {
+  x: 50,
+  y: 150,
+  targetX: 200,
+  targetY: 150,
+  speed: 4,
+  size: 8,
+  isMoving: false
+};
+
+// Particles that scatter after impact
 let particles = [];
-let timelineY = 200;
+
+// Trail for projectile
+let projectileTrail = [];
 
 function setup() {
-  createCanvas(600, 400);
-  textAlign(CENTER, CENTER);
-  textSize(14);
+  createCanvas(400, 300);
+  
+  // Initialize particles around impact point
+  for (let i = 0; i < 8; i++) {
+    let angle = (TWO_PI / 8) * i;
+    
+    // Create a single particle object with a clear name
+    let newParticle = {
+      x: impact.x,
+      y: impact.y,
+      vx: cos(angle) * 2,
+      vy: sin(angle) * 2,
+      size: 6,
+      isScattering: false,
+      trail: [],
+      color: [random(100, 255), random(100, 255), random(100, 255)]
+    };
+    
+    // Add the named particle to the array
+    particles.push(newParticle);
+  }
 }
 
 function draw() {
   background(240, 248, 255);
   
-  if (timeline.running) {
-    checkAfterEvents();
-    drawTimeline();
-    updateParticles();
-    updateStatus();
-  } else {
-    drawInstructions();
+  // Update projectile movement
+  if (projectile.isMoving && !impact.hasHappened) {
+    updateProjectile();
   }
+  
+  // Update particle scattering after impact
+  if (impact.hasHappened) {
+    updateParticles();
+  }
+  
+  // Draw impact zone
+  drawImpactZone();
+  
+  // Draw projectile
+  drawProjectile();
+  
+  // Draw particles
+  drawParticles();
+  
+  // Draw status
+  drawStatus();
 }
 
-function checkAfterEvents() {
-  let elapsed = millis() - timeline.startTime;
+function updateProjectile() {
+  // Move toward impact point
+  let dx = projectile.targetX - projectile.x;
+  let dy = projectile.targetY - projectile.y;
+  let distance = sqrt(dx * dx + dy * dy);
   
-  // Check if main event should trigger
-  if (elapsed >= timeline.mainEventTime && !timeline.mainEventTriggered) {
-    timeline.mainEventTriggered = true;
-    createMainEventEffect();
+  // Add to trail
+  let trailPoint = { x: projectile.x, y: projectile.y };
+  projectileTrail.push(trailPoint);
+  if (projectileTrail.length > 50) projectileTrail.shift();
+  
+  // Check for impact
+  if (distance < projectile.speed + impact.size/2) {
+    impact.hasHappened = true;
+    projectile.isMoving = false;
+    
+    // Start particle scattering after impact
+    for (let particle of particles) {
+      particle.isScattering = true;
+    }
+    return;
   }
   
-  // Check after events (only if main event has happened)
-  if (timeline.mainEventTriggered) {
-    for (let afterEvent of timeline.afterEvents) {
-      let afterTime = timeline.mainEventTime + afterEvent.delay;
-      if (elapsed >= afterTime && !afterEvent.triggered) {
-        afterEvent.triggered = true;
-        createAfterEventEffect(afterEvent);
+  // Move projectile
+  let angle = atan2(dy, dx);
+  projectile.x += cos(angle) * projectile.speed;
+  projectile.y += sin(angle) * projectile.speed;
+}
+
+function updateParticles() {
+  for (let particle of particles) {
+    if (particle.isScattering) {
+      // Move particle
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      
+      // Add to trail
+      let particleTrailPoint = { x: particle.x, y: particle.y };
+      particle.trail.push(particleTrailPoint);
+      if (particle.trail.length > 30) particle.trail.shift();
+      
+      // Slow down over time
+      particle.vx *= 0.98;
+      particle.vy *= 0.98;
+      
+      // Stop when very slow
+      if (abs(particle.vx) < 0.1 && abs(particle.vy) < 0.1) {
+        particle.isScattering = false;
       }
     }
   }
 }
 
-function drawTimeline() {
-  let elapsed = millis() - timeline.startTime;
-  let totalTime = 8000; // 8 second timeline
-  let progress = elapsed / totalTime;
-  
-  // Draw timeline base
-  stroke(100);
-  strokeWeight(4);
-  line(50, timelineY, width - 50, timelineY);
-  
-  // Draw time markers
-  let timelineWidth = width - 100;
-  let mainEventX = 50 + (timeline.mainEventTime / totalTime) * timelineWidth;
-  
-  // Main event marker
-  stroke(255, 100, 100);
-  strokeWeight(6);
-  if (timeline.mainEventTriggered) {
+function drawImpactZone() {
+  // Draw impact point
+  if (impact.hasHappened) {
     fill(255, 100, 100);
+    stroke(200, 50, 50);
   } else {
+    fill(200);
+    stroke(150);
+  }
+  strokeWeight(2);
+  ellipse(impact.x, impact.y, impact.size, impact.size);
+  
+  // Draw target rings
+  if (!impact.hasHappened) {
     noFill();
+    stroke(150, 100);
+    strokeWeight(1);
+    ellipse(impact.x, impact.y, impact.size + 10, impact.size + 10);
+    ellipse(impact.x, impact.y, impact.size + 20, impact.size + 20);
   }
-  ellipse(mainEventX, timelineY, 20, 20);
-  
-  // Main event label
-  fill(0);
-  noStroke();
-  textSize(12);
-  text("Main Event", mainEventX, timelineY - 30);
-  text("(3s)", mainEventX, timelineY - 15);
-  
-  // After event markers
-  for (let i = 0; i < timeline.afterEvents.length; i++) {
-    let afterEvent = timeline.afterEvents[i];
-    let afterTime = timeline.mainEventTime + afterEvent.delay;
-    let afterEventX = 50 + (afterTime / totalTime) * timelineWidth;
-    
-    stroke(afterEvent.color[0], afterEvent.color[1], afterEvent.color[2]);
-    strokeWeight(4);
-    if (afterEvent.triggered) {
-      fill(afterEvent.color[0], afterEvent.color[1], afterEvent.color[2]);
-    } else {
-      noFill();
+}
+
+function drawProjectile() {
+  // Draw projectile trail
+  if (projectileTrail.length > 1) {
+    stroke(70, 130, 180, 150);
+    strokeWeight(2);
+    noFill();
+    beginShape();
+    for (let i = 0; i < projectileTrail.length; i++) {
+      vertex(projectileTrail[i].x, projectileTrail[i].y);
     }
-    ellipse(afterEventX, timelineY, 16, 16);
-    
-    // After event labels
-    fill(0);
-    noStroke();
-    textSize(10);
-    text("After " + (afterEvent.delay/1000) + "s", afterEventX, timelineY + 25);
+    endShape();
   }
   
-  // Current time indicator
-  let currentTimeX = 50 + progress * timelineWidth;
-  if (currentTimeX <= width - 50) {
-    stroke(50, 150, 255);
-    strokeWeight(3);
-    line(currentTimeX, timelineY - 40, currentTimeX, timelineY + 40);
-    
-    // Current time label
-    fill(50, 150, 255);
+  // Draw projectile (if still moving)
+  if (projectile.isMoving) {
+    fill(70, 130, 180);
     noStroke();
-    textSize(12);
-    text(nf(elapsed/1000, 1, 1) + "s", currentTimeX, timelineY - 50);
+    ellipse(projectile.x, projectile.y, projectile.size, projectile.size);
   }
 }
 
-function createMainEventEffect() {
-  // Create burst of particles for main event
-  for (let i = 0; i < 20; i++) {
-    particles.push({
-      x: width/2,
-      y: 100,
-      vx: random(-5, 5),
-      vy: random(-8, -2),
-      life: 60,
-      maxLife: 60,
-      color: [255, 100, 100],
-      size: random(4, 8)
-    });
-  }
-}
-
-function createAfterEventEffect(afterEvent) {
-  // Create smaller particle effects for after events
-  let eventX = width/2 + random(-100, 100);
-  for (let i = 0; i < 10; i++) {
-    particles.push({
-      x: eventX,
-      y: 120,
-      vx: random(-3, 3),
-      vy: random(-5, -1),
-      life: 40,
-      maxLife: 40,
-      color: afterEvent.color,
-      size: random(3, 6)
-    });
-  }
-}
-
-function updateParticles() {
-  for (let i = particles.length - 1; i >= 0; i--) {
-    let p = particles[i];
-    
-    // Update position
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.1; // Gravity
-    
-    // Update life
-    p.life--;
+function drawParticles() {
+  for (let particle of particles) {
+    // Draw particle trail
+    if (particle.trail.length > 1) {
+      stroke(particle.color[0], particle.color[1], particle.color[2], 150);
+      strokeWeight(2);
+      noFill();
+      beginShape();
+      for (let i = 0; i < particle.trail.length; i++) {
+        vertex(particle.trail[i].x, particle.trail[i].y);
+      }
+      endShape();
+    }
     
     // Draw particle
-    let alpha = map(p.life, 0, p.maxLife, 0, 255);
-    fill(p.color[0], p.color[1], p.color[2], alpha);
+    fill(particle.color[0], particle.color[1], particle.color[2]);
     noStroke();
-    ellipse(p.x, p.y, p.size, p.size);
-    
-    // Remove dead particles
-    if (p.life <= 0) {
-      particles.splice(i, 1);
-    }
+    ellipse(particle.x, particle.y, particle.size, particle.size);
   }
 }
 
-function updateStatus() {
-  let elapsed = millis() - timeline.startTime;
-  
-  // Status text
-  fill(0);
-  noStroke();
-  textSize(16);
-  
-  if (!timeline.mainEventTriggered) {
-    text("Waiting for main event...", width/2, 50);
-  } else {
-    text("Main event occurred! After events following...", width/2, 50);
-  }
-  
-  // Event status list
-  textAlign(LEFT);
-  textSize(12);
-  let statusY = 300;
-  
-  text("Event Status:", 50, statusY);
-  statusY += 20;
-  
-  let mainStatus = timeline.mainEventTriggered ? "✓ COMPLETED" : "⏳ Waiting";
-  text("Main Event (3.0s): " + mainStatus, 70, statusY);
-  statusY += 15;
-  
-  for (let afterEvent of timeline.afterEvents) {
-    let status = afterEvent.triggered ? "✓ COMPLETED" : "⏳ Waiting";
-    let totalTime = (timeline.mainEventTime + afterEvent.delay) / 1000;
-    text("After " + (afterEvent.delay/1000) + "s (" + totalTime + "s total): " + status, 70, statusY);
-    statusY += 15;
-  }
-  
-  // Reset button
-  fill(200);
-  stroke(100);
-  strokeWeight(1);
-  rect(width - 100, 20, 80, 30);
-  fill(0);
-  noStroke();
+function drawStatus() {
+  fill(60);
   textAlign(CENTER);
-  text("Reset", width - 60, 35);
-}
-
-function drawInstructions() {
-  fill(0);
-  noStroke();
-  textAlign(CENTER);
-  textSize(18);
-  text("Temporal Sequence: AFTER", width/2, 100);
-  
   textSize(14);
-  text("This demonstrates how events happen AFTER other events", width/2, 140);
-  text("Click to start the timeline", width/2, 170);
-  text("Watch how after-events only occur AFTER the main event", width/2, 200);
   
-  // Preview timeline
-  stroke(150);
-  strokeWeight(2);
-  line(100, 250, width - 100, 250);
-  
-  // Preview markers
-  fill(255, 100, 100);
-  noStroke();
-  ellipse(200, 250, 15, 15);
-  text("Main", 200, 230);
-  
-  fill(100, 255, 100);
-  ellipse(300, 250, 12, 12);
-  text("After 1s", 300, 230);
-  
-  fill(255, 150, 100);
-  ellipse(400, 250, 12, 12);
-  text("After 2.5s", 400, 230);
-  
-  fill(255, 100, 255);
-  ellipse(500, 250, 12, 12);  text("After 4s", 500, 230);
-}
-
-// Helper functions for cross-platform input handling
-function getInputX() {
-  return touches.length > 0 ? touches[0].x : mouseX;
-}
-
-function getInputY() {
-  return touches.length > 0 ? touches[0].y : mouseY;
-}
-
-// Handle input start (both mouse and touch)
-function handleInputStart() {
-  let inputX = getInputX();
-  let inputY = getInputY();
-  
-  // Check reset button
-  if (timeline.running && inputX > width - 100 && inputX < width - 20 && 
-      inputY > 20 && inputY < 50) {
-    resetTimeline();
-    return;
-  }
-  
-  // Start timeline
-  if (!timeline.running) {
-    startTimeline();
+  if (!projectile.isMoving && !impact.hasHappened) {
+    text("Click to launch projectile toward impact point", width/2, height - 20);
+  } else if (projectile.isMoving) {
+    text("Projectile moving toward collision point", width/2, height - 20);
+  } else if (impact.hasHappened) {
+    let stillScattering = particles.some(p => p.isScattering);
+    if (stillScattering) {
+      text("Particles scattering AFTER impact", width/2, height - 20);
+    } else {
+      text("Scattering complete - click to restart", width/2, height - 20);
+    }
   }
 }
 
 function mousePressed() {
-  handleInputStart();
-}
-
-// Handle touch events for mobile
-function touchStarted() {
-  handleInputStart();
-  return false; // Prevent default touch behavior
-}
-
-function startTimeline() {
-  timeline.startTime = millis();
-  timeline.running = true;
-  timeline.mainEventTriggered = false;
+  // Reset and start new sequence
+  projectile.x = 50;
+  projectile.y = 150;
+  projectile.isMoving = true;
+  impact.hasHappened = false;
+  projectileTrail = [];
   
-  // Reset all after events
-  for (let afterEvent of timeline.afterEvents) {
-    afterEvent.triggered = false;
+  // Reset particles to center
+  for (let i = 0; i < particles.length; i++) {
+    let angle = (TWO_PI / particles.length) * i;
+    particles[i].x = impact.x;
+    particles[i].y = impact.y;
+    particles[i].vx = cos(angle) * 2;
+    particles[i].vy = sin(angle) * 2;
+    particles[i].isScattering = false;
+    particles[i].trail = [];
   }
-  
-  particles = [];
 }
-
-function resetTimeline() {
-  timeline.running = false;
-  timeline.startTime = null;
-  timeline.mainEventTriggered = false;
-  
-  // Reset all after events
-  for (let afterEvent of timeline.afterEvents) {
-    afterEvent.triggered = false;
-  }
-  
-  particles = [];
-}
-
-/*
-EDUCATIONAL NOTES:
-
-1. TEMPORAL SEQUENCING:
-   - Events are scheduled relative to other events
-   - "After" means something happens following another event
-   - Order and timing are crucial for the relationship
-
-2. TIME MANAGEMENT:
-   - Use millis() to track elapsed time
-   - Calculate relative times from reference points
-   - Boolean flags prevent duplicate event triggers
-
-3. CONDITIONAL EXECUTION:
-   - After-events only happen if main event has occurred
-   - This enforces the temporal dependency
-   - Prevents logical inconsistencies
-
-4. VISUAL TIMELINE:
-   - Shows the sequence of events clearly
-   - Current time indicator shows progression
-   - Different colors distinguish event types
-
-5. STATE TRACKING:
-   - Each event has its own triggered state
-   - Status display shows what has/hasn't happened
-   - Clean reset functionality for repeated demonstrations
-
-This pattern can be adapted for other "after" scenarios like:
-- Game events triggered after player actions
-- UI responses after user interactions
-- Animation sequences with dependent stages
-- Process steps that must follow others
-*/
