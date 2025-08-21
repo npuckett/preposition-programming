@@ -344,13 +344,14 @@ iframe {
 
 .welcome-message {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     height: 100%;
     text-align: center;
     color: var(--text-primary);
     font-size: 16px;
     font-family: 'Courier New', monospace;
+    padding-top: 80px;
 }
 
 .welcome-content {
