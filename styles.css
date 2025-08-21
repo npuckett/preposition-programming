@@ -3,6 +3,24 @@
  * Shared CSS for all preposition example pages
  */
 
+/* CSS Custom Properties */
+:root {
+    --bg-primary: #fff;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #f8f8f8;
+    --bg-quaternary: #eee;
+    --bg-accent: #ddd;
+    --text-primary: #000;
+    --text-secondary: #333;
+    --text-tertiary: #666;
+    --border-primary: #000;
+    --border-secondary: #333;
+    --border-tertiary: #666;
+    --border-light: #ddd;
+    --accent-color: #000;
+    --accent-hover: #333;
+}
+
 /* Reset and base styles */
 * {
     margin: 0;
@@ -13,13 +31,16 @@
 body {
     margin: 0;
     padding: 20px;
-    font-family: Arial, sans-serif;
-    background: #f0f0f0;
+    font-family: 'Courier New', monospace;
+    background: var(--bg-primary);
+    color: var(--text-primary);
     line-height: 1.6;
 }
 
 /* Layout containers */
 .container {
+    max-width: 1200px;
+    margin: 0 auto;
     display: flex;
     gap: 20px;
     justify-content: center;
@@ -35,88 +56,111 @@ body {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    background: white;
+    background: var(--bg-primary);
     border-radius: 8px;
     line-height: 1.6;
 }
 
 /* Typography */
 h1 {
-    color: #e0e0e0;
-    border-bottom: 3px solid #9575cd;
+    font-size: 2em;
+    margin-bottom: 10px;
+    font-weight: normal;
+    border-bottom: 2px solid var(--accent-color);
     padding-bottom: 10px;
-    margin-bottom: 20px;
+    color: var(--text-primary);
+    font-family: 'Courier New', monospace;
 }
 
 h3 {
-    color: #e0e0e0;
+    color: var(--text-primary);
     margin-top: 25px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    font-weight: normal;
+    font-size: 1.2em;
+    font-family: 'Courier New', monospace;
+}
+
+.subtitle {
+    margin-bottom: 30px;
+    opacity: 0.8;
+    font-size: 0.9em;
+    font-family: 'Courier New', monospace;
 }
 
 p {
     margin-bottom: 15px;
+    font-family: 'Courier New', monospace;
 }
 
 ul {
     margin-left: 20px;
     margin-bottom: 15px;
+    font-family: 'Courier New', monospace;
 }
 
 li {
     margin-bottom: 5px;
+    font-family: 'Courier New', monospace;
 }
 
 /* Links */
 a {
-    color: #1976D2;
+    color: var(--accent-color);
     text-decoration: none;
+    font-family: 'Courier New', monospace;
 }
 
 a:hover {
     text-decoration: underline;
+    color: var(--accent-hover);
 }
 
 /* Web editor link styling */
 .web-editor-link {
     display: inline-block;
-    background: #666;
-    color: white;
-    padding: 8px 16px;
+    background: var(--bg-quaternary);
+    color: var(--text-primary);
+    padding: 12px 20px;
+    border: 1px solid var(--border-secondary);
     border-radius: 4px;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 1em;
     margin-bottom: 15px;
-    transition: background-color 0.2s;
+    transition: all 0.3s;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
 }
 
 .web-editor-link:hover {
-    background: #555;
+    background: var(--bg-accent);
     text-decoration: none;
-    color: white;
+    color: var(--text-primary);
 }
 
 .web-editor-link-container {
     margin-bottom: 15px;
-    padding: 10px;
-    background: #ffffff;
-    border-radius: 5px;
-    border-left: 0px solid #666;
+    padding: 0;
+    background: none;
+    border: none;
 }
 
 .web-editor-link-container small {
-    color: #666;
+    color: var(--text-tertiary);
+    font-family: 'Courier New', monospace;
 }
 
 /* Code sections */
 .code-section {
-    background: #f8f8f8;
-    padding: 15px;
-    border-radius: 5px;
-    margin: 15px 0;
+    background: var(--bg-tertiary);
+    padding: 20px;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    margin: 20px 0;
     font-family: 'Courier New', monospace;
     font-size: 14px;
     line-height: 1.4;
+    color: var(--text-primary);
 }
 
 .code-section strong {
@@ -174,6 +218,9 @@ button:disabled {
 
 /* Index page specific styles */
 .index-body {
+    font-family: 'Courier New', monospace;
+    background: var(--bg-primary);
+    color: var(--text-primary);
     padding: 0;
     height: 100vh;
     overflow: hidden;
@@ -182,21 +229,23 @@ button:disabled {
 .index-container {
     display: flex;
     height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .sidebar {
     width: 280px;
-    background: #f5f5f5;
-    border-right: 1px solid #ddd;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-light);
     overflow-y: auto;
     flex-shrink: 0;
 }
 
 .header {
     padding: 20px;
-    border-bottom: 1px solid #2e0047;
-    background: #2e0047;
-    color: white;
+    border-bottom: 1px solid var(--accent-color);
+    background: var(--accent-color);
+    color: var(--bg-primary);
 }
 
 .header h1 {
@@ -205,13 +254,15 @@ button:disabled {
     margin-bottom: 5px;
     border-bottom: none;
     padding-bottom: 0;
-    color: white;
+    color: var(--bg-primary);
+    font-family: 'Courier New', monospace;
 }
 
 .header p {
     font-size: 14px;
     opacity: 0.9;
     margin-bottom: 0;
+    font-family: 'Courier New', monospace;
 }
 
 .menu-group {
@@ -221,17 +272,18 @@ button:disabled {
 .group-title {
     padding: 15px 20px 10px 20px;
     font-size: 14px;
-    font-weight: bold;
-    color: #2e0047;
+    font-weight: normal;
+    color: var(--accent-color);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border-light);
+    font-family: 'Courier New', monospace;
 }
 
 .menu-item {
     display: block;
     padding: 12px 20px 12px 35px;
-    color: #2e0047;
+    color: var(--accent-color);
     text-decoration: none;
     border: none;
     background: none;
@@ -239,18 +291,20 @@ button:disabled {
     text-align: left;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.2s;
+    transition: all 0.3s;
+    font-family: 'Courier New', monospace;
+    font-weight: normal;
 }
 
 .menu-item:hover {
-    background: #e8e8e8;
-    color: #2e0047;
+    background: var(--bg-quaternary);
+    color: var(--accent-color);
 }
 
 .menu-item.active {
-    background: #2e0047;
-    color: #ffffff;
-    border-right: 3px solid #2e0047;
+    background: var(--accent-color);
+    color: var(--bg-primary);
+    border-right: 3px solid var(--accent-color);
 }
 
 .content {
@@ -260,28 +314,32 @@ button:disabled {
 }
 
 .content-header {
-    background: white;
-    padding: 15px 20px;
-    border-bottom: 1px solid #eee;
+    background: var(--bg-primary);
+    padding: 20px;
+    border-bottom: 1px solid var(--border-light);
 }
 
 .content-header h2 {
     font-size: 18px;
-    color: #333;
+    color: var(--text-primary);
     margin: 0;
+    font-weight: normal;
+    font-family: 'Courier New', monospace;
 }
 
 .frame-container {
     flex: 1;
-    background: #f8f8f8;
+    background: var(--bg-tertiary);
     position: relative;
     overflow: auto;
+    border: 1px solid var(--border-light);
 }
 
 iframe {
     width: 100%;
     height: 100%;
-    border: none;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
 }
 
 .welcome-message {
@@ -290,26 +348,30 @@ iframe {
     justify-content: center;
     height: 100%;
     text-align: center;
-    color: #2e0047;
+    color: var(--text-primary);
     font-size: 16px;
+    font-family: 'Courier New', monospace;
 }
 
 .welcome-content {
-    max-width: 400px;
-    padding: 20px;
+    max-width: 500px;
+    padding: 30px;
 }
 
 .welcome-content h3 {
-    color: #2e0047;
-    margin-bottom: 15px;
+    color: var(--text-primary);
+    margin-bottom: 20px;
     font-size: 24px;
     margin-top: 0;
+    font-weight: normal;
+    font-family: 'Courier New', monospace;
 }
 
 .welcome-content p {
     line-height: 1.6;
-    margin-bottom: 10px;
-    color: #2e0047;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    font-family: 'Courier New', monospace;
 }
 
 /* Hide mobile-specific elements */
