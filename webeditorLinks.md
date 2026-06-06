@@ -8,7 +8,7 @@ All sketches live under the **npuckett** account. Update this file after every b
 
 | Date | Batch | Sketches | Notes |
 | --- | --- | --- | --- |
-| — | — | — | Pending first v2 ink-only sync |
+| 2026-06-06 | all | 24 | Standalone global-mode rollout: `webeditor/standalone/` + PUT update (same sketch IDs). |
 
 ## Created and browser verified
 
@@ -37,18 +37,7 @@ All sketches live under the **npuckett** account. Update this file after every b
 | after | After | https://editor.p5js.org/npuckett/sketches/N0j4jEydle | https://editor.p5js.org/npuckett/full/N0j4jEydle | https://editor.p5js.org/npuckett/sketches/GzGonI_p9 | Created 2026-06-06; p5@2.2.3, p5-phone@1.11.0. |
 | until | Until | https://editor.p5js.org/npuckett/sketches/LowKZWTYh | https://editor.p5js.org/npuckett/full/LowKZWTYh | https://editor.p5js.org/npuckett/sketches/T-UhaoxHZ | Created 2026-06-06; p5@2.2.3, p5-phone@1.11.0. |
 | since | Since | https://editor.p5js.org/npuckett/sketches/0pfbTFc_a | https://editor.p5js.org/npuckett/full/0pfbTFc_a | https://editor.p5js.org/npuckett/sketches/UdyLk3RHP | Created 2026-06-06; p5@2.2.3, p5-phone@1.11.0. |
-| during | During | https://editor.p5js.org/npuckett/sketches/rsSuQLCSH | https://editor.p5js.org/npuckett/full/rsSuQLCSH | https://editor.p5js.org/npuckett/sketches/_0kHqjHjb | Created 2026-06-06; p5@2.2.3, p5-phone@1.11.0. |
-| below | X3nB6HJLP | https://editor.p5js.org/npuckett/sketches/X3nB6HJLP |
-| beside | AYzWnDhPy | https://editor.p5js.org/npuckett/sketches/AYzWnDhPy |
-| behind | T6n1O_dKq | https://editor.p5js.org/npuckett/sketches/T6n1O_dKq |
-| beneath | Gbdl8UOve | https://editor.p5js.org/npuckett/sketches/Gbdl8UOve |
-| toward | H93wrfKL5 | https://editor.p5js.org/npuckett/sketches/H93wrfKL5 |
-| around | KZc6sFR8I | https://editor.p5js.org/npuckett/sketches/KZc6sFR8I |
-| past | DjakxBC0M | https://editor.p5js.org/npuckett/sketches/DjakxBC0M |
-| over | NtC8JgAhB | https://editor.p5js.org/npuckett/sketches/NtC8JgAhB |
-| after | GzGonI_p9 | https://editor.p5js.org/npuckett/sketches/GzGonI_p9 |
-| since | UdyLk3RHP | https://editor.p5js.org/npuckett/sketches/UdyLk3RHP |
-| until | T-UhaoxHZ | https://editor.p5js.org/npuckett/sketches/T-UhaoxHZ |
+| during | During | https://editor.p5js.org/npuckett/sketches/rsSuQLCSH | https://editor.p5js.org/npuckett/full/rsSuQLCSH | https://editor.p5js.org/npuckett/sketches/_0kHqjHjb | Created 2026-06-06; p5@2.2.3, p5-phone@1.11.0. Updated 2026-06-06: standalone global-mode sketch.js + helpers.js. |
 
 ## Stale links (pre–v2 rollout)
 

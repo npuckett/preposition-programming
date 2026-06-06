@@ -29,6 +29,7 @@ function parseArgs(argv) {
     applyResults: null,
     applyLinks: false,
     printBrowserScript: false,
+    printUpdateScript: false,
     slugs: null,
   };
 
@@ -48,6 +49,8 @@ function parseArgs(argv) {
       args.applyLinks = true;
     } else if (arg === "--print-browser-script") {
       args.printBrowserScript = true;
+    } else if (arg === "--print-update-script") {
+      args.printUpdateScript = true;
     } else if (arg === "--help" || arg === "-h") {
       printHelp();
       process.exit(0);
@@ -61,11 +64,12 @@ function printHelp() {
   console.log(`Usage: node scripts/sync-webeditor.mjs [options]
 
 Options:
-  --export                 Regenerate webeditor/projects from src/sketches
+  --export                 Regenerate webeditor/projects from webeditor/standalone/
   --batch <name>           spatial | movement | time | all (default: all)
   --slug <slug>            Single slug instead of a batch
   --prepare                Write payload JSON for browser upload
-  --print-browser-script   Print per-sketch upload loop for DevTools (pass --batch)
+  --print-browser-script   Print per-sketch POST upload loop for DevTools
+  --print-update-script    Print per-sketch PUT update loop (keeps existing sketch IDs)
   --apply-results <file>   Record results + update webeditorLinks.md
   --apply-links            Sync editorSketchId from webeditorLinks.md → prepositions.json
 
@@ -116,6 +120,9 @@ function prepareBatch(slugs, batchName) {
       title: meta.title,
       projectDir,
     });
+    if (meta.editorSketchId) {
+      payload.projectId = meta.editorSketchId;
+    }
     payloads.push(payload);
     fs.writeFileSync(
       path.join(perSlugDir, `${slug}.json`),
@@ -164,6 +171,41 @@ results;
 `);
 }
 
+function printBrowserUpdateScript(batchName = "all") {
+  const slugs = BATCHES[batchName] || BATCHES.all;
+  console.log(`
+// Paste in DevTools console on https://editor.p5js.org/ (logged in as npuckett).
+// Requires: npm run serve:cors:webeditor  (port 8876)
+// Updates existing public sketches in place — sketch URLs stay the same.
+
+async function updateOne(slug) {
+  const item = await fetch("http://127.0.0.1:8876/.sync/${batchName}/" + slug + ".json").then((r) => r.json());
+  const projectId = item.projectId;
+  if (!projectId) throw new Error(slug + ": missing projectId in payload");
+  const res = await fetch("/editor/projects/" + projectId, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ name: item.name, files: item.files }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(slug + ": " + JSON.stringify(data));
+  console.log("OK", slug, projectId);
+  return { slug: item.slug, title: item.title, projectId, p5Version: "${CDN.p5}", p5PhoneVersion: "${CDN.p5Phone}" };
+}
+
+const SLUGS = ${JSON.stringify(slugs, null, 2)};
+const results = [];
+for (const slug of SLUGS) {
+  results.push(await updateOne(slug));
+  await new Promise((r) => setTimeout(r, 500));
+}
+copy(JSON.stringify(results, null, 2));
+console.log("Copied results JSON to clipboard");
+results;
+`);
+}
+
 function applyResults(resultsFile) {
   const abs = path.isAbsolute(resultsFile)
     ? resultsFile
@@ -178,6 +220,11 @@ const args = parseArgs(process.argv);
 
 if (args.printBrowserScript) {
   printBrowserUploadScript(args.batch);
+  process.exit(0);
+}
+
+if (args.printUpdateScript) {
+  printBrowserUpdateScript(args.batch);
   process.exit(0);
 }
 
@@ -206,6 +253,7 @@ if (
   !args.applyResults &&
   !args.applyLinks &&
   !args.printBrowserScript &&
+  !args.printUpdateScript &&
   !args.export
 ) {
   printHelp();

@@ -5,12 +5,12 @@ import {
   BATCHES,
   CDN,
   CANVAS,
-  SHARED_FILES,
 } from "./constants.mjs";
+import { generateStandaloneSketches } from "./generate-standalone.mjs";
 
 const root = path.resolve(import.meta.dirname, "../..");
-const sketchDir = path.join(root, "src/sketches");
-const sharedSrcDir = path.join(root, "src/js/shared");
+const standaloneDir = path.join(root, "webeditor/standalone");
+const helpersPath = path.join(standaloneDir, "helpers.js");
 const projectsRoot = path.join(root, "webeditor/projects");
 
 function buildIndexHtml(title) {
@@ -28,47 +28,11 @@ function buildIndexHtml(title) {
   <script src="https://cdn.jsdelivr.net/npm/p5-phone@${CDN.p5Phone}/dist/p5-phone.min.js"></script>
 </head>
 <body>
-  <script type="module" src="sketch.js"></script>
+  <script src="helpers.js"></script>
+  <script src="sketch.js"></script>
 </body>
 </html>
 `;
-}
-
-function buildSketchEntry() {
-  return `import createSketch from "./preposition.js";
-
-new p5((p) => {
-  createSketch(p);
-
-  const userSetup = p.setup;
-  p.setup = function () {
-    p.createCanvas(${CANVAS.width}, ${CANVAS.height});
-    if (typeof lockGestures === "function") {
-      lockGestures();
-    }
-    if (typeof userSetup === "function") {
-      userSetup.call(p);
-    }
-  };
-});
-`;
-}
-
-function rewritePrepositionImports(content) {
-  return content.replace(
-    /from "\.\.\/js\/shared\//g,
-    'from "./shared/',
-  );
-}
-
-function copySharedFiles(targetSharedDir) {
-  fs.mkdirSync(targetSharedDir, { recursive: true });
-  for (const file of SHARED_FILES) {
-    fs.copyFileSync(
-      path.join(sharedSrcDir, file),
-      path.join(targetSharedDir, file),
-    );
-  }
 }
 
 function loadManifest() {
@@ -76,7 +40,27 @@ function loadManifest() {
   return JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 }
 
-export function exportWebEditorProjects({ slugs = BATCHES.all } = {}) {
+function removeLegacyProjectFiles(projectDir) {
+  for (const name of ["preposition.js"]) {
+    const file = path.join(projectDir, name);
+    if (fs.existsSync(file)) fs.unlinkSync(file);
+  }
+  const sharedDir = path.join(projectDir, "shared");
+  if (fs.existsSync(sharedDir)) {
+    fs.rmSync(sharedDir, { recursive: true, force: true });
+  }
+}
+
+export function exportWebEditorProjects({ slugs = BATCHES.all, regenerate = true } = {}) {
+  if (regenerate) {
+    generateStandaloneSketches({ slugs });
+  }
+
+  if (!fs.existsSync(helpersPath)) {
+    throw new Error(`Missing ${helpersPath}. Run generate-standalone first.`);
+  }
+
+  const helpersSource = fs.readFileSync(helpersPath, "utf8");
   const manifest = loadManifest();
   const bySlug = Object.fromEntries(manifest.map((p) => [p.slug, p]));
 
@@ -90,23 +74,21 @@ export function exportWebEditorProjects({ slugs = BATCHES.all } = {}) {
       continue;
     }
 
-    const sketchPath = path.join(sketchDir, `${slug}.js`);
-    if (!fs.existsSync(sketchPath)) {
-      console.warn(`Missing sketch source: ${sketchPath}`);
+    const sketchSourcePath = path.join(standaloneDir, `${slug}.js`);
+    if (!fs.existsSync(sketchSourcePath)) {
+      console.warn(`Missing standalone sketch: ${sketchSourcePath}`);
       continue;
     }
 
     const projectDir = path.join(projectsRoot, slug);
     fs.mkdirSync(projectDir, { recursive: true });
+    removeLegacyProjectFiles(projectDir);
 
-    const prepositionSource = rewritePrepositionImports(
-      fs.readFileSync(sketchPath, "utf8"),
-    );
+    const sketchSource = fs.readFileSync(sketchSourcePath, "utf8");
 
     fs.writeFileSync(path.join(projectDir, "index.html"), buildIndexHtml(prep.title));
-    fs.writeFileSync(path.join(projectDir, "sketch.js"), buildSketchEntry());
-    fs.writeFileSync(path.join(projectDir, "preposition.js"), prepositionSource);
-    copySharedFiles(path.join(projectDir, "shared"));
+    fs.writeFileSync(path.join(projectDir, "helpers.js"), helpersSource);
+    fs.writeFileSync(path.join(projectDir, "sketch.js"), sketchSource);
 
     fs.writeFileSync(
       path.join(projectDir, "meta.json"),
@@ -116,6 +98,7 @@ export function exportWebEditorProjects({ slugs = BATCHES.all } = {}) {
           title: prep.title,
           category: prep.category,
           editorSketchId: prep.editorSketchId || null,
+          format: "standalone-global",
           exportedAt: new Date().toISOString(),
         },
         null,
@@ -126,7 +109,7 @@ export function exportWebEditorProjects({ slugs = BATCHES.all } = {}) {
     count += 1;
   }
 
-  console.log(`Exported ${count} Web Editor project(s) to webeditor/projects/`);
+  console.log(`Exported ${count} standalone Web Editor project(s) to webeditor/projects/`);
   return count;
 }
 

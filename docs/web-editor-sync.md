@@ -8,85 +8,99 @@ Repeatable workflow for publishing preposition sketches to [editor.p5js.org](htt
 
 - [ ] Logged into [editor.p5js.org](https://editor.p5js.org/) as `npuckett`
 - [ ] `npm install` in this repo
-- [ ] Local sketches exported to `webeditor/projects/{slug}/`
+- [ ] Standalone sketches in `webeditor/standalone/` (generated from site copy + sketch logic)
 
-## Project layout
+## Source vs site sketches
+
+| | Site (`src/sketches/`) | Web Editor (`webeditor/standalone/`) |
+|--|------------------------|--------------------------------------|
+| Mode | p5 instance (embedded in tutorial page) | **Global mode** — standard `setup()` / `draw()` |
+| Comments | Minimal | Header with concept, try-it, key code from tutorial |
+| Files | ES modules + shared helpers | `sketch.js` + `helpers.js` (easy to read and edit) |
+
+Regenerate standalone sources:
+
+```bash
+npm run generate:webeditor   # webeditor/standalone/{slug}.js from src + manifest
+npm run export:webeditor     # webeditor/projects/{slug}/ for upload
+```
+
+## Project layout (export)
 
 Each export is a self-contained Web Editor project:
 
 ```text
 webeditor/projects/above/
   index.html       # p5 2.2.3 + compat + p5-phone CDN
-  sketch.js        # instance-mode entry (createCanvas + lockGestures)
-  preposition.js   # same logic as src/sketches/above.js
-  shared/          # palette, diagram, input, tokens (copied from src/js/shared)
-  meta.json        # slug, title, legacy editorSketchId
+  helpers.js       # shared ink-only drawing + input helpers
+  sketch.js        # global-mode sketch with tutorial header comments
+  meta.json        # slug, title, editorSketchId, exportedAt
 ```
 
 ## Commands
 
 | Command | Purpose |
 |---------|---------|
-| `npm run export:webeditor` | Regenerate all 24 projects from `src/sketches/` |
-| `npm run serve:cors:webeditor` | CORS static server on port **8876** (optional reference) |
-| `npm run sync:webeditor -- --batch spatial --prepare` | Export + write `webeditor/.sync/payloads-spatial.json` |
-| `npm run sync:webeditor -- --apply-results webeditor/.sync/results-spatial.json` | Record IDs in `webeditorLinks.md` |
+| `npm run generate:webeditor` | Regenerate `webeditor/standalone/` from manifest + `src/sketches/` |
+| `npm run export:webeditor` | Copy standalone → `webeditor/projects/` |
+| `npm run serve:cors:webeditor` | CORS static server on port **8876** |
+| `npm run sync:webeditor -- --batch all --prepare` | Export + write upload payloads |
+| `npm run sync:webeditor -- --print-update-script --batch all` | DevTools script to **PUT** updates (keeps sketch IDs) |
 | `npm run apply:webeditor-links` | Copy verified IDs → `src/data/prepositions.json` |
-| `npm run build` | Rebuild site with updated editor links |
+| `npm run build` | Rebuild site with editor links |
 
 Batches: `spatial` (9) · `movement` (10) · `time` (5) · `all` (24)
 
-## Batch sync steps
+## Update existing sketches (standalone rollout)
 
-1. **Export**
+When sketch IDs in `webeditorLinks.md` are already verified, use **PUT** so URLs stay the same:
 
-   ```bash
-   npm run sync:webeditor -- --export --batch spatial --prepare
-   ```
-
-2. **Upload** (logged-in browser on editor.p5js.org)
-
-   - Keep `npm run serve:cors:webeditor` running (port 8876)
-   - **Refresh the editor tab** if a prior upload attempt hung
-   - Open DevTools → Console; paste the script from:
+1. **Export + prepare**
 
    ```bash
-   npm run sync:webeditor -- --print-browser-script --batch spatial
+   npm run sync:webeditor -- --export --batch all --prepare
+   npm run serve:cors:webeditor
    ```
 
-   Uploads run **one sketch at a time** (~17 KB each). Do not inject the whole batch JSON in one automation call — that hung a prior attempt.
-
-3. **Record results**
-
-   Save console output as `webeditor/.sync/results-{batch}.json`, then:
+2. **Update in browser** (logged in on editor.p5js.org)
 
    ```bash
-   npm run sync:webeditor -- --apply-results webeditor/.sync/results-spatial.json
-   npm run apply:webeditor-links
-   npm run build
+   npm run sync:webeditor -- --print-update-script --batch all
    ```
 
-4. **Verify** — open each full-preview URL (`…/npuckett/full/{id}`) and confirm canvas + grid render without errors.
+   Paste the script in DevTools. Uploads run **one sketch at a time**.
+
+3. **Verify** — open full-preview URLs (`…/npuckett/full/{id}`). Code should be global-mode with header comments, not instance-mode `preposition.js`.
+
+## Create new sketches (first-time batch)
+
+Use POST when no `editorSketchId` exists yet:
+
+```bash
+npm run sync:webeditor -- --print-browser-script --batch spatial
+```
+
+Then `--apply-results` and `apply:webeditor-links` as below.
+
+## Record new IDs
+
+Save console output as `webeditor/.sync/results-{batch}.json`, then:
+
+```bash
+npm run sync:webeditor -- --apply-results webeditor/.sync/results-spatial.json
+npm run apply:webeditor-links
+npm run build
+```
 
 ## API reference
 
 From an authenticated editor session:
 
 - `GET /editor/session`
-- `POST /editor/projects` — create (new v2 sketches)
-- `PUT /editor/projects/{projectId}` — update existing
+- `POST /editor/projects` — create
+- `PUT /editor/projects/{projectId}` — update in place
 
 Public URLs:
 
-```text
-https://editor.p5js.org/npuckett/sketches/{projectId}
-https://editor.p5js.org/npuckett/full/{projectId}
-```
-
-## Validation checklist
-
-- [ ] Payload includes `index.html`, `sketch.js`, `preposition.js`, `shared/*`
-- [ ] Full preview shows grid + figure (ink-only)
-- [ ] Row added to **Created and browser verified** in `webeditorLinks.md`
-- [ ] `editorSketchId` updated in `prepositions.json`
-- [ ] Site rebuild; “Open in p5 Web Editor” links resolve
+- Sketch: `https://editor.p5js.org/npuckett/sketches/{id}`
+- Full preview: `https://editor.p5js.org/npuckett/full/{id}`

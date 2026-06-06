@@ -8,6 +8,7 @@
     "extract-manifest": "node scripts/extract-manifest.mjs",
     "editorial": "node scripts/editorial-pass.mjs",
     "export:webeditor": "node scripts/webeditor/export-projects.mjs",
+    "generate:webeditor": "node scripts/webeditor/generate-standalone.mjs",
     "serve:cors:webeditor": "npx http-server webeditor -p 8876 --cors -c-1",
     "sync:webeditor": "node scripts/sync-webeditor.mjs",
     "apply:webeditor-links": "node scripts/webeditor/apply-links.mjs"
