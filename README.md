@@ -2,7 +2,7 @@
 
 Interactive p5.js tutorials that translate spatial, directional, and temporal prepositions into code.
 
-**[Visit the site](https://npuckett.github.io/preposition-programming/)**
+**[Visit the site](https://prepositionprogramming.com/)**
 
 ## Development
 

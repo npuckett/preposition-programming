@@ -24,6 +24,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/sketches": "sketches" });
   eleventyConfig.addPassthroughCopy({ "src/styles": "styles" });
   eleventyConfig.addPassthroughCopy({ "public": "public" });
+  eleventyConfig.addPassthroughCopy({ "public/CNAME": "CNAME" });
   eleventyConfig.addPassthroughCopy({ "style-lab": "style-lab" });
   eleventyConfig.addPassthroughCopy({ "docs": "docs" });
   eleventyConfig.addPassthroughCopy({
@@ -36,7 +37,7 @@ module.exports = function (eleventyConfig) {
   });
 
   return {
-    pathPrefix: "/preposition-programming/",
+    pathPrefix: "/",
     dir: {
       input: "src",
       output: "dist",
