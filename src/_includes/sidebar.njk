@@ -1,0 +1,41 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <a href="{{ '/index.html' | url }}" class="site-brand">
+      <span class="site-brand__title">P5 Prepositions</span>
+      <span class="site-brand__tagline">Language concepts in code</span>
+    </a>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Examples">
+    <div class="menu-group">
+      <a href="{{ '/about.html' | url }}" class="menu-item">About</a>
+    </div>
+
+    <div class="menu-group">
+      <div class="group-title">Spatial Relationships</div>
+      {% for prep in prepositions %}
+        {% if prep.category == "spatial" %}
+        <a href="{{ ('/preposition-' ~ prep.slug ~ '.html') | url }}" class="menu-item">{{ prep.title }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="menu-group">
+      <div class="group-title">Movement &amp; Direction</div>
+      {% for prep in prepositions %}
+        {% if prep.category == "movement" %}
+        <a href="{{ ('/preposition-' ~ prep.slug ~ '.html') | url }}" class="menu-item">{{ prep.title }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="menu-group">
+      <div class="group-title">Time-based</div>
+      {% for prep in prepositions %}
+        {% if prep.category == "time" %}
+        <a href="{{ ('/preposition-' ~ prep.slug ~ '.html') | url }}" class="menu-item">{{ prep.title }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </nav>
+</aside>

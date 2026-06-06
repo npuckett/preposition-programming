@@ -1,0 +1,111 @@
+.example-page {
+  padding: var(--space-lg);
+  max-width: calc(var(--content-max) + var(--space-lg) * 2);
+}
+
+.example-intro,
+.example-content,
+.sketch-section {
+  margin-bottom: var(--space-lg);
+}
+
+.section-heading {
+  margin: var(--space-lg) 0 var(--space-sm);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-xs);
+}
+
+.example-intro .section-heading:first-of-type {
+  margin-top: 0;
+}
+
+.subsection-heading {
+  margin: var(--space-md) 0 var(--space-sm);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.concept-text strong {
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+p {
+  margin: 0 0 var(--space-md);
+}
+
+ul {
+  margin: 0 0 var(--space-md);
+  padding-left: 1.25rem;
+}
+
+li {
+  margin-bottom: var(--space-xs);
+}
+
+a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--color-accent);
+}
+
+.code-section {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin: var(--space-md) 0;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+.code-section strong {
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.code-section code {
+  background: rgba(17, 17, 17, 0.06);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+  font-size: 0.9em;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  background: var(--color-ink);
+  color: var(--color-bg);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+button:hover {
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .example-page {
+    padding: var(--space-md);
+  }
+}

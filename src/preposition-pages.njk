@@ -1,0 +1,50 @@
+---
+layout: base.njk
+pagination:
+  data: prepositions
+  size: 1
+  alias: prep
+permalink: "preposition-{{ prep.slug }}.html"
+loadP5: true
+bodyClass: example-body
+pageHeader: "Preposition: {{ prep.title }}"
+title: "{{ prep.title }}"
+description: "Learn the preposition \"{{ prep.title }}\" through an interactive p5.js sketch."
+---
+<article class="example-page">
+  <section class="example-intro">
+    <a class="editor-cta" href="https://editor.p5js.org/{{ site.editorUser }}/sketches/{{ prep.editorSketchId }}" target="_blank" rel="noopener noreferrer">
+      <span class="editor-cta__label">Open in p5 Web Editor</span>
+      <span class="editor-cta__hint">Fork and experiment with this sketch</span>
+    </a>
+
+    <h2 class="section-heading">Try It</h2>
+    <p>{{ prep.tryIt }}</p>
+  </section>
+
+  <section class="sketch-section">
+    <div class="sketch-frame">
+      <div id="sketch-canvas" class="sketch-canvas" aria-label="{{ prep.title }} interactive sketch"></div>
+    </div>
+  </section>
+
+  <section class="example-content">
+    <h2 class="section-heading">Concept</h2>
+    <p class="concept-text">{{ prep.conceptHtml | safe }}</p>
+
+    <h2 class="section-heading">Translation Strategy</h2>
+    {{ prep.strategyHtml | safe }}
+
+    <h2 class="section-heading">Key p5.js Methods</h2>
+    {{ prep.methodsHtml | safe }}
+
+    <h2 class="section-heading">Code Structure</h2>
+    {{ prep.codeHtml | safe }}
+  </section>
+</article>
+
+<script type="module">
+  import { mountSketch } from '{{ "/js/sketch-host.js" | url }}';
+  import createSketch from '{{ ("/sketches/" ~ prep.slug ~ ".js") | url }}';
+  mountSketch(createSketch, 'sketch-canvas');
+</script>

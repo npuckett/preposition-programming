@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Style Lab — Preposition Programming</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/p5@2.0.0/lib/p5.min.js"></script>
+  <style>
+    .style-lab-grid {
+      display: grid;
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .style-lab-card {
+      border: 1px solid var(--color-border-strong);
+      padding: 1.25rem;
+    }
+    .style-lab-card h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    .style-lab-card p {
+      color: var(--color-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body class="example-body">
+  <div class="style-lab-grid">
+    <header>
+      <h1 style="font-weight:500;margin:0 0 0.5rem;">Style Lab</h1>
+      <p style="margin:0;color:var(--color-muted);">Prototype sketches for the science-diagram visual system. Review these four examples on desktop and mobile before rolling out across all 24 tutorials.</p>
+    </header>
+
+    <section class="style-lab-card">
+      <h2>Above</h2>
+      <p>Spatial comparison, Y-axis leaders, drag interaction.</p>
+      <div class="sketch-frame"><div id="sketch-above" class="sketch-canvas"></div></div>
+    </section>
+
+    <section class="style-lab-card">
+      <h2>Between</h2>
+      <p>Boundary zone, hatched region, three-object relationship.</p>
+      <div class="sketch-frame"><div id="sketch-between" class="sketch-canvas"></div></div>
+    </section>
+
+    <section class="style-lab-card">
+      <h2>Toward</h2>
+      <p>Direction arrow, target crosshair, movement trail.</p>
+      <div class="sketch-frame"><div id="sketch-toward" class="sketch-canvas"></div></div>
+    </section>
+
+    <section class="style-lab-card">
+      <h2>Before</h2>
+      <p>Timeline axis, sequential clearing before main motion.</p>
+      <div class="sketch-frame"><div id="sketch-before" class="sketch-canvas"></div></div>
+    </section>
+  </div>
+
+  <script type="module">
+    import createAbove from '../sketches/above.js';
+    import createBetween from '../sketches/between.js';
+    import createToward from '../sketches/toward.js';
+    import createBefore from '../sketches/before.js';
+
+    function mount(factory, containerId) {
+      const container = document.getElementById(containerId);
+      new p5((p) => {
+        factory(p);
+        const userSetup = p.setup;
+        const userResize = p.windowResized;
+        p.setup = function () {
+          const w = Math.min(480, container.clientWidth || 400);
+          const h = Math.max(240, Math.round(w * 0.75));
+          p.createCanvas(w, h).parent(container);
+          if (userSetup) userSetup.call(p);
+        };
+        p.windowResized = function () {
+          const w = Math.min(480, container.clientWidth || 400);
+          const h = Math.max(240, Math.round(w * 0.75));
+          p.resizeCanvas(w, h);
+          if (userResize) userResize.call(p);
+        };
+      }, container);
+    }
+
+    mount(createAbove, 'sketch-above');
+    mount(createBetween, 'sketch-between');
+    mount(createToward, 'sketch-toward');
+    mount(createBefore, 'sketch-before');
+  </script>
+</body>
+</html>

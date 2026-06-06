@@ -1,0 +1,27 @@
+:root {
+  --font-mono: "IBM Plex Mono", "Courier New", monospace;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+
+  --color-bg: #fcfcfa;
+  --color-bg-secondary: #f4f4f2;
+  --color-ink: #111111;
+  --color-muted: #666666;
+  --color-border: #dddddb;
+  --color-border-strong: #111111;
+  --color-accent: #c0392b;
+  --color-accent-hover: #962d22;
+
+  --sidebar-width: 280px;
+  --content-max: 720px;
+  --sketch-max-width: 480px;
+  --sketch-aspect: 4 / 3;
+
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+}

@@ -1,0 +1,48 @@
+---
+layout: base.njk
+permalink: about.html
+bodyClass: example-body
+pageHeader: About
+title: About Programming with Prepositions
+---
+<article class="example-page about-page">
+  <section class="example-content">
+    <p>This site teaches programming concepts through spatial relationships and natural language. Learn how to translate everyday words into code logic.</p>
+
+    <h2 class="section-heading">JavaScript Objects vs Individual Variables</h2>
+    <p>One of the powerful features of JavaScript is its ability to create <strong>objects</strong> that group related information together. This makes code much more organized and easier to understand.</p>
+
+    <h3 class="subsection-heading">The Object-Based Approach (Recommended)</h3>
+    <p>In our "Between" example, we define circles as objects that contain all their properties:</p>
+
+    <div class="code-section">
+      <strong>Clean and Organized:</strong><br><br>
+      <code>let blueCircle = {</code><br>
+      <code>&nbsp;&nbsp;x: 100,</code><br>
+      <code>&nbsp;&nbsp;y: 150,</code><br>
+      <code>&nbsp;&nbsp;radius: 25,</code><br>
+      <code>&nbsp;&nbsp;dragging: false</code><br>
+      <code>};</code>
+    </div>
+
+    <h3 class="subsection-heading">The Individual Variable Approach (Harder to Manage)</h3>
+    <p>Without objects, you'd need separate variables for every property of every circle:</p>
+
+    <div class="code-section">
+      <strong>Cluttered and Confusing:</strong><br><br>
+      <code>let blueCircleX = 100;</code><br>
+      <code>let blueCircleY = 150;</code><br>
+      <code>let blueCircleRadius = 25;</code><br>
+      <code>let blueCircleDragging = false;</code>
+    </div>
+
+    <h3 class="subsection-heading">Why Objects Are Better</h3>
+    <ul>
+      <li><strong>Organization:</strong> Related data stays together</li>
+      <li><strong>Clarity:</strong> <code>blueCircle.x</code> is clearer than <code>blueCircleX</code></li>
+      <li><strong>Flexibility:</strong> Easy to add new properties to objects</li>
+      <li><strong>Reusability:</strong> Functions can work with any circle object</li>
+      <li><strong>Less Typing:</strong> Shorter, more readable variable names</li>
+    </ul>
+  </section>
+</article>

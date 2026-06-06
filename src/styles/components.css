@@ -1,0 +1,58 @@
+.editor-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.editor-cta:hover {
+  border-color: var(--color-ink);
+  background: var(--color-bg-secondary);
+  color: inherit;
+}
+
+.editor-cta__label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.editor-cta__hint {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.sketch-frame {
+  max-width: var(--sketch-max-width);
+  margin: 0 auto;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.sketch-canvas {
+  width: 100%;
+  aspect-ratio: var(--sketch-aspect);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sketch-canvas canvas {
+  display: block;
+  max-width: 100%;
+  height: auto !important;
+}
+
+@media (max-width: 480px) {
+  .sketch-frame {
+    max-width: 100%;
+  }
+}

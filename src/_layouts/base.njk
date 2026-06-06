@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if prep %}{{ prep.title }} — {% elif title %}{{ title }} — {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{% if prep %}Learn the preposition &quot;{{ prep.title }}&quot; through an interactive p5.js sketch.{% elif description %}{{ description }}{% else %}{{ site.description }}{% endif %}">
+  {% if canonical %}
+  <link rel="canonical" href="{{ canonical }}">
+  {% endif %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/styles/main.css' | url }}">
+  {% if loadP5 %}
+  <script src="https://cdn.jsdelivr.net/npm/p5@{{ site.p5Version }}/lib/p5.min.js"></script>
+  {% endif %}
+</head>
+<body class="{% if bodyClass %}{{ bodyClass }}{% else %}page-body{% endif %}">
+  <div class="site-layout">
+    {% include "sidebar.njk" %}
+    <div class="sidebar-overlay" aria-hidden="true"></div>
+    <main class="main-content">
+      <header class="page-header">
+        <button class="mobile-toggle" aria-label="Toggle navigation" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <h1 class="page-title">{% if prep %}Preposition: {{ prep.title }}{% elif pageHeader %}{{ pageHeader }}{% else %}{{ site.title }}{% endif %}</h1>
+      </header>
+      {{ content | safe }}
+    </main>
+  </div>
+  <script src="{{ '/js/shell.js' | url }}" type="module"></script>
+</body>
+</html>
