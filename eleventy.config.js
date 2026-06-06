@@ -8,6 +8,7 @@ module.exports = function (eleventyConfig) {
       "Interactive p5.js tutorials teaching spatial, directional, and temporal prepositions through code.",
     editorUser: "npuckett",
     p5Version: "2.0.0",
+    p5PhoneVersion: "1.11.0",
   });
 
   eleventyConfig.addPassthroughCopy({ "src/js": "js" });
@@ -15,6 +16,10 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/styles": "styles" });
   eleventyConfig.addPassthroughCopy({ "public": "public" });
   eleventyConfig.addPassthroughCopy({ "style-lab": "style-lab" });
+  eleventyConfig.addPassthroughCopy({ "docs": "docs" });
+  eleventyConfig.addPassthroughCopy({
+    "node_modules/p5-phone/dist/p5-phone.min.js": "js/vendor/p5-phone.min.js",
+  });
 
   eleventyConfig.on("eleventy.after", async () => {
     const { exportWebEditorSketches } = await import("./scripts/export-webeditor.mjs");

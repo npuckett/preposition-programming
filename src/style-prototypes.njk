@@ -1,0 +1,116 @@
+---
+layout: base.njk
+permalink: style-prototypes.html
+bodyClass: example-body
+pageHeader: Style Prototypes
+title: Visual Style Prototypes
+description: Technical Figure dialect with accent palette comparison for Preposition Programming sketches.
+loadP5: true
+---
+<link rel="stylesheet" href="{{ '/styles/style-prototypes.css' | url }}">
+
+<article class="prototype-matrix-page">
+  <section class="prototype-intro">
+    <div class="decision-banner">
+      <strong>Selected dialect:</strong> Technical Figure — grid-backed coordinate space, dashed dimensions, figure tags.
+    </div>
+    <h2>Choose an accent palette</h2>
+    <p>The structure is set. Compare four accent treatments below (same Technical Figure layout on Above, Toward, and Before). Pick one to lock in the styleguide.</p>
+    <a class="prototype-guide-link" href="{{ '/docs/visual-styleguide.md' | url }}">View styleguide (markdown)</a>
+  </section>
+
+  <div class="color-palette-matrix" aria-label="Accent palette comparison">
+    <div class="matrix-corner"></div>
+
+    {% set palettes = [
+      { id: "monochrome", name: "Ink Only", hex: "#111111", note: "No spot color — weight & fill only" },
+      { id: "blueprint", name: "Blueprint Blue", hex: "#2B5F8C", note: "Technical manual / coordinate blue" },
+      { id: "sepia", name: "Sepia Ink", hex: "#7D5A2A", note: "Warm lithograph brown" },
+      { id: "vermillion", name: "Vermillion", hex: "#C0392B", note: "High-contrast annotation red" }
+    ] %}
+    {% for pal in palettes %}
+    <div class="matrix-col-header matrix-col-header--color">
+      <span class="color-swatch" style="background: {{ pal.hex }}"></span>
+      <h3>{{ pal.name }}</h3>
+      <p class="color-hex">{{ pal.hex }}</p>
+      <p>{{ pal.note }}</p>
+    </div>
+    {% endfor %}
+
+    {% set examples = [
+      { id: "above", title: "Above", cat: "Spatial", note: "Y-axis height comparison" },
+      { id: "toward", title: "Toward", cat: "Movement", note: "Vector toward target" },
+      { id: "before", title: "Before", cat: "Time", note: "Clear path, then move" }
+    ] %}
+
+    {% for ex in examples %}
+    <div class="matrix-row-header">
+      <div class="row-category">{{ ex.cat }}</div>
+      <h3>{{ ex.title }}</h3>
+      <p>{{ ex.note }}</p>
+    </div>
+    {% for pal in palettes %}
+    <div class="prototype-cell" data-style-label="{{ pal.name }}">
+      <div id="color-{{ pal.id }}-{{ ex.id }}" class="prototype-cell__canvas" aria-label="{{ ex.title }} — {{ pal.name }}"></div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+  </div>
+
+  <section class="style-notes">
+    <h2>Palette notes</h2>
+
+    <div class="style-note-card">
+      <h3><span class="color-swatch color-swatch--inline" style="background:#111111"></span> Ink Only</h3>
+      <p class="style-note-sub">Pure greyscale on grid</p>
+      <p>Active elements use heavier strokes and filled ink silhouettes — no chromatic accent at all. Most faithful to printed plates; relies on weight and position for emphasis.</p>
+    </div>
+
+    <div class="style-note-card style-note-card--recommended">
+      <h3><span class="color-swatch color-swatch--inline" style="background:#2B5F8C"></span> Blueprint Blue <span class="tag-recommended">recommended</span></h3>
+      <p class="style-note-sub">Prussian blue accent on grid</p>
+      <p>Reads as “geometry” and “measurement” — natural for coordinate labels, vectors, and Δy. Less aggressive than red on instructional copy.</p>
+    </div>
+
+    <div class="style-note-card">
+      <h3><span class="color-swatch color-swatch--inline" style="background:#7D5A2A"></span> Sepia Ink</h3>
+      <p class="style-note-sub">Warm single-ink accent</p>
+      <p>Brown spot color evokes aged textbook lithography. Distinct from grey forms without the urgency of red.</p>
+    </div>
+
+    <div class="style-note-card">
+      <h3><span class="color-swatch color-swatch--inline" style="background:#C0392B"></span> Vermillion</h3>
+      <p class="style-note-sub">Annotation red (initial prototype)</p>
+      <p>Maximum contrast for active relationships. Can feel like warnings or corrections rather than neutral diagram notation.</p>
+    </div>
+  </section>
+
+  <details class="archive-matrix">
+    <summary>Earlier dialect comparison (Engraving / Technical / Minimal)</summary>
+    <div class="style-prototype-matrix style-prototype-matrix--archived" aria-label="Archived style comparison">
+      <div class="matrix-corner"></div>
+      {% set styles = [
+        { id: "engraving", name: "Engraving", sub: "Classical Plate" },
+        { id: "technical", name: "Technical Figure", sub: "Annotated Diagram" },
+        { id: "minimal", name: "Modern Minimal", sub: "Clean Schematic" }
+      ] %}
+      {% for s in styles %}
+      <div class="matrix-col-header"><h3>{{ s.name }}</h3><p>{{ s.sub }}</p></div>
+      {% endfor %}
+      {% for ex in examples %}
+      <div class="matrix-row-header">
+        <div class="row-category">{{ ex.cat }}</div>
+        <h3>{{ ex.title }}</h3>
+        <p>{{ ex.note }}</p>
+      </div>
+      {% for s in styles %}
+      <div class="prototype-cell">
+        <div id="proto-{{ s.id }}-{{ ex.id }}" class="prototype-cell__canvas"></div>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </details>
+</article>
+
+<script type="module" src="{{ '/js/style-prototypes/mount.js' | url }}"></script>

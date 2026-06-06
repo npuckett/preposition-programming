@@ -1,0 +1,216 @@
+/* Example page v2 — figure-first, two-column reading layout */
+
+.example-v2-body .page-header {
+  border-bottom-color: var(--color-border);
+}
+
+.example-v2-body .page-title {
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.example-v2 {
+  padding: var(--space-lg);
+  max-width: 1120px;
+}
+
+.example-v2__masthead {
+  margin-bottom: var(--space-lg);
+  max-width: 42rem;
+}
+
+.example-v2__category {
+  margin: 0 0 var(--space-xs);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.example-v2__title {
+  margin: 0 0 var(--space-sm);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.example-v2__lede {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--color-ink);
+}
+
+.example-v2__lede strong {
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.example-v2__stage {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.example-v2__figure {
+  position: sticky;
+  top: calc(var(--space-md) + 3rem);
+}
+
+.figure-panel {
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.figure-panel__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  font-size: 0.8rem;
+}
+
+.figure-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-ink);
+}
+
+.figure-caption {
+  color: var(--color-muted);
+}
+
+.figure-panel__canvas {
+  padding: 0;
+}
+
+.sketch-canvas--figure {
+  --sketch-aspect: 4 / 3;
+  max-width: none;
+  width: 100%;
+  aspect-ratio: var(--sketch-aspect);
+}
+
+.figure-panel__try {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+}
+
+.figure-panel__try strong {
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.editor-cta--inline {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-top: 1px dashed var(--color-border);
+  border-radius: 0;
+  font-size: 0.85rem;
+}
+
+.editor-cta--inline .editor-cta__hint {
+  display: none;
+}
+
+.example-v2__reading {
+  min-width: 0;
+}
+
+.reading-block {
+  margin-bottom: var(--space-lg);
+}
+
+.reading-block__title {
+  margin: 0 0 var(--space-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-xs);
+}
+
+.reading-block p:last-child,
+.reading-block ul:last-child {
+  margin-bottom: 0;
+}
+
+.reading-details {
+  margin-bottom: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+}
+
+.reading-details summary {
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.reading-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.reading-details summary::before {
+  content: "+";
+  display: inline-block;
+  width: 1.25rem;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.reading-details[open] summary::before {
+  content: "−";
+}
+
+.reading-details__body {
+  padding: 0 var(--space-md) var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.reading-details__body .code-section {
+  margin-top: var(--space-sm);
+  margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .example-v2__stage {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .example-v2__figure {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .example-v2 {
+    padding: var(--space-md);
+  }
+}

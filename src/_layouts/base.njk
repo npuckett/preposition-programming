@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="{{ '/styles/main.css' | url }}">
   {% if loadP5 %}
   <script src="https://cdn.jsdelivr.net/npm/p5@{{ site.p5Version }}/lib/p5.min.js"></script>
+  <script src="{{ '/js/vendor/p5-phone.min.js' | url }}"></script>
   {% endif %}
 </head>
 <body class="{% if bodyClass %}{{ bodyClass }}{% else %}page-body{% endif %}">

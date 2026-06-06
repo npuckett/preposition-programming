@@ -5,9 +5,13 @@
   "scripts": {
     "dev": "eleventy --serve --port=8080",
     "build": "node scripts/build.mjs",
-    "extract-manifest": "node scripts/extract-manifest.mjs"
+    "extract-manifest": "node scripts/extract-manifest.mjs",
+    "editorial": "node scripts/editorial-pass.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0"
+  },
+  "dependencies": {
+    "p5-phone": "^1.11.0"
   }
 }
