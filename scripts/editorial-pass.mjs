@@ -770,8 +770,42 @@ const prepositions = [
   },
 ];
 
+const figureCaptions = {
+  above: "Y-axis height comparison — smaller Y is higher on screen",
+  below: "Y-axis height comparison — larger Y is lower on screen",
+  between: "Horizontal span — C is between A and B when X lies in range",
+  among: "Group proximity — mover is among the cluster when near its center",
+  beside: "Adjacent zones — the center point must fall beside the reference",
+  behind: "Draw order — the back shape is rendered before the front shape",
+  beneath: "Containment zone — the object must sit fully beneath the surface",
+  within: "Container bounds — the center lies inside the rectangle",
+  through: "Barrier crossing — labels track approach, interior, and exit",
+  toward: "Direction vector — the mover advances toward the target each frame",
+  away: "Outward vector — distance from the source increases over time",
+  across: "Linear crossing — interpolation from one side to the other",
+  along: "Path following — position sampled along connected waypoints",
+  around: "Circular orbit — angle advances around a center point",
+  into: "Entry arc — transition from outside the container to inside",
+  onto: "Landing path — the object comes to rest on the platform surface",
+  past: "Reference crossing — state updates once the mover passes the landmark",
+  over: "Arc clearance — the path rises above the obstacle mid-crossing",
+  under: "Dip path — a curved route passes beneath the bridge obstacle",
+  before: "Sequential stages — prerequisites finish before the main mover starts",
+  after: "Event sequence — scatter effects begin once the collision occurs",
+  during: "Overlapping process — particles emit throughout the journey",
+  since: "Accumulating trail — length grows continuously from the start point",
+  until: "Progress toward a limit — the process stops when the target is reached",
+};
+
 if (prepositions.length !== 24) {
   throw new Error(`Expected 24 entries, got ${prepositions.length}`);
+}
+
+for (const prep of prepositions) {
+  prep.figureCaption = figureCaptions[prep.slug];
+  if (!prep.figureCaption) {
+    throw new Error(`Missing figure caption for ${prep.slug}`);
+  }
 }
 
 fs.writeFileSync(OUT, JSON.stringify(prepositions, null, 2) + "\n");

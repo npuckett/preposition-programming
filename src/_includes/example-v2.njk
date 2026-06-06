@@ -1,32 +1,21 @@
----
-layout: base.njk
-permalink: preposition-above-v2.html
-loadP5: true
-bodyClass: example-v2-body
-pageHeader: "Layout prototype"
-title: "Above (layout v2)"
-description: "Prototype figure-first layout for the Above preposition example — Ink Only technical figure style."
----
-{% for prep in prepositions %}
-{% if prep.slug == "above" %}
 <article class="example-v2">
   <header class="example-v2__masthead">
-    <p class="example-v2__category">Spatial relationship</p>
+    <p class="example-v2__category">{{ prep | categoryLabel }}</p>
     <h2 class="example-v2__title">{{ prep.title }}</h2>
     <p class="example-v2__lede">{{ prep.tryIt }}</p>
   </header>
 
   <div class="example-v2__stage">
-    <section class="example-v2__figure" aria-labelledby="figure-caption">
+    <section class="example-v2__figure" aria-labelledby="figure-caption-{{ prep.slug }}">
       <div class="figure-panel">
         <div class="figure-panel__meta">
           <span class="figure-tag">Fig. 1</span>
-          <span id="figure-caption" class="figure-caption">Y-axis height comparison — smaller Y is higher on screen</span>
+          <span id="figure-caption-{{ prep.slug }}" class="figure-caption">{{ prep.figureCaption }}</span>
         </div>
         <div class="figure-panel__canvas">
           <div id="sketch-canvas" class="sketch-canvas sketch-canvas--figure" aria-label="{{ prep.title }} interactive figure"></div>
         </div>
-        <p class="figure-panel__try"><strong>Try it</strong> — Drag circles A and B. Watch the Y level lines, Δy dimension, and status bar.</p>
+        <p class="figure-panel__try"><strong>Try it</strong> — drag, click, or tap inside the figure.</p>
         <a class="editor-cta editor-cta--inline" href="https://editor.p5js.org/{{ site.editorUser }}/sketches/{{ prep.editorSketchId }}" target="_blank" rel="noopener noreferrer">
           <span class="editor-cta__label">Open in p5 Web Editor</span>
           <span class="editor-cta__hint">Fork and experiment with this sketch</span>
@@ -64,8 +53,6 @@ description: "Prototype figure-first layout for the Above preposition example �
 
 <script type="module">
   import { mountSketch } from '{{ "/js/sketch-host.js" | url }}';
-  import createSketch from '{{ "/sketches/above-v2.js" | url }}';
+  import createSketch from '{{ ("/sketches/" ~ prep.slug ~ ".js") | url }}';
   mountSketch(createSketch, 'sketch-canvas', { maxWidth: 560 });
 </script>
-{% endif %}
-{% endfor %}

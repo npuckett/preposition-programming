@@ -136,7 +136,11 @@ ${code}
 `;
 }
 
-const STYLED_SKETCHES = new Set(["above", "between", "toward", "before"]);
+const STYLED_SKETCHES = new Set([
+  "above", "below", "between", "among", "beside", "behind", "beneath", "within",
+  "through", "toward", "away", "across", "along", "around", "into", "onto",
+  "past", "over", "under", "before", "after", "during", "since", "until",
+]);
 
 export function convertAllSketches() {
   fs.mkdirSync(targetDir, { recursive: true });

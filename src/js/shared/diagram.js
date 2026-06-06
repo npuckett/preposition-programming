@@ -79,6 +79,105 @@ export function drawDimensionV(p, x, y1, y2, label) {
   p.textStyle(p.NORMAL);
 }
 
+export function drawDimensionH(p, y, x1, x2, label) {
+  if (!PALETTE.dashedLeaders) return;
+  mutedStroke(p, 0.75);
+  p.drawingContext.setLineDash([4, 3]);
+  p.line(x1, y, x2, y);
+  p.drawingContext.setLineDash([]);
+  const tick = 4;
+  inkStroke(p, 0.75);
+  p.line(x1, y - tick, x1, y + tick);
+  p.line(x2, y - tick, x2, y + tick);
+  p.noStroke();
+  p.fill(...PALETTE.ink);
+  p.textAlign(p.CENTER, p.BOTTOM);
+  p.textSize(10);
+  p.textStyle(p.BOLD);
+  p.text(label, (x1 + x2) / 2, y - 6);
+  p.textStyle(p.NORMAL);
+}
+
+export function drawContainerRect(p, x, y, w, h, options = {}) {
+  const { label = "", tag = "" } = options;
+  p.noFill();
+  inkStroke(p, 1.25);
+  p.rect(x, y, w, h);
+  if (tag && PALETTE.figureTags) {
+    p.noStroke();
+    p.fill(...PALETTE.muted);
+    p.textAlign(p.LEFT, p.TOP);
+    p.textSize(9);
+    p.text(tag, x + 4, y + 4);
+  }
+  if (label) {
+    p.fill(...PALETTE.muted);
+    p.textAlign(p.CENTER, p.TOP);
+    p.text(label, x + w / 2, y + h + 6);
+  }
+}
+
+export function drawZoneRect(p, x, y, w, h, active = false) {
+  if (active) {
+    p.fill(...PALETTE.fill);
+    inkStroke(p, 1.25);
+  } else {
+    p.fill(...PALETTE.bg);
+    mutedStroke(p, 0.75);
+  }
+  p.rect(x, y, w, h);
+}
+
+export function drawFigureRect(p, x, y, w, h, options = {}) {
+  const { label = "", tag = "", emphasis = "none" } = options;
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+
+  if (emphasis === "hatch") {
+    drawHatchRect(p, x, y, w, h);
+  } else if (emphasis === "solid") {
+    p.fill(...PALETTE.ink);
+    inkStroke(p, 2);
+    p.rect(x, y, w, h);
+  } else {
+    p.fill(...PALETTE.fill);
+    inkStroke(p, 1.25);
+    p.rect(x, y, w, h);
+  }
+
+  if (tag && PALETTE.figureTags) {
+    p.noStroke();
+    p.fill(...PALETTE.muted);
+    p.textAlign(p.LEFT, p.BOTTOM);
+    p.textSize(9);
+    p.text(tag, x + w + 4, y);
+  }
+  if (label) {
+    p.noStroke();
+    p.fill(...PALETTE.ink);
+    p.textAlign(p.CENTER, p.BOTTOM);
+    p.textSize(11);
+    p.text(label, cx, y - (tag ? 14 : 4));
+  }
+}
+
+export function drawInkTrail(p, points) {
+  if (points.length < 2) return;
+  for (let i = 1; i < points.length; i++) {
+    const alpha = p.map(i, 0, points.length - 1, 40, 200);
+    p.stroke(...PALETTE.muted, alpha);
+    p.strokeWeight(1);
+    p.line(points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
+  }
+}
+
+export function drawDashedLine(p, x1, y1, x2, y2) {
+  p.drawingContext.setLineDash([4, 4]);
+  mutedStroke(p, 0.75);
+  p.line(x1, y1, x2, y2);
+  p.drawingContext.setLineDash([]);
+}
+
 export function drawFigureObject(p, x, y, r, options = {}) {
   const {
     label = "",

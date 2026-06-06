@@ -1,188 +1,102 @@
-import { PALETTE } from "../js/shared/palette.js";
-import * as diagram from "../js/shared/diagram.js";
+import { applyBackground } from "../js/shared/palette.js";
+import {
+  drawLevelLine,
+  drawDimensionV,
+  drawFigureObject,
+  drawStatusBar,
+} from "../js/shared/diagram.js";
+import { pointerX, pointerY, hitCircle } from "../js/shared/input.js";
 
 export default function createSketch(p) {
-/*
- * PREPOSITION: BELOW
- * 
- * CONCEPT:
- * "Below" means positioned at a lower level than something else.
- * In screen coordinates, this translates to having a larger Y value,
- * since Y increases downward from the top of the screen.
- * 
- * LEARNING OBJECTIVES:
- * - Understand Y-axis direction in computer graphics
- * - Practice comparative logic with coordinates
- * - Learn drag-and-drop interaction patterns
- * - Create dynamic visual relationships
- * - Use conditional statements for real-time feedback
- * 
- * KEY VARIABLES:
- * - greenCircle, orangeCircle: objects storing position and state
- * - dragging: boolean flag for interaction state
- * - p.mouseX, p.mouseY: mouse position variables
- * 
- * KEY METHODS:
- * - setup(): initializes canvas
- * - draw(): continuous rendering loop
- * - p.dist(): calculates distance between points
- * - mousePressed(), mouseDragged(), mouseReleased(): mouse interaction
- * 
- * HOW TO EXTEND:
- * 1. Add multiple objects in a vertical stack
- * 2. Create gravity simulation where objects fall "below" others
- * 3. Add collision detection when objects are below each other
- * 4. Implement layering system with depth
- * 5. Add animations that demonstrate "sinking below"
- * 6. Create a sorting game where objects must be arranged below/above
- */
+  let circleA = { x: 0, y: 0, radius: 20, dragging: false };
+  let circleB = { x: 0, y: 0, radius: 20, dragging: false };
 
-// Circle objects with position, size, and interaction properties
-let greenCircle = { 
-  x: 150, 
-  y: 80, 
-  radius: 20, 
-  dragging: false 
-};
+  p.setup = function () {
+    circleA.x = p.width * 0.35;
+    circleA.y = p.height * 0.58;
+    circleB.x = p.width * 0.62;
+    circleB.y = p.height * 0.32;
+  };
 
-let orangeCircle = { 
-  x: 250, 
-  y: 200, 
-  radius: 20, 
-  dragging: false 
-};
+  p.draw = function () {
+    applyBackground(p);
 
-p.setup = function() {
-}
+    const belowIsA = circleA.y > circleB.y;
+    const sameLevel = Math.abs(circleA.y - circleB.y) < 2;
 
-p.draw = function() {
-  p.background(...PALETTE.bg);
-  
-  // Draw reference lines to show Y levels
-  drawYLevelLine(greenCircle, p.color(100, 200, 100));
-  drawYLevelLine(orangeCircle, p.color(255, 150, 100));
-  
-  // Determine the "below" relationship
-  let relationship = "";
-  if (greenCircle.y > orangeCircle.y) {
-    // Larger Y value = lower on screen = "below"
-    relationship = "Green is BELOW orange";
-  } else if (orangeCircle.y > greenCircle.y) {
-    relationship = "Orange is BELOW green";
-  } else {
-    relationship = "Circles are at SAME level";
+    drawLevelLine(p, circleA.y, `Y=${Math.round(circleA.y)}`);
+    drawLevelLine(p, circleB.y, `Y=${Math.round(circleB.y)}`);
+
+    if (!sameLevel) {
+      drawDimensionV(
+        p,
+        p.width * 0.78,
+        Math.min(circleA.y, circleB.y),
+        Math.max(circleA.y, circleB.y),
+        "Δy"
+      );
+    }
+
+    drawFigureObject(p, circleA.x, circleA.y, circleA.radius, {
+      label: "A",
+      tag: "1a",
+      emphasis: sameLevel ? "none" : belowIsA ? "solid" : "hatch",
+    });
+    drawFigureObject(p, circleB.x, circleB.y, circleB.radius, {
+      label: "B",
+      tag: "1b",
+      emphasis: sameLevel ? "none" : belowIsA ? "hatch" : "solid",
+    });
+
+    const status = sameLevel
+      ? "Same Y — neither above nor below"
+      : belowIsA
+        ? "A is BELOW B"
+        : "B is BELOW A";
+    drawStatusBar(p, status, !sameLevel);
+  };
+
+  function handleInputStart() {
+    const x = pointerX(p);
+    const y = pointerY(p);
+    if (hitCircle(p, x, y, circleA.x, circleA.y, circleA.radius)) {
+      circleA.dragging = true;
+    } else if (hitCircle(p, x, y, circleB.x, circleB.y, circleB.radius)) {
+      circleB.dragging = true;
+    }
   }
-  
-  // Draw the circles
-  drawCircle(greenCircle, p.color(100, 200, 100), "Green");
-  drawCircle(orangeCircle, p.color(255, 150, 100), "Orange");
-  
-  // Display relationship and instructions
-  p.fill(...PALETTE.ink);
-  p.noStroke();
-  p.textAlign(CENTER);
-  p.textSize(14);
-  p.text(relationship, p.width/2, 30);
-  p.text("Drag the circles to change the relationship", p.width/2, p.height - 20);
-}
 
-function drawCircle(circle, circleColor, label) {
-  // Draw main circle
-  p.fill(circleColor);
-  p.noStroke();
-  p.ellipse(circle.x, circle.y, circle.radius * 2, circle.radius * 2);
-  
-  // Draw label
-  p.fill(...PALETTE.ink);
-  p.textAlign(CENTER);
-  p.textSize(12);
-  p.text(label, circle.x, circle.y - circle.radius - 8);
-}
-
-function drawYLevelLine(circle, lineColor) {
-  // Horizontal reference line
-  p.stroke(lineColor);
-  p.strokeWeight(1);
-  p.line(0, circle.y, p.width, circle.y);
-  
-  // Y coordinate display
-  p.fill(lineColor);
-  p.noStroke();
-  p.textAlign(LEFT);
-  p.textSize(10);  p.text("Y: " + Math.round(circle.y), 5, circle.y - 3);
-}
-
-// Helper functions for cross-platform input handling
-function getInputX() {
-  return p.touches.length > 0 ? p.touches[0].x : p.mouseX;
-}
-
-function getInputY() {
-  return p.touches.length > 0 ? p.touches[0].y : p.mouseY;
-}
-
-// Handle input start (both mouse and touch)
-function handleInputStart() {
-  let inputX = getInputX();
-  let inputY = getInputY();
-  
-  // Check which circle is clicked/touched
-  if (p.dist(inputX, inputY, greenCircle.x, greenCircle.y) < greenCircle.radius) {
-    greenCircle.dragging = true;
-  } else if (p.dist(inputX, inputY, orangeCircle.x, orangeCircle.y) < orangeCircle.radius) {
-    orangeCircle.dragging = true;
+  function handleInputDrag() {
+    const x = pointerX(p);
+    const y = pointerY(p);
+    if (circleA.dragging) {
+      circleA.x = x;
+      circleA.y = y;
+    }
+    if (circleB.dragging) {
+      circleB.x = x;
+      circleB.y = y;
+    }
   }
-}
 
-// Handle input drag (both mouse and touch)
-function handleInputDrag() {
-  let inputX = getInputX();
-  let inputY = getInputY();
-  
-  // Update position of dragged circle
-  if (greenCircle.dragging) {
-    greenCircle.x = inputX;
-    greenCircle.y = inputY;
+  function handleInputEnd() {
+    circleA.dragging = false;
+    circleB.dragging = false;
   }
-  if (orangeCircle.dragging) {
-    orangeCircle.x = inputX;
-    orangeCircle.y = inputY;
-  }
-}
 
-// Handle input end (both mouse and touch)
-function handleInputEnd() {
-  // Stop dragging
-  greenCircle.dragging = false;
-  orangeCircle.dragging = false;
-}
-
-p.mousePressed = function() {
-  handleInputStart();
-}
-
-p.mouseDragged = function() {
-  handleInputDrag();
-}
-
-p.mouseReleased = function() {
-  handleInputEnd();
-}
-
-// Touch event handlers for mobile
-p.touchStarted = function() {
-  handleInputStart();
-  return false; // Prevent default touch behavior
-}
-
-p.touchMoved = function() {
-  handleInputDrag();
-  return false; // Prevent scrolling
-}
-
-p.touchEnded = function() {
-  handleInputEnd();
-  return false;
-}
-
+  p.mousePressed = handleInputStart;
+  p.mouseDragged = handleInputDrag;
+  p.mouseReleased = handleInputEnd;
+  p.touchStarted = () => {
+    handleInputStart();
+    return false;
+  };
+  p.touchMoved = () => {
+    handleInputDrag();
+    return false;
+  };
+  p.touchEnded = () => {
+    handleInputEnd();
+    return false;
+  };
 }

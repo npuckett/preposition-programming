@@ -40,3 +40,34 @@ export function pointerY(p) {
 export function hitCircle(p, x, y, cx, cy, radius) {
   return p.dist(x, y, cx, cy) < radius;
 }
+
+/** Wire drag for an array of { x, y, radius, dragging } circles. */
+export function bindCircleDrag(p, circles) {
+  bindPointerInput(p, {
+    onPress: () => {
+      const x = pointerX(p);
+      const y = pointerY(p);
+      for (const c of circles) {
+        if (hitCircle(p, x, y, c.x, c.y, c.radius)) {
+          c.dragging = true;
+          return;
+        }
+      }
+    },
+    onDrag: () => {
+      const x = pointerX(p);
+      const y = pointerY(p);
+      for (const c of circles) {
+        if (c.dragging) {
+          c.x = x;
+          c.y = y;
+        }
+      }
+    },
+    onRelease: () => {
+      for (const c of circles) {
+        c.dragging = false;
+      }
+    },
+  });
+}

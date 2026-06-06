@@ -11,6 +11,15 @@ module.exports = function (eleventyConfig) {
     p5PhoneVersion: "1.11.0",
   });
 
+  eleventyConfig.addFilter("categoryLabel", (prep) => {
+    const labels = {
+      spatial: "Spatial relationship",
+      movement: "Movement & direction",
+      time: "Time-based relationship",
+    };
+    return labels[prep?.category] || "Preposition";
+  });
+
   eleventyConfig.addPassthroughCopy({ "src/js": "js" });
   eleventyConfig.addPassthroughCopy({ "src/sketches": "sketches" });
   eleventyConfig.addPassthroughCopy({ "src/styles": "styles" });

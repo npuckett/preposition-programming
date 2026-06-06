@@ -6,7 +6,7 @@ import {
   TECHNICAL_BASE,
   COLOR_PALETTES,
   buildTechnicalStyle,
-} from "../style-prototypes/tokens.js";
+} from "./tokens.js";
 
 export const DEFAULT_ACCENT = "monochrome";
 

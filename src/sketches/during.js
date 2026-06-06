@@ -1,231 +1,110 @@
-import { PALETTE } from "../js/shared/palette.js";
-import * as diagram from "../js/shared/diagram.js";
+import { applyBackground } from "../js/shared/palette.js";
+import {
+  drawArrow,
+  drawDashedLine,
+  drawFigureObject,
+  drawStatusBar,
+} from "../js/shared/diagram.js";
+import { bindPointerInput } from "../js/shared/input.js";
 
 export default function createSketch(p) {
-/**
- * P5.js Sketch: DURING - Particle Emission During Movement
- * 
- * CONCEPT: "During" represents events that happen throughout
- * a period of time or process. This shows particles being emitted
- * during a traveler's journey from point A to point B.
- * 
- * LEARNING OBJECTIVES:
- * • Understand events occurring within a time period
- * • Practice tracking ongoing activities during movement
- * • Learn continuous processes vs. single events
- * • Explore spatial representation of "during" relationships
- * 
- * KEY VARIABLES & METHODS:
- * • traveler - main object making the journey
- * • particles - objects emitted during the journey
- * • Continuous emission throughout movement
- * 
- * EXTENSION IDEAS:
- * • Different emission patterns during journey
- * • Varying particle behaviors during movement
- * • Multiple travelers with different emission rates
- */
+  const start = { x: 62, y: 148 };
+  const end = { x: 338, y: 148 };
+  const traveler = { x: start.x, y: start.y, speed: 0.03, t: 0, moving: false };
+  let particles = [];
+  let statusText = "Click to begin A -> B journey.";
 
-// Main traveler moving between points
-let traveler = {
-  x: 50,
-  y: 150,
-  targetX: 350,
-  targetY: 150,
-  speed: 2,
-  size: 12,
-  isMoving: false
-};
-
-// Particles emitted during the journey
-let particles = [];
-
-// Trail showing the journey path
-let journeyTrail = [];
-
-p.setup = function() {
-}
-
-p.draw = function() {
-  p.background(...PALETTE.bg);
-  
-  // Update traveler movement
-  if (traveler.isMoving) {
-    updateJourney();
+  function resetJourney() {
+    traveler.x = start.x;
+    traveler.y = start.y;
+    traveler.t = 0;
+    traveler.moving = true;
+    particles = [];
+    statusText = "DURING journey: emitting particles.";
   }
-  
-  // Update particles
-  updateParticles();
-  
-  // Draw journey path
-  drawPath();
-  
-  // Draw particles
-  drawParticles();
-  
-  // Draw traveler
-  drawTraveler();
-  
-  // Draw trail
-  drawTrail();
-  
-  // Draw status
-  drawStatus();
-}
 
-function updateJourney() {
-  // Add to trail
-  let trailPoint = { x: traveler.x, y: traveler.y };
-  journeyTrail.push(trailPoint);
-  if (journeyTrail.length > 100) {
-    journeyTrail.shift();
-  }
-  
-  // Move traveler toward target
-  let dx = traveler.targetX - traveler.x;
-  let dy = traveler.targetY - traveler.y;
-  let distance = p.sqrt(dx * dx + dy * dy);
-  
-  if (distance < traveler.speed) {
-    traveler.x = traveler.targetX;
-    traveler.y = traveler.targetY;
-    traveler.isMoving = false;
-  } else {
-    let angle = p.atan2(dy, dx);
-    traveler.x += p.cos(angle) * traveler.speed;
-    traveler.y += p.sin(angle) * traveler.speed;
-  }
-  
-  // Emit particles DURING the journey (every few frames)
-  if (p.frameCount % 8 === 0) {
-    let newParticle = {
-      x: traveler.x,
-      y: traveler.y,
-      vx: p.random(-2, 2),
-      vy: p.random(-2, 2),
-      size: p.random(4, 8),
-      life: 1.0,
-      trail: [],
-      color: [p.random(100, 255), p.random(100, 255), p.random(100, 255)]
-    };
-    
-    particles.push(newParticle);
-  }
-}
+  function updateTraveler() {
+    traveler.t = p.min(1, traveler.t + traveler.speed);
+    traveler.x = p.lerp(start.x, end.x, traveler.t);
+    traveler.y = p.lerp(start.y, end.y, traveler.t);
 
-function updateParticles() {
-  for (let i = particles.length - 1; i >= 0; i--) {
-    let particle = particles[i];
-    
-    // Move particle
-    particle.x += particle.vx;
-    particle.y += particle.vy;
-    
-    // Add to trail
-    let particleTrailPoint = { x: particle.x, y: particle.y };
-    particle.trail.push(particleTrailPoint);
-    if (particle.trail.length > 20) {
-      particle.trail.shift();
+    if (p.frameCount % 8 === 0) {
+      particles.push({
+        x: traveler.x,
+        y: traveler.y,
+        vx: p.random(-0.45, 0.45),
+        vy: p.random(-0.45, 0.45),
+        life: 1,
+      });
     }
-    
-    // Fade out over time
-    particle.life -= 0.01;
-    particle.vx *= 0.99;
-    particle.vy *= 0.99;
-    
-    // Remove when faded
-    if (particle.life <= 0) {
-      particles.splice(i, 1);
+
+    if (traveler.t >= 1) {
+      traveler.moving = false;
+      statusText = "Journey complete. Click to restart.";
     }
   }
-}
 
-function drawPath() {
-  // Draw journey path line
-  p.stroke(...PALETTE.light);
-  p.strokeWeight(2);
-  p.line(50, 150, 350, 150);
-  
-  // Draw start and end markers
-  p.fill(100, 200, 100);
-  p.noStroke();
-  p.ellipse(50, 150, 20, 20);
-  
-  p.fill(200, 100, 100);
-  p.ellipse(350, 150, 20, 20);
-}
-
-function drawParticles() {
-  for (let particle of particles) {
-    // Draw particle trail
-    if (particle.trail.length > 1) {
-      let alpha = particle.life * 150;
-      p.stroke(particle.color[0], particle.color[1], particle.color[2], alpha);
-      p.strokeWeight(2);
-      p.noFill();
-      p.beginShape();
-      for (let i = 0; i < particle.trail.length; i++) {
-        p.vertex(particle.trail[i].x, particle.trail[i].y);
-      }
-      p.endShape();
+  function updateParticles() {
+    for (const pt of particles) {
+      if (pt.life <= 0.02) continue;
+      pt.x += pt.vx;
+      pt.y += pt.vy;
+      pt.vx *= 0.95;
+      pt.vy *= 0.95;
+      pt.life *= 0.97;
     }
-    
-    // Draw particle
-    let alpha = particle.life * 255;
-    p.fill(particle.color[0], particle.color[1], particle.color[2], alpha);
-    p.noStroke();
-    p.ellipse(particle.x, particle.y, particle.size, particle.size);
   }
-}
 
-function drawTraveler() {
-  p.fill(70, 130, 180);
-  p.noStroke();
-  p.ellipse(traveler.x, traveler.y, traveler.size, traveler.size);
-}
+  function drawLane() {
+    drawDashedLine(p, start.x, start.y, end.x, end.y);
+    drawArrow(p, start.x + 10, start.y - 18, end.x - 10, end.y - 18, 1);
+    drawFigureObject(p, start.x, start.y, 9, { label: "A", tag: "START", emphasis: "outline" });
+    drawFigureObject(p, end.x, end.y, 9, { label: "B", tag: "END", emphasis: "outline" });
+  }
 
-function drawTrail() {
-  if (journeyTrail.length > 1) {
-    p.stroke(70, 130, 180, 150);
-    p.strokeWeight(3);
-    p.noFill();
-    p.beginShape();
-    for (let i = 0; i < journeyTrail.length; i++) {
-      p.vertex(journeyTrail[i].x, journeyTrail[i].y);
+  function drawTraveler() {
+    drawFigureObject(p, traveler.x, traveler.y, 10, {
+      label: "",
+      tag: "T",
+      emphasis: traveler.moving ? "solid" : "outline",
+    });
+  }
+
+  function drawParticles() {
+    for (const pt of particles) {
+      if (pt.life <= 0.02) continue;
+      drawFigureObject(p, pt.x, pt.y, 2.4, {
+        label: "",
+        tag: "",
+        emphasis: "outline",
+      });
     }
-    p.endShape();
   }
-}
 
-function drawStatus() {
-  p.fill(...PALETTE.ink);
-  p.noStroke();
-  p.textAlign(CENTER);
-  p.textSize(14);
-  
-  if (!traveler.isMoving) {
-    p.text("Click to start journey - particles emit DURING travel", p.width/2, p.height - 20);
-  } else {
-    let progress = ((traveler.x - 50) / (350 - 50)) * 100;
-    p.text(`Particles emitting DURING journey (${progress.toFixed(0)}% complete, ${particles.length} active)`, p.width/2, p.height - 20);
+  function drawStatus() {
+    if (traveler.moving) {
+      const percent = Math.floor(traveler.t * 100);
+      drawStatusBar(p, `DURING journey: ${percent}% , ${particles.length} dots`, true);
+      return;
+    }
+    drawStatusBar(p, statusText);
   }
-}
 
-p.mousePressed = function() {
-  // Reset journey
-  traveler.x = 50;
-  traveler.y = 150;
-  traveler.isMoving = true;
-  
-  // Clear existing particles and trail
-  particles = [];
-  journeyTrail = [];
-}
+  p.setup = function setup() {
+    bindPointerInput(p, {
+      onPress: () => {
+        if (!traveler.moving) resetJourney();
+      },
+    });
+  };
 
-  if (typeof p.mousePressed === "function") {
-    p.touchStarted = function () {
-      p.mousePressed();
-      return false;
-    };
-  }
+  p.draw = function draw() {
+    applyBackground(p);
+    drawLane();
+    if (traveler.moving) updateTraveler();
+    updateParticles();
+    drawParticles();
+    drawTraveler();
+    drawStatus();
+  };
 }

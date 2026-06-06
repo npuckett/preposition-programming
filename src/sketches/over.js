@@ -1,300 +1,101 @@
-import { PALETTE } from "../js/shared/palette.js";
-import * as diagram from "../js/shared/diagram.js";
+import { applyBackground } from "../js/shared/palette.js";
+import {
+  drawFigureObject,
+  drawArrow,
+  drawStatusBar,
+  drawZoneRect,
+  drawDashedLine,
+  drawInkTrail,
+} from "../js/shared/diagram.js";
+import { bindPointerInput } from "../js/shared/input.js";
 
 export default function createSketch(p) {
-/**
- * P5.js Sketch: OVER - Crossing Above or Spanning Across
- * 
- * CONCEPT: "Over" can mean crossing above something (like a bridge over water)
- * or spanning across a distance. It implies movement that goes above and 
- * across an obstacle or area, often suggesting a path that clears something.
- * 
- * LEARNING OBJECTIVES:
- * • Understand p.height/elevation relationships in 2D space
- * • Practice arc movement and trajectory calculations  
- * • Learn collision detection with obstacles
- * • Explore path visualization and clearance concepts
- * 
- * KEY VARIABLES & METHODS:
- * • Bezier curves or quadratic curves for arc paths
- * • Height simulation using Y coordinates
- * • Path planning around obstacles
- * • p.lerp() for smooth movement along curves
- * 
- * EXTENSION IDEAS:
- * • Multiple obstacles to cross over
- * • Variable arc heights based on obstacle size
- * • Interactive bridge-building mechanics
- * • Physics simulation with gravity and launching
- * • Different crossing methods (bridge, jump, fly)
- */
+  const obstacle = { x: 200, y: 180, width: 80, height: 60 };
+  const start = { x: 50, y: 200 };
+  const end = { x: 350, y: 200 };
+  const control = { x: 200, y: 100 };
+  const mover = { x: 50, y: 200, radius: 12 };
 
-let obstacle = { x: 200, y: 180, p.width: 80, p.height: 60 };
-let movingCircle = { x: 50, y: 200, radius: 12 };
-let startPoint = { x: 50, y: 200 };
-let endPoint = { x: 350, y: 200 };
-let controlPoint = { x: 200, y: 100 }; // Peak of the arc
-let progress = 0;
-let isMoving = false;
-let hasCompleted = false;
-let path = [];
-let showPath = true;
+  let progress = 0;
+  let isMoving = false;
+  let hasCompleted = false;
+  const trail = [];
 
-p.setup = function() {
-// Pre-calculate the path for visualization
-    calculatePath();
-}
-
-p.draw = function() {
-    p.background(...PALETTE.bg);
-    
-    // Update movement
-    if (isMoving && progress < 1) {
-        progress += 0.015; // Speed of crossing
-        
-        // Calculate position along bezier curve (going "over" the obstacle)
-        let t = progress;
-        movingCircle.x = bezierPoint(startPoint.x, startPoint.x, endPoint.x, endPoint.x, t);
-        movingCircle.y = bezierPoint(startPoint.y, controlPoint.y, controlPoint.y, endPoint.y, t);
-        
-        // Check if animation is complete
-        if (progress >= 1) {
-            isMoving = false;
-            hasCompleted = true;
-        }
-    }
-    
-    // Draw ground line
-    p.stroke(100, 150, 100);
-    p.strokeWeight(3);
-    p.line(0, 220, p.width, 220);
-    p.fill(100, 150, 100);
-    p.noStroke();
-    p.textAlign(CENTER, CENTER);
-    p.textSize(10);
-    p.text("Ground Level", p.width/2, 235);
-      // Draw obstacle (what we're going over)
-    p.fill(120, 80, 60);
-    p.stroke(90, 60, 40);
-    p.strokeWeight(2);
-    p.rect(obstacle.x - obstacle.width/2, obstacle.y - obstacle.height/2, 
-         obstacle.width, obstacle.height);
-    
-    // Draw dotted lines showing the "over" trigger zone
-    p.stroke(100, 100, 100, 150);
-    p.strokeWeight(1);
-    drawingContext.setLineDash([5, 5]); // Create dotted line pattern
-    
-    // Left boundary line
-    p.line(obstacle.x - obstacle.width/2, obstacle.y - obstacle.height/2, 
-         obstacle.x - obstacle.width/2, 50);
-    
-    // Right boundary line  
-    p.line(obstacle.x + obstacle.width/2, obstacle.y - obstacle.height/2, 
-         obstacle.x + obstacle.width/2, 50);
-    
-    // Reset line dash for other drawings
-    drawingContext.setLineDash([]);
-    
-    // Zone label
-    p.fill(100, 100, 100, 150);
-    p.noStroke();
-    p.textAlign(CENTER, CENTER);
-    p.textSize(8);
-    p.text("Over Zone", obstacle.x, 60);
-    
-    // Obstacle label
-    p.fill(255);
-    p.noStroke();
-    p.textAlign(CENTER, CENTER);
-    p.textSize(10);
-    p.text("Obstacle", obstacle.x, obstacle.y);
-    
-    // Draw the arc path (showing the "over" trajectory)
-    if (showPath) {
-        p.stroke(150, 150, 150, 150);
-        p.strokeWeight(2);
-        p.noFill();
-        p.beginShape();
-        for (let i = 0; i < path.length; i++) {
-            p.vertex(path[i].x, path[i].y);
-        }
-        p.endShape();
-        
-        // Draw path points
-        p.fill(150, 150, 150, 100);
-        p.noStroke();
-        for (let i = 0; i < path.length; i += 5) {
-            p.ellipse(path[i].x, path[i].y, 3, 3);
-        }
-    }
-    
-    // Draw p.height indicators
-    if (isMoving || hasCompleted) {
-        // Current p.height above ground
-        let heightAboveGround = 220 - movingCircle.y;
-        p.stroke(200, 100, 100, 150);
-        p.strokeWeight(1);
-        p.line(movingCircle.x, movingCircle.y, movingCircle.x, 220);
-        
-        // Height label
-        p.fill(200, 100, 100);
-        p.noStroke();
-        p.textAlign(LEFT, CENTER);
-        p.textSize(8);
-        p.text(`${heightAboveGround.toFixed(0)}px high`, movingCircle.x + 15, movingCircle.y - 10);
-    }
-    
-    // Draw start and end points
-    p.fill(100, 255, 100);
-    p.stroke(50, 200, 50);
-    p.strokeWeight(2);
-    p.ellipse(startPoint.x, startPoint.y, 20, 20);
-    
-    p.fill(255, 100, 100);
-    p.stroke(200, 50, 50);
-    p.ellipse(endPoint.x, endPoint.y, 20, 20);
-    
-    // Labels for start/end
-    p.fill(...PALETTE.ink);
-    p.noStroke();
-    p.textAlign(CENTER, CENTER);
-    p.textSize(9);
-    p.text("Start", startPoint.x, startPoint.y - 25);
-    p.text("End", endPoint.x, endPoint.y - 25);
-    
-    // Draw moving circle
-    p.fill(255, 215, 0);
-    p.stroke(200, 165, 0);
-    p.strokeWeight(2);
-    p.ellipse(movingCircle.x, movingCircle.y, movingCircle.radius * 2, movingCircle.radius * 2);
-    
-    // Draw direction arrow when moving
-    if (isMoving) {
-        // Calculate direction based on curve tangent
-        let t = progress;
-        let nextT = p.min(t + 0.01, 1);
-        let currentX = bezierPoint(startPoint.x, startPoint.x, endPoint.x, endPoint.x, t);
-        let currentY = bezierPoint(startPoint.y, controlPoint.y, controlPoint.y, endPoint.y, t);
-        let nextX = bezierPoint(startPoint.x, startPoint.x, endPoint.x, endPoint.x, nextT);
-        let nextY = bezierPoint(startPoint.y, controlPoint.y, controlPoint.y, endPoint.y, nextT);
-        
-        let dirX = nextX - currentX;
-        let dirY = nextY - currentY;
-        let dirLength = p.dist(0, 0, dirX, dirY);
-        if (dirLength > 0) {
-            dirX = (dirX / dirLength) * 20;
-            dirY = (dirY / dirLength) * 20;
-            
-            p.stroke(255, 100, 100);
-            p.strokeWeight(2);
-            p.line(movingCircle.x, movingCircle.y, 
-                 movingCircle.x + dirX, movingCircle.y + dirY);
-        }
-    }
-    
-    // Check if circle is over the obstacle
-    let isOverObstacle = (movingCircle.x > obstacle.x - obstacle.width/2 && 
-                         movingCircle.x < obstacle.x + obstacle.width/2);
-    
-    if (isOverObstacle && isMoving) {
-        // Highlight when crossing over
-        p.fill(255, 255, 0, 100);
-        p.noStroke();
-        p.ellipse(movingCircle.x, movingCircle.y, 40, 40);
-        
-        p.fill(...PALETTE.ink);
-        p.textAlign(CENTER, CENTER);
-        p.textSize(10);
-        p.text("OVER the obstacle!", movingCircle.x, movingCircle.y - 30);
-    }
-    
-    // Instructions and status
-    p.fill(...PALETTE.ink);
-    p.noStroke();
-    p.textAlign(CENTER, CENTER);
-    p.textSize(12);
-    
-    if (hasCompleted) {
-        p.text("Successfully crossed OVER the obstacle!", p.width/2, 30);
-        p.text("Click to reset and try again", p.width/2, 45);
-    } else if (isMoving) {
-        p.text("Moving OVER the obstacle...", p.width/2, 30);
-        p.text(`Progress: ${(progress * 100).toFixed(1)}%`, p.width/2, 45);
-    } else {
-        p.text("Click to move the yellow circle OVER the brown obstacle", p.width/2, 30);
-        p.text("Watch the arc path that goes above and across", p.width/2, 45);
-    }
-    
-    // Controls hint
-    p.textAlign(CENTER, BOTTOM);
-    p.textSize(10);
-    p.text("Press SPACE to toggle path visibility", p.width/2, p.height - 10);
-}
-
-function calculatePath() {
-    path = [];
-    for (let i = 0; i <= 100; i++) {
-        let t = i / 100;
-        let x = bezierPoint(startPoint.x, startPoint.x, endPoint.x, endPoint.x, t);
-        let y = bezierPoint(startPoint.y, controlPoint.y, controlPoint.y, endPoint.y, t);
-        path.push({x: x, y: y});    }
-}
-
-// Helper functions for cross-platform input handling
-function getInputX() {
-    return p.touches.length > 0 ? p.touches[0].x : p.mouseX;
-}
-
-function getInputY() {
-    return p.touches.length > 0 ? p.touches[0].y : p.mouseY;
-}
-
-// Handle input start (both mouse and touch)
-function handleInputStart() {
-    if (hasCompleted || !isMoving) {
-        // Reset animation
+  p.setup = function () {
+    bindPointerInput(p, {
+      onPress: () => {
         progress = 0;
         isMoving = true;
         hasCompleted = false;
-        movingCircle.x = startPoint.x;
-        movingCircle.y = startPoint.y;
-    }
-}
+        mover.x = start.x;
+        mover.y = start.y;
+        trail.length = 0;
+      },
+    });
+  };
 
-p.mousePressed = function() {
-    handleInputStart();
-}
+  p.draw = function () {
+    applyBackground(p);
 
-// Handle touch events for mobile
-p.touchStarted = function() {
-    handleInputStart();
-    return false; // Prevent default touch behavior
-}
-
-p.keyPressed = function() {
-    if (p.key === ' ') {
-        showPath = !showPath;
-    } else if (p.key === '1') {
-        // Low arc
-        controlPoint.y = 150;
-        calculatePath();
-    } else if (p.key === '2') {
-        // Medium arc
-        controlPoint.y = 100;
-        calculatePath();
-    } else if (p.key === '3') {
-        // High arc
-        controlPoint.y = 60;
-        calculatePath();
-    } else if (p.key === 'r' || p.key === 'R') {
-        // Reset
-        progress = 0;
+    if (isMoving && progress < 1) {
+      progress += 0.015;
+      mover.x = p.bezierPoint(start.x, start.x, end.x, end.x, progress);
+      mover.y = p.bezierPoint(start.y, control.y, control.y, end.y, progress);
+      trail.push({ x: mover.x, y: mover.y });
+      if (trail.length > 90) trail.shift();
+      if (progress >= 1) {
         isMoving = false;
-        hasCompleted = false;
-        movingCircle.x = startPoint.x;
-        movingCircle.y = startPoint.y;
+        hasCompleted = true;
+      }
     }
-}
 
+    drawZoneRect(
+      p,
+      obstacle.x - obstacle.width / 2,
+      obstacle.y - obstacle.height / 2,
+      obstacle.width,
+      obstacle.height,
+      true
+    );
+    drawDashedLine(p, obstacle.x - obstacle.width / 2, 50, obstacle.x - obstacle.width / 2, 220);
+    drawDashedLine(p, obstacle.x + obstacle.width / 2, 50, obstacle.x + obstacle.width / 2, 220);
+
+    for (let i = 1; i <= 24; i++) {
+      const t0 = (i - 1) / 24;
+      const t1 = i / 24;
+      drawDashedLine(
+        p,
+        p.bezierPoint(start.x, start.x, end.x, end.x, t0),
+        p.bezierPoint(start.y, control.y, control.y, end.y, t0),
+        p.bezierPoint(start.x, start.x, end.x, end.x, t1),
+        p.bezierPoint(start.y, control.y, control.y, end.y, t1)
+      );
+    }
+
+    drawInkTrail(p, trail);
+    drawFigureObject(p, start.x, start.y, 7, { label: "start", tag: "1", emphasis: "outline" });
+    drawFigureObject(p, end.x, end.y, 7, { label: "end", tag: "2", emphasis: "outline" });
+    drawFigureObject(p, mover.x, mover.y, mover.radius, {
+      label: "mover",
+      tag: "m",
+      emphasis: isMoving ? "hatch" : hasCompleted ? "solid" : "none",
+    });
+
+    if (isMoving) {
+      const nt = p.min(progress + 0.02, 1);
+      const nx = p.bezierPoint(start.x, start.x, end.x, end.x, nt);
+      const ny = p.bezierPoint(start.y, control.y, control.y, end.y, nt);
+      drawArrow(p, mover.x, mover.y, nx, ny, 1.2);
+    }
+
+    drawStatusBar(
+      p,
+      hasCompleted
+        ? "Figure m moved over obstacle."
+        : isMoving
+          ? "Figure m follows an arc over the obstacle."
+          : "Click/tap to move figure m over.",
+      isMoving || hasCompleted
+    );
+  };
 }

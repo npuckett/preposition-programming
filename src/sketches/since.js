@@ -1,129 +1,74 @@
-import { PALETTE } from "../js/shared/palette.js";
-import * as diagram from "../js/shared/diagram.js";
+import { PALETTE, applyBackground } from "../js/shared/palette.js";
+import {
+  drawArrow,
+  drawFigureObject,
+  drawInkTrail,
+  drawStatusBar,
+} from "../js/shared/diagram.js";
+import { bindPointerInput, pointerX, pointerY } from "../js/shared/input.js";
 
 export default function createSketch(p) {
-/**
- * P5.js Sketch: SINCE - Growing Trail
- * 
- * CONCEPT: "Since" means from a point in time until now.
- * This shows a trail that grows longer since you clicked,
- * demonstrating accumulation over time through space.
- * 
- * LEARNING OBJECTIVES:
- * • Understand continuous growth from a starting point
- * • Practice trail/path visualization
- * • Learn state management and time tracking
- * • Explore spatial representation of temporal concepts
- * 
- * KEY VARIABLES & METHODS:
- * • trail - array of points that grows since start
- * • isGrowing - tracks if trail is active
- * • Simple point addition over time
- * 
- * EXTENSION IDEAS:
- * • Multiple trails from different start points
- * • Trail fading over time
- * • Different trail patterns and shapes
- */
+  const origin = { x: 200, y: 150 };
+  let trail = [];
+  let active = false;
+  let step = 0;
 
-// Trail that grows since starting point
-let trail = [];
-let isGrowing = false;
-let startPoint = { x: 0, y: 0 };
-let currentAngle = 0;
-let trailLength = 0;
-
-p.setup = function() {
-}
-
-p.draw = function() {
-  p.background(...PALETTE.bg);
-  
-  // Update trail if growing
-  if (isGrowing) {
-    updateTrail();
+  function startAtPointer() {
+    origin.x = p.constrain(pointerX(p), 24, p.width - 24);
+    origin.y = p.constrain(pointerY(p), 28, p.height - 42);
+    trail = [{ x: origin.x, y: origin.y }];
+    step = 0;
+    active = true;
   }
-  
-  // Draw trail
-  drawTrail();
-  
-  // Draw status
-  drawStatus();
-}
 
-function updateTrail() {
-  // Add new point to trail every few frames
-  if (p.frameCount % 3 === 0) {
-    // Spiral pattern growing outward
-    let radius = trailLength * 2;
-    let x = startPoint.x + p.cos(currentAngle) * radius;
-    let y = startPoint.y + p.sin(currentAngle) * radius;
-    
-    trail.push({ x: x, y: y });
-    
-    currentAngle += 0.2;
-    trailLength += 0.5;
-    
-    // Keep trail manageable
-    if (trail.length > 200) {
-      trail.shift();
+  function updateTrail() {
+    step += 1;
+    const angle = step * 0.18 + p.frameCount * 0.015;
+    const radius = 0.55 * step;
+    const x = origin.x + p.cos(angle) * radius;
+    const y = origin.y + p.sin(angle) * radius;
+    trail.push({ x, y });
+    if (trail.length > 220) trail.shift();
+  }
+
+  function drawSpiral() {
+    drawInkTrail(p, trail);
+    if (trail.length > 1) {
+      p.noFill();
+      p.stroke(...PALETTE.ink);
+      p.strokeWeight(0.9);
+      p.beginShape();
+      for (const point of trail) p.vertex(point.x, point.y);
+      p.endShape();
+    }
+    drawFigureObject(p, origin.x, origin.y, 6, {
+      label: "Origin",
+      tag: "S",
+      emphasis: "hatch",
+    });
+    if (trail.length > 0) {
+      const tip = trail[trail.length - 1];
+      drawFigureObject(p, tip.x, tip.y, 4, { label: "", tag: "", emphasis: "solid" });
+      drawArrow(p, origin.x + 12, origin.y - 12, tip.x, tip.y, 0.9);
     }
   }
-}
 
-function drawTrail() {
-  if (trail.length < 2) return;
-  
-  p.stroke(70, 130, 180);
-  p.strokeWeight(3);
-  p.noFill();
-  
-  // Draw the growing trail
-  p.beginShape();
-  for (let i = 0; i < trail.length; i++) {
-    p.vertex(trail[i].x, trail[i].y);
+  function drawStatus() {
+    if (!active) {
+      drawStatusBar(p, "Click to set origin for SINCE trail.");
+      return;
+    }
+    drawStatusBar(p, `SINCE origin: ${trail.length} points accumulated`, true);
   }
-  p.endShape();
-  
-  // Draw start point
-  p.fill(220, 50, 50);
-  p.noStroke();
-  p.ellipse(startPoint.x, startPoint.y, 8, 8);
-  
-  // Draw current end point
-  if (trail.length > 0) {
-    p.fill(50, 150, 50);
-    let lastPoint = trail[trail.length - 1];
-    p.ellipse(lastPoint.x, lastPoint.y, 6, 6);
-  }
-}
 
-function drawStatus() {
-  p.fill(...PALETTE.ink);
-  p.textAlign(CENTER);
-  p.textSize(14);
-  
-  if (!isGrowing) {
-    p.text("Click to start a trail that grows SINCE your click", p.width/2, p.height - 20);
-  } else {
-    p.text(`Trail growing SINCE start (${trail.length} points)`, p.width/2, p.height - 20);
-  }
-}
+  p.setup = function setup() {
+    bindPointerInput(p, { onPress: startAtPointer });
+  };
 
-p.mousePressed = function() {
-  // Start new trail from click point
-  startPoint.x = p.mouseX;
-  startPoint.y = p.mouseY;
-  trail = [];
-  isGrowing = true;
-  currentAngle = 0;
-  trailLength = 0;
-}
-
-  if (typeof p.mousePressed === "function") {
-    p.touchStarted = function () {
-      p.mousePressed();
-      return false;
-    };
-  }
+  p.draw = function draw() {
+    applyBackground(p);
+    if (active) updateTrail();
+    drawSpiral();
+    drawStatus();
+  };
 }

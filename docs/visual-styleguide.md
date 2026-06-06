@@ -4,7 +4,7 @@ Reference for updating existing p5.js examples and authoring new ones.
 
 **Selected dialect:** Technical Figure (grid-backed coordinate space)  
 **Accent palette:** **Ink Only** (`monochrome`) — locked site-wide  
-**Layout prototype:** [Above (layout v2)](/preposition-programming/preposition-above-v2.html)
+**Layout prototype:** rolled out to all example pages (figure-first two-column layout)
 
 ---
 
@@ -31,19 +31,17 @@ Reference for updating existing p5.js examples and authoring new ones.
 | Arrows | Open arrowheads; accent or heavy ink for active vector |
 | Timeline | Tick-mark axis with stage labels |
 
-**Implementation:** `src/js/style-prototypes/tokens.js` → `TECHNICAL_BASE` + `buildTechnicalStyle(paletteId)`
+**Implementation:** `src/js/shared/tokens.js` → `TECHNICAL_BASE` + `buildTechnicalStyle(paletteId)`
 
 ---
 
 ## Accent palette — Ink Only (locked)
 
-Historical alternatives (blueprint, sepia, vermillion) remain on [style-prototypes.html](/preposition-programming/style-prototypes.html) for reference.
-
 | ID | Name | Treatment |
 |----|------|-----------|
 | `monochrome` | **Ink Only** | Active: solid ink fill + 2px stroke. Inactive: light fill or diagonal hatch. Measurements in ink. |
 
-**Implementation:** `DEFAULT_ACCENT = "monochrome"` in `src/js/style-prototypes/tokens.js` and `src/js/shared/palette.js`.
+**Implementation:** `DEFAULT_ACCENT = "monochrome"` in `src/js/shared/palette.js`.
 
 ---
 
@@ -79,8 +77,14 @@ Site sketches import from `src/js/shared/palette.js` (wraps technical + active a
 | `drawFigureObject` | Circles with solid / hatch / outline emphasis + figure tags |
 | `hatchCircle` | Diagonal hatch fill for secondary object |
 | `drawStatusBar` | Bottom relationship caption (bold when active) |
+| `drawDimensionH` | Horizontal Δ with dashed leader |
+| `drawContainerRect` | Bounded region (within, into) |
+| `drawZoneRect` | Emphasis band between anchors (between, beside) |
+| `drawFigureRect` | Rectangular figure with tag + emphasis |
+| `drawInkTrail` | Fading point trail for movement history |
+| `drawDashedLine` | Generic dashed segment |
 
-Source: `src/js/shared/diagram.js`
+Source: `src/js/shared/diagram.js` · Input: `bindCircleDrag()` in `src/js/shared/input.js`
 
 ---
 
@@ -116,7 +120,8 @@ All prose lives in `src/data/prepositions.json`. Regenerate from `scripts/editor
 | Field | Standard |
 |-------|----------|
 | **Concept** | `<strong>WORD</strong> means …` + one sentence mapping to screen/code |
-| **Try it** | One sentence: action + what to watch. No color names; use A/B labels. Drag vs click matches the sketch |
+| **Try it** | One sentence in the masthead lede: action + what to watch. No color names; use A/B labels |
+| **Figure caption** | Short technical description under Fig. 1 (`figureCaption` in manifest) |
 | **Strategy** | Opener: `Ways to express <em>word</em> in a sketch:` (spatial/movement) or `… in code:` (time). Three parallel bullets |
 | **Key methods** | Sketch-specific only; grouped headings; em dashes after links; `rel="noopener noreferrer"` on external links |
 | **Code pattern** | Four numbered steps; title is always **Code pattern** (not “Basic Pattern for …”) |
@@ -125,15 +130,17 @@ All prose lives in `src/data/prepositions.json`. Regenerate from `scripts/editor
 
 ---
 
-## Example page layout (v2 prototype)
+## Example page layout
 
-Figure-first two-column layout on [preposition-above-v2.html](/preposition-programming/preposition-above-v2.html):
+Figure-first two-column layout on every preposition page:
 
-- **Masthead** — category, title, concept lede
-- **Sticky figure panel** — Fig. tag, caption, canvas, try-it hint, inline editor link
+- **Masthead** — category, title, try-it lede
+- **Sticky figure panel** — Fig. tag, caption, canvas, inline editor link
 - **Reading column** — concept, strategy, collapsible methods + code
 
-CSS: `src/styles/example-v2.css`
+Template: `src/_includes/example-v2.njk` · CSS: `src/styles/example-v2.css`
+
+Each entry includes `figureCaption` in `src/data/prepositions.json` (see `scripts/editorial-pass.mjs`).
 
 ---
 
@@ -141,11 +148,12 @@ CSS: `src/styles/example-v2.css`
 
 1. ~~Lock accent palette~~ ✓ Ink Only
 2. ~~Promote diagram helpers~~ ✓ `shared/diagram.js`
-3. Validate layout on Above v2 prototype
-4. Apply v2 layout + ink style to remaining examples
+3. ~~Validate layout on Above v2 prototype~~ ✓
+4. ~~Apply v2 layout site-wide~~ ✓
+5. ~~Deep ink-only sketch styling for remaining examples~~ ✓ all 24 sketches hand-styled
 
 ---
 
 ## Archived dialects
 
-Engraving and Modern Minimal were compared and not selected. See collapsed matrix on style-prototypes page.
+Engraving and Modern Minimal were compared during prototyping and not selected. Technical Figure + Ink Only is the site standard.

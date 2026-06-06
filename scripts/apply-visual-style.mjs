@@ -1,12 +1,11 @@
 /**
- * Apply diagram palette to auto-converted sketches.
+ * Apply diagram palette and grid background to all sketches.
  */
 import fs from "node:fs";
 import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
 const sketchDir = path.join(root, "src/sketches");
-const styled = new Set(["above", "between", "toward", "before"]);
 
 const colorReplacements = [
   [/p\.fill\(\s*0\s*\)/g, "p.fill(...PALETTE.ink)"],
@@ -17,18 +16,46 @@ const colorReplacements = [
   [/p\.stroke\(\s*50\s*\)/g, "p.stroke(...PALETTE.ink)"],
   [/p\.stroke\(\s*200\s*\)/g, "p.stroke(...PALETTE.light)"],
   [/p\.color\(\s*100,\s*150,\s*255[^)]*\)/g, "p.color(...PALETTE.objectA)"],
-  [/p\.color\(\s*255,\s*100,\s*100[^)]*\)/g, "p.color(...PALETTE.accent)"],
-  [/p\.color\(\s*100,\s*255,\s*100[^)]*\)/g, "p.color(...PALETTE.accent)"],
+  [/p\.color\(\s*255,\s*100,\s*100[^)]*\)/g, "p.color(...PALETTE.objectB)"],
+  [/p\.color\(\s*100,\s*255,\s*100[^)]*\)/g, "p.color(...PALETTE.objectA)"],
+  [/p\.color\(\s*255,\s*150,\s*100[^)]*\)/g, "p.color(...PALETTE.objectB)"],
   [/p\.color\(\s*150\s*\)/g, "p.color(...PALETTE.muted)"],
   [/p\.color\(\s*100\s*\)/g, "p.color(...PALETTE.muted)"],
 ];
 
+const INK_ONLY = new Set([
+  "above", "below", "between", "among", "beside", "behind", "beneath", "within",
+  "through", "toward", "away", "across", "along", "around", "into", "onto",
+  "past", "over", "under", "before", "after", "during", "since", "until",
+]);
+
 for (const file of fs.readdirSync(sketchDir).filter((f) => f.endsWith(".js"))) {
   const slug = file.replace(".js", "");
-  if (styled.has(slug)) continue;
+  if (slug.endsWith("-v2") || INK_ONLY.has(slug)) continue;
 
   let content = fs.readFileSync(path.join(sketchDir, file), "utf8");
-  if (!content.includes("PALETTE")) continue;
+
+  if (!content.includes("diagram")) {
+    content = content.replace(
+      /import \{ PALETTE \} from "\.\.\/js\/shared\/palette\.js";/,
+      `import { PALETTE } from "../js/shared/palette.js";\nimport * as diagram from "../js/shared/diagram.js";`
+    );
+  }
+
+  if (!content.includes("applyBackground")) {
+    content = content.replace(
+      /p\.background\(\.\.\.PALETTE\.bg\)/g,
+      "diagram.applyBackground(p)"
+    );
+    content = content.replace(
+      /p\.background\(\s*240\s*,\s*248\s*,\s*255\s*\)/g,
+      "diagram.applyBackground(p)"
+    );
+    content = content.replace(
+      /p\.background\(\s*240\s*\)/g,
+      "diagram.applyBackground(p)"
+    );
+  }
 
   for (const [pattern, replacement] of colorReplacements) {
     content = content.replace(pattern, replacement);
@@ -52,4 +79,4 @@ for (const file of fs.readdirSync(sketchDir).filter((f) => f.endsWith(".js"))) {
   fs.writeFileSync(path.join(sketchDir, file), content);
 }
 
-console.log("Applied palette substitutions to converted sketches");
+console.log("Applied ink-only palette and grid background to sketches");
