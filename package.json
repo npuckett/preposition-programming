@@ -9,13 +9,14 @@
     "editorial": "node scripts/editorial-pass.mjs",
     "export:webeditor": "node scripts/webeditor/export-projects.mjs",
     "generate:webeditor": "node scripts/webeditor/generate-standalone.mjs",
-    "serve:cors:webeditor": "npx http-server webeditor -p 8876 --cors -c-1",
-    "sync:webeditor": "node scripts/sync-webeditor.mjs",
+    "prepare:webeditor": "p5-webeditor-sync prepare --batch all",
+    "sync:webeditor": "p5-webeditor-sync push --batch all",
+    "verify:webeditor": "p5-webeditor-sync verify --batch all",
     "apply:webeditor-links": "node scripts/webeditor/apply-links.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0",
-    "http-server": "^14.1.1"
+    "p5-webeditor-sync": "file:../p5-webeditor-sync"
   },
   "dependencies": {
     "p5-phone": "^1.11.0"

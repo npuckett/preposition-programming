@@ -1,0 +1,40 @@
+{
+  "$schema": "https://unpkg.com/p5-webeditor-sync/schema/config.json",
+  "account": "npuckett",
+  "projectsDir": "webeditor/projects",
+  "syncDir": "webeditor/.sync",
+  "registryFile": "webeditor/.sync/registry.json",
+  "namePrefix": "PP — ",
+  "visibility": "Public",
+  "batches": {
+    "spatial": [
+      "above",
+      "below",
+      "between",
+      "among",
+      "beside",
+      "behind",
+      "beneath",
+      "within",
+      "through"
+    ],
+    "movement": [
+      "toward",
+      "away",
+      "across",
+      "along",
+      "around",
+      "into",
+      "onto",
+      "past",
+      "over",
+      "under"
+    ],
+    "time": ["before", "after", "during", "since", "until"],
+    "all": []
+  },
+  "verify": {
+    "enabled": true,
+    "signature": "Preposition Programming"
+  }
+}

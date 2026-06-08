@@ -1,14 +1,14 @@
 # p5 Web Editor sync
 
-Repeatable workflow for publishing preposition sketches to [editor.p5js.org](https://editor.p5js.org/) under **npuckett**. Adapted from [p5-phone/docs/web-editor/batch-sync.md](https://github.com/npuckett/p5-phone/blob/main/docs/web-editor/batch-sync.md).
+Repeatable workflow for publishing preposition sketches to [editor.p5js.org](https://editor.p5js.org/) under **npuckett**. Uses [p5-webeditor-sync](https://github.com/npuckett/p5-webeditor-sync).
 
 **Migration log:** [webeditorLinks.md](../webeditorLinks.md)
 
 ## Prerequisites
 
-- [ ] Logged into [editor.p5js.org](https://editor.p5js.org/) as `npuckett`
-- [ ] `npm install` in this repo
+- [ ] `npm install` in this repo (includes `p5-webeditor-sync`)
 - [ ] Standalone sketches in `webeditor/standalone/` (generated from site copy + sketch logic)
+- [ ] One-time auth: `npx p5-webeditor-sync login` (or set `P5_EDITOR_COOKIE`)
 
 ## Source vs site sketches
 
@@ -43,64 +43,67 @@ webeditor/projects/above/
 |---------|---------|
 | `npm run generate:webeditor` | Regenerate `webeditor/standalone/` from manifest + `src/sketches/` |
 | `npm run export:webeditor` | Copy standalone → `webeditor/projects/` |
-| `npm run serve:cors:webeditor` | CORS static server on port **8876** |
-| `npm run sync:webeditor -- --batch all --prepare` | Export + write upload payloads |
-| `npm run sync:webeditor -- --print-update-script --batch all` | DevTools script to **PUT** updates (keeps sketch IDs) |
+| `npm run prepare:webeditor` | Write upload payloads to `webeditor/.sync/` |
+| `npm run sync:webeditor` | Create or update all sketches on editor.p5js.org |
+| `npm run verify:webeditor` | Check full-preview pages for signature text |
 | `npm run apply:webeditor-links` | Copy verified IDs → `src/data/prepositions.json` |
 | `npm run build` | Rebuild site with editor links |
 
 Batches: `spatial` (9) · `movement` (10) · `time` (5) · `all` (24)
 
-## Update existing sketches (standalone rollout)
+Config: [`p5-webeditor.config.json`](../p5-webeditor.config.json)
 
-When sketch IDs in `webeditorLinks.md` are already verified, use **PUT** so URLs stay the same:
+## Sync workflow
 
-1. **Export + prepare**
-
-   ```bash
-   npm run sync:webeditor -- --export --batch all --prepare
-   npm run serve:cors:webeditor
-   ```
-
-2. **Update in browser** (logged in on editor.p5js.org)
+1. **Generate and export**
 
    ```bash
-   npm run sync:webeditor -- --print-update-script --batch all
+   npm run generate:webeditor
+   npm run export:webeditor
    ```
 
-   Paste the script in DevTools. Uploads run **one sketch at a time**.
+2. **Push** (creates new projects or updates existing IDs from registry / `meta.json`)
 
-3. **Verify** — open full-preview URLs (`…/npuckett/full/{id}`). Code should be global-mode with header comments, not instance-mode `preposition.js`.
+   ```bash
+   npm run sync:webeditor
+   ```
 
-## Create new sketches (first-time batch)
+   Options via CLI:
 
-Use POST when no `editorSketchId` exists yet:
+   ```bash
+   npx p5-webeditor-sync push --batch spatial --dry-run
+   npx p5-webeditor-sync push --batch all --resume
+   npx p5-webeditor-sync push --batch all --force
+   ```
+
+3. **Verify**
+
+   ```bash
+   npm run verify:webeditor
+   ```
+
+4. **Update site manifest** (if new sketch IDs)
+
+   ```bash
+   npm run apply:webeditor-links
+   npm run build
+   ```
+
+Re-running push with no file changes uploads **zero** projects (content hash skip). Registry: `webeditor/.sync/registry.json`.
+
+## Auth
+
+See [p5-webeditor-sync docs/AUTH.md](https://github.com/npuckett/p5-webeditor-sync/blob/main/docs/AUTH.md).
 
 ```bash
-npm run sync:webeditor -- --print-browser-script --batch spatial
+npx p5-webeditor-sync login
+npx p5-webeditor-sync session
 ```
 
-Then `--apply-results` and `apply:webeditor-links` as below.
+## Deprecated
 
-## Record new IDs
+Removed from this repo:
 
-Save console output as `webeditor/.sync/results-{batch}.json`, then:
-
-```bash
-npm run sync:webeditor -- --apply-results webeditor/.sync/results-spatial.json
-npm run apply:webeditor-links
-npm run build
-```
-
-## API reference
-
-From an authenticated editor session:
-
-- `GET /editor/session`
-- `POST /editor/projects` — create
-- `PUT /editor/projects/{projectId}` — update in place
-
-Public URLs:
-
-- Sketch: `https://editor.p5js.org/npuckett/sketches/{id}`
-- Full preview: `https://editor.p5js.org/npuckett/full/{id}`
+- `npm run serve:cors:webeditor` (CORS server for DevTools scripts)
+- `--print-browser-script` / `--print-update-script` (DevTools paste workflow)
+- `scripts/sync-webeditor.mjs` orchestration (replaced by `p5-webeditor-sync` CLI)
